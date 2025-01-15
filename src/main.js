@@ -1,5 +1,6 @@
 import { createApp } from "vue";
 import App from "./App.vue";
+import "./main.css";
 import VueTextareaAutosize from "vue-textarea-autosize";
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";

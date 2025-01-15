@@ -1,0 +1,11 @@
+:root {
+  --black: rgb(0, 0, 0); /* #000 */
+  --dark-gray: rgb(34, 34, 34); /* #222 */
+  --light-gray: rgb(239, 239, 239); /* #efefef */
+  --red: rgb(212, 53, 65); /* #d43541 */
+  --slate-green: rgb(42, 76, 80); /* #2a4c50 */
+  --white: rgb(255, 255, 255); /* #fff */
+
+  --md-tran-black: rgba(0, 0, 0, 0.5);
+  --lt-tran-black: rgba(0, 0, 0, 0.7);
+}
