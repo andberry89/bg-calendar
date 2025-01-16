@@ -1,21 +1,14 @@
 <template>
-  <article id="calendar">
-    <header>
-      <div class="current-date">
-        <div class="current-day">Saturday</div>
-        <div class="today">
-          <div><div class="arrow-up"></div></div>
-          <div><div class="arrow-up"></div></div>
-          <div><div class="arrow-up"></div></div>
-          <div>15</div>
-          <div>January</div>
-          <div>2025</div>
-          <div><div class="arrow-down"></div></div>
-          <div><div class="arrow-down"></div></div>
-          <div><div class="arrow-down"></div></div>
-        </div>
-      </div>
-    </header>
+  <article
+    id="calendar"
+    :style="{ 'background-image': 'url(' + require('@/assets/calendar/' + currentDate.month + '.jpg') + ')' }"
+  >
+    <CalendarHeader
+      :currentDate="currentDate"
+      :prevMonthDays="prevMonthDays"
+      :currentMonthDays="currentMonthDays"
+      @update="updateDate($event)"
+    />
     <section>
       <div class="weekdays">
         <div
@@ -27,20 +20,26 @@
         </div>
       </div>
       <div class="date">
-        <div class="day-hidden">29</div>
-        <div class="day-hidden">30</div>
-        <div class="day-hidden">31</div>
+        <div
+          class="day-hidden"
+          v-for="(n, idx) in firstMonthDay - 1"
+          :key="'prev' + idx"
+        >
+          {{ prevMonthDays + 1 - firstMonthDay + n }}
+        </div>
         <div
           class="day"
-          v-for="(n, idx) in 31"
-          :key="idx"
+          :class="{ active: n === currentDate.date }"
+          @click="currentDate.date = n"
+          v-for="(n, idx) in currentMonthDays"
+          :key="'day' + idx"
         >
           {{ n }}
         </div>
         <div
           class="day-hidden"
-          v-for="(n, idx) in 8"
-          :key="idx"
+          v-for="(n, idx) in 43 - (currentMonthDays + firstMonthDay)"
+          :key="'next' + idx"
         >
           {{ n }}
         </div>
@@ -49,26 +48,13 @@
   </article>
 </template>
 <script>
+import CalendarHeader from "./CalendarHeader.vue";
+
 export default {
   name: "Calendar",
   data() {
     return {
       weekdays: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
-      weekdayNames: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-      month: [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-      ],
       currentDate: {
         date: 0,
         month: 0,
@@ -76,10 +62,49 @@ export default {
       },
     };
   },
+  components: {
+    CalendarHeader,
+  },
+  computed: {
+    prevMonthDays() {
+      let year = this.currentDate.month === 0 ? this.currentDate.year - 1 : this.currentDate.year;
+      let month = this.currentDate.month === 0 ? 12 : this.currentDate.month;
+      return new Date(year, month, 0).getDate();
+    },
+    firstMonthDay() {
+      let firstDay = new Date(this.currentDate.year, this.currentDate.month, 1).getDay();
+      return firstDay + 1;
+    },
+    currentMonthDays() {
+      return new Date(this.currentDate.year, this.currentDate.month + 1, 0).getDate();
+    },
+  },
+  methods: {
+    getCurrentDate() {
+      let today = new Date();
+      this.currentDate.date = today.getDate();
+      this.currentDate.month = today.getMonth();
+      this.currentDate.year = today.getFullYear();
+    },
+    updateDate(newDate) {
+      this.currentDate = newDate;
+    },
+  },
+  created() {
+    this.getCurrentDate();
+  },
 };
 </script>
 <style lang="scss" scoped>
 @import url("https://fonts.googleapis.com/css?family=Anton");
+
+@mixin arrow-style() {
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  cursor: pointer;
+}
 
 @mixin calendar-layout($property) {
   display: grid;
@@ -97,14 +122,6 @@ export default {
   }
 }
 
-@mixin arrow-style() {
-  width: 0;
-  height: 0;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  cursor: pointer;
-}
-
 #calendar {
   width: 460px;
   height: 730px;
@@ -112,8 +129,8 @@ export default {
   font-family: "Anton";
   border-radius: 15px;
   overflow: hidden;
-  background: url("../assets/calendar/7.jpg") center center;
   background-size: cover;
+  user-select: none;
 
   header {
     display: flex;
@@ -179,6 +196,11 @@ export default {
   .date {
     @include calendar-layout(10px 20px 20px);
     background-color: var(--lt-tran-black);
+
+    .active {
+      background-color: var(--white);
+      color: var(--slate-green);
+    }
 
     .day {
       cursor: pointer;
