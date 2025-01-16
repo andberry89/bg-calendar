@@ -105,7 +105,7 @@ export default {
     },
     monthUp() {
       if (this.newDate.month === 11) {
-        this.newDate.month = 1;
+        this.newDate.month = 0;
         this.newDate.year++;
       } else {
         this.newDate.month++;
