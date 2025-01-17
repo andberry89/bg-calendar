@@ -10,33 +10,37 @@
       </div>
     </div>
     <div class="date">
-      <div
-        class="day-hidden"
+      <CalendarDay
+        class="day-hidden day-container"
         v-for="(n, idx) in firstMonthDay - 1"
         :key="'prev' + idx"
-      >
-        {{ prevMonthDays + 1 - firstMonthDay + n }}
-      </div>
-      <div
-        class="day"
+        :date="prevMonthDays + 1 - firstMonthDay + n"
+        :currentDate="activeDate"
+        month="prev"
+      />
+      <CalendarDay
+        class="day day-container"
         :class="{ active: n === activeDate.date }"
         @click="updateDate(n)"
         v-for="(n, idx) in currentMonthDays"
         :key="'day' + idx"
-      >
-        {{ n }}
-      </div>
-      <div
-        class="day-hidden"
+        :date="n"
+        :currentDate="activeDate"
+      />
+      <CalendarDay
+        class="day-hidden day-container"
         v-for="(n, idx) in 43 - (currentMonthDays + firstMonthDay)"
         :key="'next' + idx"
-      >
-        {{ n }}
-      </div>
+        :date="n"
+        :currentDate="activeDate"
+        month="next"
+      />
     </div>
   </section>
 </template>
 <script>
+import CalendarDay from "./CalendarDay.vue";
+
 export default {
   name: "CalendarBody",
   data() {
@@ -48,6 +52,9 @@ export default {
       },
       weekdays: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
     };
+  },
+  components: {
+    CalendarDay,
   },
   props: {
     currentDate: {
@@ -64,6 +71,10 @@ export default {
     },
   },
   methods: {
+    getDay(date) {
+      const day = new Date(date.year, date.month, date.date).getDay();
+      return { ...date, day: day };
+    },
     updateDate(date) {
       this.activeDate.date = date;
       this.$emit("update", this.activeDate);
@@ -77,14 +88,14 @@ export default {
 <style lang="scss" scoped>
 @mixin calendar-layout($property) {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
-  grid-gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  grid-gap: 10px 2px;
   padding: $property;
 
   div {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: top;
     height: 30px;
     color: var(--white);
     border-radius: 5px;
@@ -95,6 +106,7 @@ export default {
   @include calendar-layout(10px 20px 10px);
   background-color: var(--md-tran-black);
   border-bottom: 1px solid var(--white);
+  font-size: 1.5em;
 
   div:first-child,
   div:nth-child(7n) {
@@ -105,38 +117,20 @@ export default {
 .date {
   @include calendar-layout(10px 20px 20px);
   background-color: var(--lt-tran-black);
+  height: 50vh;
+  font-size: 1.5rem;
 
   .active {
     background-color: var(--white);
     color: var(--slate-green);
   }
 
-  .day {
-    cursor: pointer;
-
-    &:hover {
-      background-color: var(--white);
-      color: var(--slate-green);
-    }
-
-    &:first-child,
-    &:nth-child(7n) {
-      color: var(--red);
-
-      &:hover {
-        background-color: var(--white);
-        color: var(--red);
-      }
-    }
+  .day-container {
+    height: 100%;
   }
 
-  .day-hidden {
-    opacity: 0.4;
-
-    &:first-child,
-    &:nth-child(7) {
-      color: var(--red);
-    }
+  .weekend {
+    color: var(--red);
   }
 }
 </style>

@@ -1,8 +1,9 @@
 <template>
-  <article
+  <!-- <article
     id="calendar"
     :style="{ 'background-image': 'url(' + require('@/assets/calendar/' + currentDate.month + '.jpg') + ')' }"
-  >
+  > -->
+  <article id="calendar">
     <CalendarHeader
       :currentDate="currentDate"
       :prevMonthDays="prevMonthDays"
@@ -66,8 +67,12 @@ export default {
 @import url("https://fonts.googleapis.com/css?family=Anton");
 
 #calendar {
-  width: 460px;
-  height: 730px;
+  width: 1000px;
+  height: 90vh;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: space-between;
+  margin: 0 auto;
   background-color: var(--light-gray);
   font-family: "Anton";
   border-radius: 15px;

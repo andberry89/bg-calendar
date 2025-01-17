@@ -152,7 +152,7 @@ header {
   display: flex;
   justify-content: center;
   align-items: top;
-  height: 400px;
+  height: 200px;
   padding: 20px 0 0;
   text-align: center;
   overflow: hidden;
