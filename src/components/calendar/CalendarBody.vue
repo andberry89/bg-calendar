@@ -9,9 +9,12 @@
         {{ weekday }}
       </div>
     </div>
-    <div class="date">
+    <div
+      class="date"
+      v-if="dataReady"
+    >
       <CalendarDay
-        class="day-hidden day-container"
+        dayClass="day-hidden"
         v-for="(n, idx) in firstMonthDay - 1"
         :key="'prev' + idx"
         :date="prevMonthDays + 1 - firstMonthDay + n"
@@ -19,16 +22,17 @@
         month="prev"
       />
       <CalendarDay
-        class="day day-container"
+        dayClass="day"
+        v-for="(n, idx) in currentMonthDays"
         :class="{ active: n === activeDate.date }"
         @click="updateDate(n)"
-        v-for="(n, idx) in currentMonthDays"
         :key="'day' + idx"
         :date="n"
         :currentDate="activeDate"
+        :events="this.events[n - 1]"
       />
       <CalendarDay
-        class="day-hidden day-container"
+        dayClass="day-hidden"
         v-for="(n, idx) in 43 - (currentMonthDays + firstMonthDay)"
         :key="'next' + idx"
         :date="n"
@@ -50,6 +54,8 @@ export default {
         month: 0,
         year: 0,
       },
+      dataReady: false,
+      events: [],
       weekdays: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
     };
   },
@@ -63,6 +69,7 @@ export default {
     },
     prevMonthDays: Number,
     currentMonthDays: Number,
+    currentMonthEvents: Array,
   },
   computed: {
     firstMonthDay() {
@@ -79,9 +86,37 @@ export default {
       this.activeDate.date = date;
       this.$emit("update", this.activeDate);
     },
+    updateEvents() {
+      this.events = Array.from({ length: this.currentMonthDays }, () => []);
+      this.currentMonthEvents.forEach((e) => {
+        const startIdx = e.start.split("-")[2] - 1;
+        const endIdx = e.end.split("-")[2] - 1;
+
+        for (let i = startIdx; i < endIdx + 1; i++) {
+          this.events[i].push(e);
+        }
+      });
+      this.dataReady = true;
+      //TODO: Work on how to have events that span several days
+    },
+  },
+  watch: {
+    "activeDate.month": {
+      handler() {
+        this.updateEvents();
+      },
+    },
+    "activeDate.year": {
+      handler() {
+        this.updateEvents();
+      },
+    },
   },
   created() {
     this.activeDate = this.currentDate;
+    this.updateEvents();
+
+    //TODO: Events aren't updating when months are changing
   },
 };
 </script>
@@ -94,10 +129,9 @@ export default {
 
   div {
     display: flex;
-    justify-content: center;
-    align-items: top;
-    height: 30px;
-    color: var(--white);
+    flex-flow: column wrap;
+    justify-content: flex-start;
+    align-items: center;
     border-radius: 5px;
   }
 }
@@ -117,20 +151,10 @@ export default {
 .date {
   @include calendar-layout(10px 20px 20px);
   background-color: var(--lt-tran-black);
-  height: 50vh;
-  font-size: 1.5rem;
+  height: 75vh;
 
   .active {
-    background-color: var(--white);
-    color: var(--slate-green);
-  }
-
-  .day-container {
-    height: 100%;
-  }
-
-  .weekend {
-    color: var(--red);
+    background-color: var(--ocean-lt-blue);
   }
 }
 </style>

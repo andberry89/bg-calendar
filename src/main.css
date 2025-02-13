@@ -6,6 +6,20 @@
   --slate-green: rgb(42, 76, 80); /* #2a4c50 */
   --white: rgb(255, 255, 255); /* #fff */
 
+  /* Ocean theme */
+  --ocean-dark-blue: rgb(39, 76, 119); /* #274c77 */
+  --ocean-md-blue: rgb(96, 150, 186); /* #6096ba */
+  --ocean-lt-blue: rgb(163, 206, 241); /* #a3cef1 */
+  --ocean-gray: rgb(231, 236, 239); /* #e7ecef */
+  --ocean-dark-gray: rgb(139, 140, 137); /* #8b8c89 */
+  --ocean-red: rgb(174, 32, 18); /* #ae2012 */
+  --ocean-yellow: rgb(245, 188, 27); /* #f5bc1b */
+  --ocean-birthday: rgb(148, 210, 189); /* #94d2bd */
+  --ocean-cd-event: rgb(186, 96, 105); /* #ba6069 */
+  --ocean-press-trip: rgb(132, 96, 186); /* #8460ba */
+  --ocean-auto-show: rgb(150, 186, 96); /* #96ba60 */
+  --ocean-off: rgb(186, 132, 96); /* #ba8460 */
+
   --md-tran-black: rgba(0, 0, 0, 0.5);
   --lt-tran-black: rgba(0, 0, 0, 0.7);
 }
