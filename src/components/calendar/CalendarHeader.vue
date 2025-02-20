@@ -1,48 +1,29 @@
 <template>
   <header>
-    <div class="current-date">
-      <div class="current-day">{{ weekdayNames[currentDay] }}</div>
-      <div class="today">
-        <div>
-          <div
-            class="arrow-up"
-            @click="dateUp()"
-          ></div>
-        </div>
-        <div>
-          <div
-            class="arrow-up"
-            @click="monthUp()"
-          ></div>
-        </div>
-        <div>
-          <div
-            class="arrow-up"
-            @click="yearUp()"
-          ></div>
-        </div>
-        <div>{{ currentDate.date }}</div>
-        <div>{{ month[currentDate.month] }}</div>
-        <div>{{ currentDate.year }}</div>
-        <div>
-          <div
-            class="arrow-down"
-            @click="dateDown()"
-          ></div>
-        </div>
-        <div>
-          <div
-            class="arrow-down"
-            @click="monthDown()"
-          ></div>
-        </div>
-        <div>
-          <div
-            class="arrow-down"
-            @click="yearDown()"
-          ></div>
-        </div>
+    <div class="today">
+      <div>{{ currentDate.date }}</div>
+      <div>{{ month[currentDate.month] }}</div>
+      <div>{{ currentDate.year }}</div>
+      <div
+        class="date-picker-btn"
+        @click="toggleDatePicker"
+      >
+        &#10552;
       </div>
+      <div
+        v-if="showDatePicker"
+        class="date-picker"
+      >
+        <input
+          type="date"
+          @input="updateDate($event.target.value)"
+        />
+      </div>
+    </div>
+    <div class="date-nav">
+      <div @click="monthDown">&lt;</div>
+      <div @click="dateFn">Today</div>
+      <div @click="monthUp">&gt;</div>
     </div>
   </header>
 </template>
@@ -51,6 +32,7 @@ export default {
   name: "CalendarHeader",
   data() {
     return {
+      showDatePicker: false,
       newDate: {
         date: 0,
         month: 0,
@@ -80,10 +62,18 @@ export default {
     },
     prevMonthDays: Number,
     currentMonthDays: Number,
+    dateFn: {
+      type: Function,
+      required: false,
+    },
   },
   computed: {
     currentDay() {
       return new Date(this.currentDate.year, this.currentDate.month, this.currentDate.date).getDay();
+    },
+    today() {
+      const today = new Date();
+      return today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
     },
   },
   methods: {
@@ -125,6 +115,16 @@ export default {
     yearDown() {
       this.newDate.year--;
     },
+    toggleDatePicker() {
+      this.showDatePicker = !this.showDatePicker;
+    },
+    updateDate(date) {
+      const split = date.split("-");
+      this.newDate.year = parseInt(split[0]);
+      this.newDate.month = parseInt(split[1] - 1);
+      this.newDate.date = parseInt(split[2]);
+      this.toggleDatePicker();
+    },
   },
   watch: {
     newDate: {
@@ -143,58 +143,85 @@ export default {
 @mixin arrow-style() {
   width: 0;
   height: 0;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
   cursor: pointer;
 }
 
 header {
   display: flex;
-  justify-content: center;
-  align-items: top;
-  height: 200px;
-  padding: 20px 0 0;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 50px;
   text-align: center;
   overflow: hidden;
   color: var(--light-gray);
   text-shadow: 1px 1px 1px var(--dark-gray), 1px -1px 1px var(--dark-gray), -1px 1px 1px var(--dark-gray),
     -1px -1px 1px var(--dark-gray);
+  height: 10vh;
 
-  .current-date {
-    width: 300px;
+  .arrow-left {
+    @include arrow-style();
+    border-right: 10px solid var(--white);
 
-    .arrow-up {
-      @include arrow-style();
-      border-bottom: 10px solid var(--white);
-
-      &:hover {
-        border-bottom: 10px solid var(--md-tran-black);
-      }
-    }
-    .arrow-down {
-      @include arrow-style();
-      border-top: 10px solid var(--white);
-
-      &:hover {
-        border-top: 10px solid var(--md-tran-black);
-      }
+    &:hover {
+      border-right: 10px solid var(--md-tran-black);
     }
   }
+  .arrow-right {
+    @include arrow-style();
+    border-left: 10px solid var(--white);
+
+    &:hover {
+      border-left: 10px solid var(--md-tran-black);
+    }
+  }
+
   .today {
     display: grid;
-    grid-template-columns: 40px auto 70px;
-    grid-gap: 0;
+    grid-template-columns: 40px auto 70px auto;
+    grid-gap: 10px;
+    font-size: 2rem;
+    position: relative;
 
     div {
       display: flex;
       justify-content: center;
     }
+
+    .date-picker-btn {
+      padding: 0 4px;
+
+      &:hover {
+        cursor: pointer;
+      }
+    }
+
+    .date-picker {
+      position: absolute;
+      bottom: -20px;
+      right: 0;
+    }
   }
-  .current-day {
-    font-size: 4rem;
-  }
-  .today {
-    font-size: 2rem;
+
+  .date-nav {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    font-size: 1.5rem;
+    gap: 2px;
+
+    div {
+      border: 1px solid var(--white);
+      border-radius: 8px;
+      padding: 4px 10px;
+      transition: 0.4s;
+
+      &:hover {
+        background-color: var(--ocean-lt-blue);
+        cursor: pointer;
+      }
+    }
   }
 }
 </style>

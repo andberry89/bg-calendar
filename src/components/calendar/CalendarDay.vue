@@ -77,7 +77,8 @@ export default {
 </script>
 <style lang="scss" scoped>
 .container {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
+  height: 200px;
 }
 .day {
   border: 1px solid var(--white);
@@ -90,9 +91,13 @@ export default {
   // }
 }
 .day-hidden {
-  opacity: 0.4;
+  opacity: 0.5;
   border: 1px solid var(--ocean-gray);
   background-color: var(--ocean-dark-blue);
+
+  .date-text {
+    color: var(--white);
+  }
 }
 
 .weekend {

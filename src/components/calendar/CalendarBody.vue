@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section class="calendar-body">
     <div class="weekdays">
       <div
         class="weekday"
@@ -97,7 +97,6 @@ export default {
         }
       });
       this.dataReady = true;
-      //TODO: Work on how to have events that span several days
     },
   },
   watch: {
@@ -115,8 +114,6 @@ export default {
   created() {
     this.activeDate = this.currentDate;
     this.updateEvents();
-
-    //TODO: Events aren't updating when months are changing
   },
 };
 </script>
@@ -136,11 +133,19 @@ export default {
   }
 }
 
+.calendar-body {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  height: 100%;
+}
+
 .weekdays {
   @include calendar-layout(10px 20px 10px);
   background-color: var(--md-tran-black);
   border-bottom: 1px solid var(--white);
   font-size: 1.5em;
+  color: var(--ocean-gray);
 
   div:first-child,
   div:nth-child(7n) {
@@ -151,7 +156,7 @@ export default {
 .date {
   @include calendar-layout(10px 20px 20px);
   background-color: var(--lt-tran-black);
-  height: 75vh;
+  flex-grow: 4;
 
   .active {
     background-color: var(--ocean-lt-blue);

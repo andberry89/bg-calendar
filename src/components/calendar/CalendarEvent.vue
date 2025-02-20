@@ -17,6 +17,18 @@ export default {
     numberOfDays() {
       return differenceInDays(this.event.end, this.event.start) + 1;
     },
+    staffInitials() {
+      let arr = [];
+      this.event.staff.forEach((e) => {
+        const split = e.split(" ");
+        const first = split[0].charAt(0);
+        const last = split[1].charAt(0);
+        const initials = first + last;
+        arr.push(initials);
+      });
+
+      return arr;
+    },
   },
   methods: {
     differenceInDays: differenceInDays,
@@ -25,7 +37,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 .event-container {
-  font: 400 10pt/1.1 "Roboto", "Verdana", sans-serif;
+  font: 400 9pt/1.1 "Roboto", "Verdana", sans-serif;
   text-align: center;
   padding: 4px;
   margin: 2px 0;
