@@ -1,5 +1,11 @@
 <template>
   <div :class="[dayClass, { weekend: isWeekend }, 'container']">
+    <EventModal
+      v-if="showEventDetails"
+      :event="modalEvent"
+      :day="getDay"
+      @update="closeModal"
+    />
     <div class="date-text">
       {{ date }}
       <CalendarEvent
@@ -12,11 +18,13 @@
       v-for="(event, idx) in filteredEvents"
       :key="'event-' + idx"
       :event="event"
+      @update="updateEventModal($event)"
     />
   </div>
 </template>
 <script>
 import CalendarEvent from "./CalendarEvent.vue";
+import EventModal from "./EventModal.vue";
 
 export default {
   name: "CalendarDay",
@@ -24,10 +32,13 @@ export default {
     return {
       holidays: [],
       filteredEvents: [],
+      showEventDetails: false,
+      modalEvent: {},
     };
   },
   components: {
     CalendarEvent,
+    EventModal,
   },
   props: {
     date: Number,
@@ -46,6 +57,10 @@ export default {
     },
   },
   computed: {
+    getDay() {
+      let date = { ...this.currentDate };
+      return new Date(date.year, date.month, this.date).getDay();
+    },
     isWeekend() {
       let date = { ...this.currentDate };
       if (this.month === "prev") {
@@ -69,6 +84,16 @@ export default {
       return day === 0 || day === 6;
     },
   },
+  methods: {
+    closeModal() {
+      this.modalEvent = {};
+      this.showEventDetails = false;
+    },
+    updateEventModal(event) {
+      this.modalEvent = event;
+      this.showEventDetails = true;
+    },
+  },
   created() {
     this.holidays = this.events.filter((e) => e.name === "Holiday");
     this.filteredEvents = this.events.filter((e) => e.name !== "Holiday");
@@ -79,6 +104,7 @@ export default {
 .container {
   font-size: 0.75rem;
   height: 200px;
+  position: relative;
 }
 .day {
   border: 1px solid var(--white);

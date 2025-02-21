@@ -55,11 +55,15 @@ export default {
     },
     currentMonthEvents() {
       const currentYearEvents = this.sortedEvents[this.currentDate.year];
-      return currentYearEvents.filter((e) => {
-        const split = e.start.split("-");
-        const month = split[1] - 1;
-        return this.currentDate.month === month;
-      });
+      if (currentYearEvents) {
+        return currentYearEvents.filter((e) => {
+          const split = e.start.split("-");
+          const month = split[1] - 1;
+          return this.currentDate.month === month;
+        });
+      } else {
+        return [];
+      }
     },
   },
   methods: {
@@ -164,7 +168,7 @@ export default {
         start: "2025-02-17",
         end: "2025-02-17",
         eventId: "00006",
-        closed: true,
+        closed: "full",
       },
       {
         name: "Holiday",
@@ -174,7 +178,7 @@ export default {
         start: "2025-02-14",
         end: "2025-02-14",
         eventId: "00008",
-        closed: false,
+        closed: "no",
       },
       {
         name: "Holiday",
@@ -184,7 +188,7 @@ export default {
         start: "2025-03-17",
         end: "2025-03-17",
         eventId: "00990",
-        closed: false,
+        closed: "no",
       },
       {
         name: "Off",
@@ -194,7 +198,6 @@ export default {
         start: "2025-03-24",
         end: "2025-03-24",
         eventId: "00991",
-        closed: false,
       },
       {
         name: "Off",
@@ -204,7 +207,6 @@ export default {
         start: "2025-03-24",
         end: "2025-03-28",
         eventId: "00992",
-        closed: false,
       },
       {
         name: "Off",
@@ -214,7 +216,6 @@ export default {
         start: "2026-01-01",
         end: "2026-01-03",
         eventId: "016dj",
-        closed: false,
       },
     ];
     this.sortedEvents = this.sortEvents(this.events);

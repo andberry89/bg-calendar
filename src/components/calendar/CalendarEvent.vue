@@ -1,5 +1,8 @@
 <template>
-  <div :class="[event.class, 'event-container']">
+  <div
+    :class="[event.class, 'event-container']"
+    @click="emitEvent"
+  >
     {{ event.details }}
   </div>
 </template>
@@ -32,6 +35,9 @@ export default {
   },
   methods: {
     differenceInDays: differenceInDays,
+    emitEvent() {
+      this.$emit("update", this.event);
+    },
   },
 };
 </script>
