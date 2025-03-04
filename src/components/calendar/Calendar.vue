@@ -24,6 +24,7 @@
 <script>
 import CalendarHeader from "./CalendarHeader.vue";
 import CalendarBody from "./CalendarBody.vue";
+import { db } from "@/main";
 
 export default {
   name: "Calendar",
@@ -35,6 +36,7 @@ export default {
         year: 0,
       },
       events: [],
+      staff: [],
       sortedEvents: {
         type: Object,
       },
@@ -73,6 +75,27 @@ export default {
       this.currentDate.month = today.getMonth();
       this.currentDate.year = today.getFullYear();
     },
+    async getEvents() {
+      let snapshot = await db.collection("calEvent").get();
+      let events = [];
+      snapshot.forEach((doc) => {
+        let appData = doc.data();
+        appData.id = doc.id;
+        events.push(appData);
+      });
+      this.events = events;
+      this.sortedEvents = this.sortEvents(events);
+    },
+    async getStaff() {
+      let snapshot = await db.collection("staff").get();
+      let staff = [];
+      snapshot.forEach((doc) => {
+        let appData = doc.data();
+        appData.id = doc.id;
+        staff.push(appData);
+      });
+      this.staff = staff;
+    },
     updateDate(newDate) {
       this.currentDate = newDate;
     },
@@ -97,7 +120,6 @@ export default {
 
         sortedEvents[year] = yearEvents;
       });
-
       return sortedEvents;
 
       //todo: work on this function
@@ -105,121 +127,11 @@ export default {
   },
   created() {
     this.getCurrentDate();
-    this.events = [
-      {
-        name: "Auto Show",
-        details: "Chicago Auto Show",
-        class: "auto-show",
-        staff: ["Rich Ceppos", "Drew Dorian"],
-        start: "2025-02-06",
-        end: "2025-02-07",
-        eventId: "00001",
-      },
-      {
-        name: "Birthday",
-        details: "Andrew's Birthday",
-        class: "birthday",
-        staff: ["Andrew Berry"],
-        start: "2025-02-14",
-        end: "2025-02-14",
-        eventId: "00002",
-      },
-      {
-        name: "Press Trip",
-        details: "Volvo in Sweden",
-        staff: ["Austin Parsons"],
-        class: "press-trip",
-        start: "2025-02-08",
-        end: "2025-02-14",
-        eventId: "00003",
-      },
-      {
-        name: "Press Trip",
-        details: "Palm Springs",
-        staff: ["Drew Dorian"],
-        class: "press-trip",
-        start: "2025-02-10",
-        end: "2025-02-11",
-        eventId: "00007",
-      },
-      {
-        name: "Off",
-        details: "Drew Off",
-        staff: ["Drew Dorian"],
-        class: "off",
-        start: "2025-02-14",
-        end: "2025-02-18",
-        eventId: "00004",
-      },
-      {
-        name: "Car and Driver Event",
-        details: "Lightning Lap Live @ 9:00 AM",
-        staff: [],
-        class: "cd-event",
-        start: "2025-02-20",
-        end: "2025-02-20",
-        eventId: "00005",
-      },
-      {
-        name: "Holiday",
-        details: "President's Day",
-        staff: [],
-        class: "holiday",
-        start: "2025-02-17",
-        end: "2025-02-17",
-        eventId: "00006",
-        closed: "full",
-      },
-      {
-        name: "Holiday",
-        details: "Valentine's Day",
-        staff: [],
-        class: "holiday",
-        start: "2025-02-14",
-        end: "2025-02-14",
-        eventId: "00008",
-        closed: "no",
-      },
-      {
-        name: "Holiday",
-        details: "St. Patrick's Day",
-        staff: [],
-        class: "holiday",
-        start: "2025-03-17",
-        end: "2025-03-17",
-        eventId: "00990",
-        closed: "no",
-      },
-      {
-        name: "Off",
-        details: "Joey off",
-        staff: ["Joey Caparella"],
-        class: "off",
-        start: "2025-03-24",
-        end: "2025-03-24",
-        eventId: "00991",
-      },
-      {
-        name: "Off",
-        details: "Andy off",
-        staff: ["Andy Wendler"],
-        class: "off",
-        start: "2025-03-24",
-        end: "2025-03-28",
-        eventId: "00992",
-      },
-      {
-        name: "Off",
-        details: "Andrew off",
-        staff: ["Andrew Berry"],
-        class: "off",
-        start: "2026-01-01",
-        end: "2026-01-03",
-        eventId: "016dj",
-      },
-    ];
-    this.sortedEvents = this.sortEvents(this.events);
     // console.log(new Date(this.events[0].start.replace(/-/g, "/").replace(/T.+/, "")));
+  },
+  mounted() {
+    this.getEvents();
+    this.getStaff();
   },
 };
 </script>

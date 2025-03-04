@@ -1,9 +1,9 @@
 <template>
   <div :class="['event-modal', day < 4 ? 'right' : 'left']">
-    <EditModal
+    <ModalOverlay
       v-if="showEdit"
       @update="closeEdit"
-      >EDIT MODAL</EditModal
+      >EDIT MODAL</ModalOverlay
     >
     <div
       class="close-btn"
@@ -34,7 +34,7 @@
 </template>
 <script>
 import { format } from "date-fns";
-import EditModal from "./EditModal.vue";
+import ModalOverlay from "../common/ModalOverlay.vue";
 
 export default {
   name: "EventModal",
@@ -44,7 +44,7 @@ export default {
     };
   },
   components: {
-    EditModal,
+    ModalOverlay,
   },
   props: {
     day: {

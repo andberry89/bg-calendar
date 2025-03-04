@@ -11,7 +11,7 @@
 </template>
 <script>
 export default {
-  name: "EditModal",
+  name: "ModalOverlay",
 };
 </script>
 <style lang="scss" scoped>
