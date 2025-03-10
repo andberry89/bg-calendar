@@ -69,6 +69,7 @@
               v-model="newEvent.start"
               name="startDate"
               id="startDate"
+              @input="checkEndDate"
             />
             <label for="endDate">End Date</label>
             <input
@@ -100,6 +101,7 @@
 <script>
 import Button from "@/components/common/Button.vue";
 import { month, weekdayNames, eventType } from "./utils/selectOptions";
+import { compareDesc, parse } from "date-fns";
 
 export default {
   name: "CalendarHeader",
@@ -152,6 +154,8 @@ export default {
     },
   },
   methods: {
+    compareDesc: compareDesc,
+    parse: parse,
     dateUp() {
       if (this.newDate.date === this.currentMonthDays) {
         this.newDate.date = 1;
@@ -189,6 +193,20 @@ export default {
     },
     yearDown() {
       this.newDate.year--;
+    },
+    checkEndDate() {
+      if (this.newEvent.end === "") {
+        this.newEvent.end = this.newEvent.start;
+      } else {
+        // compare the two dates
+        // if startDate comes AFTER endDate, then update endDate to match startDate
+        const startDate = parse(this.newEvent.start, "yyyy-MM-dd", new Date());
+        const endDate = parse(this.newEvent.end, "yyyy-MM-dd", new Date());
+        const result = compareDesc(startDate, endDate);
+        if (result < 0) {
+          this.newEvent.end = this.newEvent.start;
+        }
+      }
     },
     toggleForm() {
       this.showForm = !this.showForm;
