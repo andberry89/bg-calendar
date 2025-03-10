@@ -1,15 +1,16 @@
 <template>
-  <!-- <article
+  <article id="calendar">
+    <!-- <article
     id="calendar"
     :style="{ 'background-image': 'url(' + require('@/assets/calendar/' + currentDate.month + '.jpg') + ')' }"
   > -->
-  <article id="calendar">
     <CalendarHeader
       :currentDate="currentDate"
       :prevMonthDays="prevMonthDays"
       :currentMonthDays="currentMonthDays"
       @update="updateDate($event)"
       :dateFn="getCurrentDate"
+      :staff="staff"
     />
     <CalendarBody
       :currentDate="currentDate"
@@ -122,7 +123,7 @@ export default {
       });
       return sortedEvents;
 
-      //todo: work on this function
+      // TODO: work on this function
     },
   },
   created() {

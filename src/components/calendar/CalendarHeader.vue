@@ -1,59 +1,133 @@
 <template>
   <header>
-    <div class="today">
-      <div>{{ currentDate.date }}</div>
-      <div>{{ month[currentDate.month] }}</div>
-      <div>{{ currentDate.year }}</div>
-      <div
-        class="date-picker-btn"
-        @click="toggleDatePicker"
-      >
-        &#10552;
+    <div class="date-container">
+      <div class="today">
+        <div>{{ currentDate.date }}</div>
+        <div>{{ month[currentDate.month] }}</div>
+        <div>{{ currentDate.year }}</div>
+        <div
+          class="date-picker-btn"
+          @click="toggleDatePicker"
+        >
+          &#10552;
+        </div>
+        <div
+          v-if="showDatePicker"
+          class="date-picker"
+        >
+          <input
+            type="date"
+            @input="updateDate($event.target.value)"
+          />
+        </div>
       </div>
-      <div
-        v-if="showDatePicker"
-        class="date-picker"
-      >
-        <input
-          type="date"
-          @input="updateDate($event.target.value)"
-        />
+      <div class="date-nav">
+        <div @click="monthDown">&lt;</div>
+        <div @click="dateFn">Today</div>
+        <div @click="monthUp">&gt;</div>
       </div>
     </div>
-    <div class="date-nav">
-      <div @click="monthDown">&lt;</div>
-      <div @click="dateFn">Today</div>
-      <div @click="monthUp">&gt;</div>
+    <div class="new-event-container">
+      <Button @click="toggleForm">New Event</Button>
+      <Transition name="drop-form">
+        <div
+          v-if="showForm"
+          class="new-event-form-container"
+        >
+          <div class="new-event-form">
+            <label for="eventType">Event Type</label>
+            <select
+              name="eventType"
+              id="eventType"
+              v-model="newEvent.name"
+            >
+              <option
+                disabled
+                value="Event Type"
+              >
+                --Event Type--
+              </option>
+              <option
+                v-for="(event, idx) in eventType"
+                :key="'event-' + idx"
+                :value="event"
+              >
+                {{ event }}
+              </option>
+            </select>
+            <label for="details">Event Details</label>
+            <input
+              type="text"
+              placeholder="Details"
+              v-model="newEvent.details"
+              name="details"
+              id="details"
+            />
+            <label for="startDate">Start Date</label>
+            <input
+              type="date"
+              v-model="newEvent.start"
+              name="startDate"
+              id="startDate"
+            />
+            <label for="endDate">End Date</label>
+            <input
+              type="date"
+              v-model="newEvent.end"
+              name="endDate"
+              id="endDate"
+            />
+            <ul>
+              <li
+                v-for="(s, idx) in staff"
+                :key="'staff-' + idx"
+              >
+                <input
+                  type="checkbox"
+                  :id="'staff' + idx"
+                  :name="'staff' + idx"
+                  :value="s.lastName"
+                /><label :for="'staff' + idx">{{ s.shortName }}</label>
+              </li>
+            </ul>
+            <button class="submit-event-button">Add Event</button>
+          </div>
+        </div>
+      </Transition>
     </div>
   </header>
 </template>
 <script>
+import Button from "@/components/common/Button.vue";
+import { month, weekdayNames, eventType } from "./utils/selectOptions";
+
 export default {
   name: "CalendarHeader",
   data() {
     return {
       showDatePicker: false,
+      showForm: true,
+      newEvent: {
+        class: "",
+        closed: "",
+        details: "",
+        end: "",
+        name: "",
+        staff: [],
+        start: "",
+      },
       newDate: {
         date: 0,
         month: 0,
         year: 0,
       },
-      month: [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-      ],
-      weekdayNames: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+      eventType: eventType,
+      month: month,
+      weekdayNames: weekdayNames,
     };
+  },
+  components: {
+    Button,
   },
   props: {
     currentDate: {
@@ -62,6 +136,7 @@ export default {
     },
     prevMonthDays: Number,
     currentMonthDays: Number,
+    staff: Array,
     dateFn: {
       type: Function,
       required: false,
@@ -115,6 +190,9 @@ export default {
     yearDown() {
       this.newDate.year--;
     },
+    toggleForm() {
+      this.showForm = !this.showForm;
+    },
     toggleDatePicker() {
       this.showDatePicker = !this.showDatePicker;
     },
@@ -138,6 +216,8 @@ export default {
     this.newDate = this.currentDate;
   },
 };
+
+// TODO: continue working on new event form
 </script>
 <style lang="scss" scoped>
 @mixin arrow-style() {
@@ -154,72 +234,138 @@ header {
   align-items: center;
   padding: 0 50px;
   text-align: center;
-  overflow: hidden;
   color: var(--light-gray);
   text-shadow: 1px 1px 1px var(--dark-gray), 1px -1px 1px var(--dark-gray), -1px 1px 1px var(--dark-gray),
     -1px -1px 1px var(--dark-gray);
-  height: 10vh;
+  height: 15vh;
 
-  .arrow-left {
-    @include arrow-style();
-    border-right: 10px solid var(--white);
+  .date-container {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    gap: 25px;
+    width: 30%;
 
-    &:hover {
-      border-right: 10px solid var(--md-tran-black);
-    }
-  }
-  .arrow-right {
-    @include arrow-style();
-    border-left: 10px solid var(--white);
-
-    &:hover {
-      border-left: 10px solid var(--md-tran-black);
-    }
-  }
-
-  .today {
-    display: grid;
-    grid-template-columns: 40px auto 70px auto;
-    grid-gap: 10px;
-    font-size: 2rem;
-    position: relative;
-
-    div {
-      display: flex;
-      justify-content: center;
-    }
-
-    .date-picker-btn {
-      padding: 0 4px;
+    .arrow-left {
+      @include arrow-style();
+      border-right: 10px solid var(--white);
 
       &:hover {
-        cursor: pointer;
+        border-right: 10px solid var(--md-tran-black);
+      }
+    }
+    .arrow-right {
+      @include arrow-style();
+      border-left: 10px solid var(--white);
+
+      &:hover {
+        border-left: 10px solid var(--md-tran-black);
       }
     }
 
-    .date-picker {
-      position: absolute;
-      bottom: -20px;
-      right: 0;
+    .today {
+      display: grid;
+      grid-template-columns: 40px auto 70px auto;
+      grid-gap: 10px;
+      font-size: 2rem;
+      position: relative;
+
+      div {
+        display: flex;
+        justify-content: center;
+      }
+
+      .date-picker-btn {
+        padding: 0 4px;
+
+        &:hover {
+          cursor: pointer;
+        }
+      }
+
+      .date-picker {
+        position: absolute;
+        bottom: -20px;
+        right: 0;
+      }
+    }
+
+    .date-nav {
+      display: flex;
+      flex-flow: row nowrap;
+      align-items: center;
+      font-size: 1.5rem;
+      gap: 8px;
+
+      div {
+        border: 1px solid var(--white);
+        border-radius: 8px;
+        padding: 2px 14px;
+        transition: 0.4s;
+
+        &:hover {
+          background-color: var(--ocean-lt-blue);
+          cursor: pointer;
+        }
+      }
     }
   }
 
-  .date-nav {
-    display: flex;
-    flex-flow: row nowrap;
-    align-items: center;
-    font-size: 1.5rem;
-    gap: 2px;
+  .new-event-container {
+    position: relative;
+    width: 25%;
+    font: 400 1rem/1 "Arial", sans-serif;
+    text-shadow: none;
+    color: var(--black);
 
-    div {
+    .drop-form-enter-active,
+    .drop-form-leave-active {
+      transition: all 0.5s ease;
+    }
+
+    .drop-form-enter-from,
+    .drop-form-leave-to {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+
+    .new-event-form-container {
+      position: absolute;
+      bottom: -250px;
+      right: 18px;
       border: 1px solid var(--white);
-      border-radius: 8px;
-      padding: 4px 10px;
-      transition: 0.4s;
+      background-color: var(--ocean-lt-blue);
+      padding: 15px 30px 15px 10px;
+      text-align: left;
+      z-index: 99;
 
-      &:hover {
-        background-color: var(--ocean-lt-blue);
-        cursor: pointer;
+      .new-event-form {
+        label {
+          font-size: 0.7rem;
+          font-weight: 700;
+          display: block;
+        }
+        input,
+        select {
+          margin-bottom: 5px;
+        }
+        ul {
+          padding: 0;
+          list-style: none;
+          margin: 0;
+
+          li {
+            display: flex;
+            align-items: center;
+
+            label {
+              display: inline;
+            }
+          }
+        }
+        button {
+          margin-top: 5px;
+        }
       }
     }
   }
