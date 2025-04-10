@@ -95,6 +95,21 @@
           >
             Add Event
           </button>
+          <div
+            class="err-msg"
+            v-if="showErrMsg"
+          >
+            This is not a valid event!<br />
+            Make sure to check the following:
+            <ul>
+              <li
+                v-for="error in errors"
+                :key="error"
+              >
+                {{ error }}
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </Transition>
@@ -110,6 +125,7 @@ export default {
   data() {
     return {
       eventType: eventType,
+      isValidEvent: false,
       newEvent: {
         class: "",
         closed: "",
@@ -120,6 +136,7 @@ export default {
         staff: [],
       },
       errors: [],
+      showErrMsg: false,
       showForm: true,
     };
   },
@@ -135,30 +152,60 @@ export default {
     emitNewEvent() {
       //TODO: VALIDATE EVENT
 
+      this.errors = [];
       const keys = Object.keys(this.newEvent);
-      keys.forEach((k) => console.warn(this.newEvent[k]));
-      if (this.newEvent.type !== "Holiday") {
-        this.newEvent.closed = "none";
-      } else {
-        this.newEvent.staff = [];
-      }
+      console.warn(keys);
+      keys.forEach((k) => {
+        if (this.newEvent[k] === "" || this.newEvent === []) {
+          let error = k.charAt(0).toUpperCase() + k.slice(1);
+          switch (error) {
+            case "Details":
+              error = "Event Details";
+              break;
+            case "End":
+              error = "End Date";
+              break;
+            case "Type":
+              error = "Event Type";
+              break;
+            case "Start":
+              error = "Start Date";
+              break;
+            default:
+              error = "";
+              break;
+          }
+          if (error !== "") this.errors.push(error);
+        }
+      });
 
-      switch (this.newEvent.type) {
-        case "Auto Show":
-          this.newEvent.class = "auto-show";
-          break;
-        case "Press Trip":
-          this.newEvent.class = "press-trip";
-          break;
-        case "C/D Event":
-          this.newEvent.class = "cd-event";
-          break;
-        default:
-          this.newEvent.class = this.newEvent.type.toLowerCase();
-          break;
+      if (this.errors.length > 0) {
+        this.showErrMsg = true;
+      } else {
+        if (this.newEvent.type !== "Holiday") {
+          this.newEvent.closed = "none";
+        } else {
+          this.newEvent.staff = [];
+        }
+
+        switch (this.newEvent.type) {
+          case "Auto Show":
+            this.newEvent.class = "auto-show";
+            break;
+          case "Press Trip":
+            this.newEvent.class = "press-trip";
+            break;
+          case "C/D Event":
+            this.newEvent.class = "cd-event";
+            break;
+          default:
+            this.newEvent.class = this.newEvent.type.toLowerCase();
+            break;
+        }
+        this.$emit("update", this.newEvent);
+        this.resetNewEvent();
+        this.showErrMsg = false;
       }
-      this.$emit("update", this.newEvent);
-      this.resetNewEvent();
     },
     compareDates(val) {
       if (this.newEvent.end === "") {
@@ -247,6 +294,18 @@ export default {
       }
       button {
         margin-top: 5px;
+      }
+
+      .err-msg {
+        font: 700 12px/1.1 "Arial", sans-serif;
+        color: var(--red);
+        margin-top: 10px;
+
+        ul {
+          font-weight: 400;
+          list-style: disc;
+          margin-top: 2px;
+        }
       }
     }
   }
