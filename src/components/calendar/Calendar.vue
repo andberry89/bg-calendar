@@ -36,7 +36,7 @@ import CalendarHeader from "./CalendarHeader.vue";
 import CalendarBody from "./CalendarBody.vue";
 import StaffList from "./StaffList.vue";
 import { db } from "@/main";
-import { doc, setDoc, deleteDoc } from "firebase/firestore";
+import { doc, setDoc, deleteDoc, addDoc, collection } from "firebase/firestore";
 
 export default {
   name: "Calendar",
@@ -82,8 +82,12 @@ export default {
     },
   },
   methods: {
-    addEvent(event) {
+    async addEvent(event) {
       console.warn(event);
+
+      const docRef = await addDoc(collection(db, "calEvent"), event);
+      console.log("Document written with ID: ", docRef.id);
+      this.getEvents();
     },
     async addStaff(person) {
       // TODO: CHECK TO SEE IF THEY EXIST FIRST

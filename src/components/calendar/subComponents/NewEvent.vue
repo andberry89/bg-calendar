@@ -150,34 +150,7 @@ export default {
     compareDesc: compareDesc,
     parse: parse,
     emitNewEvent() {
-      //TODO: VALIDATE EVENT
-
-      this.errors = [];
-      const keys = Object.keys(this.newEvent);
-      console.warn(keys);
-      keys.forEach((k) => {
-        if (this.newEvent[k] === "" || this.newEvent === []) {
-          let error = k.charAt(0).toUpperCase() + k.slice(1);
-          switch (error) {
-            case "Details":
-              error = "Event Details";
-              break;
-            case "End":
-              error = "End Date";
-              break;
-            case "Type":
-              error = "Event Type";
-              break;
-            case "Start":
-              error = "Start Date";
-              break;
-            default:
-              error = "";
-              break;
-          }
-          if (error !== "") this.errors.push(error);
-        }
-      });
+      this.errors = this.validateEvent(this.newEvent);
 
       if (this.errors.length > 0) {
         this.showErrMsg = true;
@@ -204,7 +177,6 @@ export default {
         }
         this.$emit("update", this.newEvent);
         this.resetNewEvent();
-        this.showErrMsg = false;
       }
     },
     compareDates(val) {
@@ -222,6 +194,36 @@ export default {
         }
       }
     },
+    validateEvent(event) {
+      const keys = Object.keys(event);
+      let errors = [];
+
+      keys.forEach((k) => {
+        if (event[k] === "" || event === []) {
+          let error = k.charAt(0).toUpperCase() + k.slice(1);
+          switch (error) {
+            case "Details":
+              error = "Event Details";
+              break;
+            case "End":
+              error = "End Date";
+              break;
+            case "Type":
+              error = "Event Type";
+              break;
+            case "Start":
+              error = "Start Date";
+              break;
+            default:
+              error = "";
+              break;
+          }
+          if (error !== "") errors.push(error);
+        }
+      });
+
+      return errors;
+    },
     resetNewEvent() {
       this.newEvent = {
         class: "",
@@ -232,6 +234,8 @@ export default {
         staff: [],
         type: "",
       };
+      this.errors = [];
+      this.showErrMsg = false;
     },
     toggleForm() {
       this.showForm = !this.showForm;
