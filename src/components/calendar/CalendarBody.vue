@@ -84,7 +84,7 @@ export default {
     },
     updateDate(date) {
       this.activeDate.date = date;
-      this.$emit("update", this.activeDate);
+      this.$emit("date", this.activeDate);
     },
     updateEvents() {
       this.events = Array.from({ length: this.currentMonthDays }, () => []);

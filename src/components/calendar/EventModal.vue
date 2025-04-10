@@ -14,7 +14,7 @@
     <div class="event-header">
       <div class="event-name">
         {{ event.details }} {{ event.class === "birthday" ? "🎂" : "" }}
-        <span class="event-type">({{ event.name }})</span>
+        <span class="event-type">({{ event.type }})</span>
       </div>
       <div
         class="event-staff"

@@ -1,31 +1,42 @@
 <template>
-  <article id="calendar">
-    <!-- <article
+  <main>
+    <StaffList
+      :staff="staff"
+      key="staff-list"
+      @update="updateStaff($event)"
+    />
+    <article id="calendar">
+      <!-- <article
     id="calendar"
     :style="{ 'background-image': 'url(' + require('@/assets/calendar/' + currentDate.month + '.jpg') + ')' }"
   > -->
-    <CalendarHeader
-      :currentDate="currentDate"
-      :prevMonthDays="prevMonthDays"
-      :currentMonthDays="currentMonthDays"
-      @update="updateDate($event)"
-      :dateFn="getCurrentDate"
-      :staff="staff"
-    />
-    <CalendarBody
-      :currentDate="currentDate"
-      :prevMonthDays="prevMonthDays"
-      :currentMonthDays="currentMonthDays"
-      :currentMonthEvents="currentMonthEvents"
-      :key="currentDate.month + '-' + currentDate.year"
-      @update="updateDate($event)"
-    />
-  </article>
+      <CalendarHeader
+        :currentDate="currentDate"
+        :prevMonthDays="prevMonthDays"
+        :currentMonthDays="currentMonthDays"
+        @date="updateDate($event)"
+        @update="addEvent($event)"
+        :dateFn="getCurrentDate"
+        :staff="staff"
+        key="calendar-header"
+      />
+      <CalendarBody
+        :currentDate="currentDate"
+        :prevMonthDays="prevMonthDays"
+        :currentMonthDays="currentMonthDays"
+        :currentMonthEvents="currentMonthEvents"
+        :key="currentDate.month + '-' + currentDate.year"
+        @date="updateDate($event)"
+      />
+    </article>
+  </main>
 </template>
 <script>
 import CalendarHeader from "./CalendarHeader.vue";
 import CalendarBody from "./CalendarBody.vue";
+import StaffList from "./StaffList.vue";
 import { db } from "@/main";
+import { doc, setDoc, deleteDoc } from "firebase/firestore";
 
 export default {
   name: "Calendar",
@@ -46,6 +57,7 @@ export default {
   components: {
     CalendarHeader,
     CalendarBody,
+    StaffList,
   },
   computed: {
     prevMonthDays() {
@@ -70,6 +82,34 @@ export default {
     },
   },
   methods: {
+    addEvent(event) {
+      console.warn(event);
+    },
+    async addStaff(person) {
+      // TODO: CHECK TO SEE IF THEY EXIST FIRST
+      const firstName = person.firstName.trim();
+      const lastName = person.lastName.trim();
+      const firstInitial = firstName.charAt(0).toUpperCase();
+      const lastInitial = lastName.charAt(0).toUpperCase();
+      const initials = firstInitial + lastInitial;
+      const shortName = firstInitial + ". " + lastName;
+      const id = (firstName + "-" + lastName).toLowerCase();
+
+      await setDoc(doc(db, "staff", id), {
+        firstName: firstName,
+        lastName: lastName,
+        initials: initials,
+        shortName: shortName,
+      });
+
+      this.getStaff();
+    },
+    async deleteStaff(person) {
+      const id = (person.firstName + "-" + person.lastName).toLowerCase();
+      await deleteDoc(doc(db, "staff", id));
+
+      this.getStaff();
+    },
     getCurrentDate() {
       let today = new Date();
       this.currentDate.date = today.getDate();
@@ -95,10 +135,15 @@ export default {
         appData.id = doc.id;
         staff.push(appData);
       });
-      this.staff = staff;
+      this.staff = staff.sort((a, b) => (a.lastName > b.lastName ? 1 : b.lastName > a.lastName ? -1 : 0));
     },
     updateDate(newDate) {
       this.currentDate = newDate;
+    },
+    updateStaff(staffFn) {
+      const fn = staffFn[0];
+      const staff = staffFn[1];
+      fn === "add" ? this.addStaff(staff) : this.deleteStaff(staff);
     },
     sortEvents(events) {
       let yearsWithEvents = events
@@ -138,20 +183,24 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import url("https://fonts.googleapis.com/css?family=Anton");
-
-#calendar {
-  width: 1032px;
+main {
   display: flex;
-  flex-flow: column nowrap;
-  justify-content: flex-start;
-  gap: 10px;
-  margin: 0 auto;
-  background-color: var(--ocean-dark-blue);
-  font-family: "Anton";
-  border-radius: 15px;
-  overflow: hidden;
-  background-size: cover;
-  user-select: none;
-  position: relative;
+  flex-flow: row nowrap;
+
+  #calendar {
+    width: 1032px;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    gap: 10px;
+    margin: 0 auto;
+    background-color: var(--ocean-dark-blue);
+    font-family: "Anton";
+    border-radius: 15px;
+    overflow: hidden;
+    background-size: cover;
+    user-select: none;
+    position: relative;
+  }
 }
 </style>

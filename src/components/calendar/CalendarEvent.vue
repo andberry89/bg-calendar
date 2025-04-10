@@ -75,7 +75,7 @@ export default {
     cursor: default;
   }
 }
-.off {
+.vacation {
   background-color: var(--ocean-off);
   opacity: 0.7;
 }
