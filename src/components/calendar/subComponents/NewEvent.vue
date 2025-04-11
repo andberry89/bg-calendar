@@ -27,7 +27,10 @@
               {{ event }}
             </option>
           </select>
-          <div v-if="this.newEvent.type === 'Holiday'">
+          <div
+            class="holiday-options"
+            v-if="this.newEvent.type === 'Holiday'"
+          >
             <span class="office-closure-label">Office Closed?</span>
             <label>
               <input
@@ -264,7 +267,7 @@ export default {
 
   .new-event-form-container {
     position: absolute;
-    bottom: -250px;
+    top: 70px;
     right: 18px;
     border: 1px solid var(--white);
     background-color: var(--ocean-lt-blue);
@@ -273,6 +276,21 @@ export default {
     z-index: 99;
 
     .new-event-form {
+      .holiday-options {
+        margin-bottom: 4px;
+        background-color: var(--ocean-md-blue);
+        padding: 2px;
+        border-radius: 4px;
+
+        .office-closure-label {
+          font-size: 14px;
+        }
+
+        input {
+          cursor: pointer;
+        }
+      }
+
       label {
         font-size: 0.7rem;
         font-weight: 700;

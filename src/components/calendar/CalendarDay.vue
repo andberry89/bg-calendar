@@ -98,6 +98,16 @@ export default {
     this.holidays = this.events.filter((e) => e.name === "Holiday");
     this.filteredEvents = this.events.filter((e) => e.name !== "Holiday");
   },
+  watch: {
+    events: {
+      handler(newEvents) {
+        this.holidays = newEvents.filter((e) => e.name === "Holiday");
+        this.filteredEvents = newEvents.filter((e) => e.name !== "Holiday");
+      },
+      immediate: true, // Trigger the watcher immediately
+      deep: true, // Watch deeply to account for nested changes in the array
+    },
+  },
 };
 </script>
 <style lang="scss" scoped>

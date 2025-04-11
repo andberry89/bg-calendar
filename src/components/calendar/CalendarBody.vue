@@ -87,32 +87,48 @@ export default {
       this.$emit("date", this.activeDate);
     },
     updateEvents() {
-      this.events = Array.from({ length: this.currentMonthDays }, () => []);
+      if (!this.currentMonthDays || !this.currentMonthEvents) {
+        // wait until both are available
+        return;
+      }
+
+      let updatedEvents = Array.from({ length: this.currentMonthDays }, () => []);
       this.currentMonthEvents.forEach((e) => {
         const startIdx = e.start.split("-")[2] - 1;
         const endIdx = e.end.split("-")[2] - 1;
 
         for (let i = startIdx; i < endIdx + 1; i++) {
-          this.events[i].push(e);
+          updatedEvents[i].push(e);
         }
       });
+
+      this.events = updatedEvents;
+
       this.dataReady = true;
     },
   },
   watch: {
-    "activeDate.month": {
+    activeDate: {
       handler() {
         this.updateEvents();
       },
+      deep: true,
     },
-    "activeDate.year": {
+    currentMonthDays: {
       handler() {
         this.updateEvents();
       },
+      immediate: true, // Trigger immediately when the component is initialized
+    },
+    currentMonthEvents: {
+      handler() {
+        this.updateEvents();
+      },
+      immediate: true, // Trigger immediately when the component is initialized
     },
   },
   created() {
-    this.activeDate = this.currentDate;
+    this.activeDate = { ...this.currentDate };
     this.updateEvents();
   },
 };
