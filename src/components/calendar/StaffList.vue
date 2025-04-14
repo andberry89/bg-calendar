@@ -26,7 +26,7 @@
   </article>
 </template>
 <script>
-import EditStaff from "./subComponents/EditStaff.vue";
+import EditStaff from "./components/EditStaff.vue";
 
 export default {
   name: "StaffList",

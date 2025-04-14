@@ -109,8 +109,7 @@ export default {
       this.getStaff();
     },
     async deleteStaff(person) {
-      const id = (person.firstName + "-" + person.lastName).toLowerCase();
-      await deleteDoc(doc(db, "staff", id));
+      await deleteDoc(doc(db, "staff", person.id));
 
       this.getStaff();
     },

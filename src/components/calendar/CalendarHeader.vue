@@ -36,7 +36,7 @@
 </template>
 <script>
 // import Button from "@/components/common/Button.vue";
-import NewEvent from "./subComponents/NewEvent.vue";
+import NewEvent from "./components/NewEvent.vue";
 import { month, weekdayNames } from "./utils/selectOptions";
 
 export default {

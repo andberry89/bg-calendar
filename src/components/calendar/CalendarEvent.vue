@@ -1,9 +1,44 @@
 <template>
   <div
-    :class="[event.class, 'event-container']"
+    class="event-container"
     @click="emitEvent"
   >
-    {{ event.details }}
+    <div
+      v-if="event.class === 'birthday'"
+      :class="event.class"
+    >
+      {{ event.staff[0].shortName }}'s Birthday! 🎂
+    </div>
+    <div
+      v-if="event.class === 'press-trip'"
+      :class="event.class"
+    >
+      {{ event.staff[0].initials }} Press Trip
+    </div>
+    <div
+      v-if="event.class === 'vacation'"
+      :class="event.class"
+    >
+      {{ event.staff[0].initials }} Off (Vacation)
+    </div>
+    <div
+      v-if="event.class === 'auto-show'"
+      :class="event.class"
+    >
+      {{ event.details }}
+    </div>
+    <div
+      v-if="event.class === 'cd-event'"
+      :class="event.class"
+    >
+      {{ event.details }}
+    </div>
+    <div
+      v-if="event.class === 'holiday'"
+      :class="event.class"
+    >
+      <strong>{{ event.details }}</strong>
+    </div>
   </div>
 </template>
 <script>
@@ -20,18 +55,6 @@ export default {
     numberOfDays() {
       return differenceInDays(this.event.end, this.event.start) + 1;
     },
-    staffInitials() {
-      let arr = [];
-      this.event.staff.forEach((e) => {
-        const split = e.split(" ");
-        const first = split[0].charAt(0);
-        const last = split[1].charAt(0);
-        const initials = first + last;
-        arr.push(initials);
-      });
-
-      return arr;
-    },
   },
   methods: {
     differenceInDays: differenceInDays,
@@ -42,7 +65,7 @@ export default {
 };
 </script>
 <style lang="scss" scoped>
-.event-container {
+.event-container div {
   font: 400 9pt/1.1 "Roboto", "Verdana", sans-serif;
   text-align: center;
   padding: 4px;
@@ -68,7 +91,6 @@ export default {
 .holiday {
   width: 100%;
   color: var(--white);
-  font-weight: 700;
 
   &:hover {
     transform: none;
@@ -83,3 +105,5 @@ export default {
   background-color: var(--ocean-press-trip);
 }
 </style>
+
+// TODO: format calendar events based on type

@@ -18,7 +18,8 @@
       v-for="(event, idx) in filteredEvents"
       :key="'event-' + idx"
       :event="event"
-      @update="updateEventModal($event)"
+      @click="openEventModal(event)"
+      @update="updateEvents"
     />
   </div>
 </template>
@@ -89,20 +90,23 @@ export default {
       this.modalEvent = {};
       this.showEventDetails = false;
     },
-    updateEventModal(event) {
+    openEventModal(event) {
       this.modalEvent = event;
       this.showEventDetails = true;
     },
+    updateEvents() {
+      this.$emit("update");
+      // this.holidays = this.events.filter((e) => e.type === "Holiday");
+      // this.filteredEvents = this.events.filter((e) => e.type !== "Holiday");
+    },
   },
   created() {
-    this.holidays = this.events.filter((e) => e.name === "Holiday");
-    this.filteredEvents = this.events.filter((e) => e.name !== "Holiday");
+    this.updateEvents();
   },
   watch: {
     events: {
-      handler(newEvents) {
-        this.holidays = newEvents.filter((e) => e.name === "Holiday");
-        this.filteredEvents = newEvents.filter((e) => e.name !== "Holiday");
+      handler() {
+        this.updateEvents();
       },
       immediate: true, // Trigger the watcher immediately
       deep: true, // Watch deeply to account for nested changes in the array
@@ -144,6 +148,9 @@ export default {
   // }
 }
 .date-text {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
   font-size: 1rem;
   border-bottom: 1px solid var(--ocean-gray);
   width: 100%;
