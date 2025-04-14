@@ -39,8 +39,8 @@
 </template>
 <script>
 import { format } from "date-fns";
-import { db } from "@/main";
-import { doc, deleteDoc } from "firebase/firestore";
+// import { db } from "@/main";
+// import { doc, deleteDoc } from "firebase/firestore";
 import ModalOverlay from "../common/ModalOverlay.vue";
 
 export default {
@@ -75,8 +75,8 @@ export default {
     },
   },
   methods: {
-    doc: doc,
-    deleteDoc: deleteDoc,
+    // doc: doc,
+    // deleteDoc: deleteDoc,
     format: format,
     closeEdit() {
       this.showEdit = false;
@@ -84,10 +84,8 @@ export default {
     closeModal() {
       this.$emit("update");
     },
-    async deleteEvent() {
-      await deleteDoc(doc(db, "calEvent", this.event.id));
-      console.log("Doc deleted.");
-      this.closeModal();
+    deleteEvent() {
+      this.$emit("delete", this.event.id);
     },
     openEdit() {
       this.showEdit = true;

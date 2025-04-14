@@ -26,6 +26,8 @@
         v-for="(n, idx) in currentMonthDays"
         :class="{ active: n === activeDate.date }"
         @click="updateDate(n)"
+        @update="updateEvents"
+        @delete="deleteEvent($event)"
         :key="'day' + idx"
         :date="n"
         :currentDate="activeDate"
@@ -78,6 +80,9 @@ export default {
     },
   },
   methods: {
+    deleteEvent(id) {
+      this.$emit("delete", id);
+    },
     getDay(date) {
       const day = new Date(date.year, date.month, date.date).getDay();
       return { ...date, day: day };

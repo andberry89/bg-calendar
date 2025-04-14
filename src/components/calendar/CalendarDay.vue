@@ -5,6 +5,7 @@
       :event="modalEvent"
       :day="getDay"
       @update="closeModal"
+      @delete="deleteEvent($event)"
     />
     <div class="date-text">
       {{ date }}
@@ -90,23 +91,29 @@ export default {
       this.modalEvent = {};
       this.showEventDetails = false;
     },
+    deleteEvent(event) {
+      this.$emit("delete", event);
+      this.closeModal();
+    },
     openEventModal(event) {
       this.modalEvent = event;
       this.showEventDetails = true;
     },
-    updateEvents() {
-      this.$emit("update");
+    sortEvents() {
       this.holidays = this.events.filter((e) => e.type === "Holiday");
       this.filteredEvents = this.events.filter((e) => e.type !== "Holiday");
     },
+    updateEvents() {
+      this.$emit("update");
+    },
   },
   created() {
-    this.updateEvents();
+    this.sortEvents();
   },
   watch: {
     events: {
       handler() {
-        this.updateEvents();
+        this.sortEvents();
       },
       immediate: true, // Trigger the watcher immediately
       deep: true, // Watch deeply to account for nested changes in the array

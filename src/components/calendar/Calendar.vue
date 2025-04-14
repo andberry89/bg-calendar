@@ -27,6 +27,7 @@
         :currentMonthEvents="currentMonthEvents"
         :key="currentDate.month + '-' + currentDate.year"
         @date="updateDate($event)"
+        @delete="deleteEvent($event)"
       />
     </article>
   </main>
@@ -107,6 +108,11 @@ export default {
       });
 
       this.getStaff();
+    },
+    async deleteEvent(id) {
+      await deleteDoc(doc(db, "calEvent", id));
+
+      this.getEvents();
     },
     async deleteStaff(person) {
       await deleteDoc(doc(db, "staff", person.id));
