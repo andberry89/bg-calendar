@@ -96,8 +96,8 @@ export default {
     },
     updateEvents() {
       this.$emit("update");
-      // this.holidays = this.events.filter((e) => e.type === "Holiday");
-      // this.filteredEvents = this.events.filter((e) => e.type !== "Holiday");
+      this.holidays = this.events.filter((e) => e.type === "Holiday");
+      this.filteredEvents = this.events.filter((e) => e.type !== "Holiday");
     },
   },
   created() {
