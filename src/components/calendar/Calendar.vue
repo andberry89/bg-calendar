@@ -37,7 +37,8 @@ import CalendarHeader from "./CalendarHeader.vue";
 import CalendarBody from "./CalendarBody.vue";
 import StaffList from "./StaffList.vue";
 import { db } from "@/main";
-import { doc, setDoc, deleteDoc, addDoc, collection } from "firebase/firestore";
+import { doc, deleteDoc, addDoc, collection } from "firebase/firestore";
+import { addStaff, deleteStaff } from "@/router/staff";
 
 export default {
   name: "Calendar",
@@ -83,6 +84,8 @@ export default {
     },
   },
   methods: {
+    addStaff: addStaff,
+    deleteStaff: deleteStaff,
     async addEvent(event) {
       console.warn(event);
 
@@ -90,22 +93,20 @@ export default {
       console.log("Document written with ID: ", docRef.id);
       this.getEvents();
     },
-    async addStaff(person) {
-      // TODO: CHECK TO SEE IF THEY EXIST FIRST
-      const firstName = person.firstName.trim();
-      const lastName = person.lastName.trim();
-      const firstInitial = firstName.charAt(0).toUpperCase();
-      const lastInitial = lastName.charAt(0).toUpperCase();
-      const initials = firstInitial + lastInitial;
-      const shortName = firstInitial + ". " + lastName;
-      const id = (firstName + "-" + lastName).toLowerCase();
-
-      await setDoc(doc(db, "staff", id), {
-        firstName: firstName,
-        lastName: lastName,
-        initials: initials,
-        shortName: shortName,
-      });
+    async editStaff(fn, person) {
+      if (fn === "add") {
+        try {
+          await addStaff(person);
+        } catch (err) {
+          console.warn(err);
+        }
+      } else {
+        try {
+          await deleteStaff(person.id);
+        } catch (err) {
+          console.warn(err);
+        }
+      }
 
       this.getStaff();
     },
@@ -113,11 +114,6 @@ export default {
       await deleteDoc(doc(db, "calEvent", id));
 
       this.getEvents();
-    },
-    async deleteStaff(person) {
-      await deleteDoc(doc(db, "staff", person.id));
-
-      this.getStaff();
     },
     getCurrentDate() {
       let today = new Date();
@@ -150,9 +146,10 @@ export default {
       this.currentDate = newDate;
     },
     updateStaff(staffFn) {
+      //TODO: combine this with editStaff?
       const fn = staffFn[0];
       const staff = staffFn[1];
-      fn === "add" ? this.addStaff(staff) : this.deleteStaff(staff);
+      fn === "add" ? this.editStaff("add", staff) : this.editStaff("delete", staff);
     },
     sortEvents(events) {
       let yearsWithEvents = events
