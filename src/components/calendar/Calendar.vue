@@ -15,7 +15,7 @@
         :prevMonthDays="prevMonthDays"
         :currentMonthDays="currentMonthDays"
         @date="updateDate($event)"
-        @update="addEvent($event)"
+        @update="updateEvents('add', $event)"
         :dateFn="getCurrentDate"
         :staff="staff"
         key="calendar-header"
@@ -27,7 +27,7 @@
         :currentMonthEvents="currentMonthEvents"
         :key="currentDate.month + '-' + currentDate.year"
         @date="updateDate($event)"
-        @delete="deleteEvent($event)"
+        @delete="updateEvents('delete', $event)"
       />
     </article>
   </main>
@@ -37,7 +37,7 @@ import CalendarHeader from "./CalendarHeader.vue";
 import CalendarBody from "./CalendarBody.vue";
 import StaffList from "./StaffList.vue";
 import { db } from "@/main";
-import { doc, deleteDoc, addDoc, collection } from "firebase/firestore";
+import { addEvent, deleteEvent } from "@/router/events";
 import { addStaff, deleteStaff } from "@/router/staff";
 
 export default {
@@ -86,35 +86,8 @@ export default {
   methods: {
     addStaff: addStaff,
     deleteStaff: deleteStaff,
-    async addEvent(event) {
-      console.warn(event);
-
-      const docRef = await addDoc(collection(db, "calEvent"), event);
-      console.log("Document written with ID: ", docRef.id);
-      this.getEvents();
-    },
-    async editStaff(fn, person) {
-      if (fn === "add") {
-        try {
-          await addStaff(person);
-        } catch (err) {
-          console.warn(err);
-        }
-      } else {
-        try {
-          await deleteStaff(person.id);
-        } catch (err) {
-          console.warn(err);
-        }
-      }
-
-      this.getStaff();
-    },
-    async deleteEvent(id) {
-      await deleteDoc(doc(db, "calEvent", id));
-
-      this.getEvents();
-    },
+    addEvent: addEvent,
+    deleteEvent: deleteEvent,
     getCurrentDate() {
       let today = new Date();
       this.currentDate.date = today.getDate();
@@ -145,11 +118,40 @@ export default {
     updateDate(newDate) {
       this.currentDate = newDate;
     },
-    updateStaff(staffFn) {
-      //TODO: combine this with editStaff?
+    async updateEvents(fn, event) {
+      if (fn === "add") {
+        try {
+          await addEvent(event);
+        } catch (err) {
+          console.warn(err);
+        }
+      } else {
+        try {
+          await deleteEvent(event.id);
+        } catch (err) {
+          console.warn(err);
+        }
+      }
+      this.getEvents();
+    },
+    async updateStaff(staffFn) {
       const fn = staffFn[0];
-      const staff = staffFn[1];
-      fn === "add" ? this.editStaff("add", staff) : this.editStaff("delete", staff);
+      const person = staffFn[1];
+      if (fn === "add") {
+        try {
+          await addStaff(person);
+        } catch (err) {
+          console.warn(err);
+        }
+      } else {
+        try {
+          await deleteStaff(person.id);
+        } catch (err) {
+          console.warn(err);
+        }
+      }
+
+      this.getStaff();
     },
     sortEvents(events) {
       let yearsWithEvents = events

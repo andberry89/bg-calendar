@@ -85,7 +85,7 @@ export default {
       this.$emit("update");
     },
     deleteEvent() {
-      this.$emit("delete", this.event.id);
+      this.$emit("delete", this.event);
     },
     openEdit() {
       this.showEdit = true;

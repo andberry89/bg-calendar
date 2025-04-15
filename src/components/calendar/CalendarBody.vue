@@ -80,8 +80,8 @@ export default {
     },
   },
   methods: {
-    deleteEvent(id) {
-      this.$emit("delete", id);
+    deleteEvent(event) {
+      this.$emit("delete", event);
     },
     getDay(date) {
       const day = new Date(date.year, date.month, date.date).getDay();
