@@ -13,8 +13,7 @@
     </div>
     <div class="event-header">
       <div class="event-name">
-        {{ event.details }} {{ event.class === "birthday" ? "🎂" : "" }}
-        <span class="event-type">({{ event.type }})</span>
+        <span class="event-type">{{ event.type }} {{ event.class === "Birthday" ? "🎂" : "" }}</span>
       </div>
       <div class="event-dates">
         {{ eventDates }}
@@ -38,9 +37,7 @@
   </div>
 </template>
 <script>
-import { format } from "date-fns";
-// import { db } from "@/main";
-// import { doc, deleteDoc } from "firebase/firestore";
+import { format, parseISO } from "date-fns";
 import ModalOverlay from "../common/ModalOverlay.vue";
 
 export default {
@@ -65,19 +62,22 @@ export default {
   },
   computed: {
     eventDates() {
-      const start = this.format(this.event.start, "MM/dd/yyyy");
+      // We use the .replace regex so the format method does not subtract a day
+      console.log(this.event);
+      const startDate = new Date(this.event.start.replace(/-/g, "/"));
+      const start = this.format(startDate, "MM/dd/yyyy");
       if (this.event.start === this.event.end) {
         return start;
       } else {
-        const end = this.format(this.event.end, "MM/dd/yyyy");
+        const endDate = new Date(this.event.end.replace(/-/g, "/"));
+        const end = this.format(endDate, "MM/dd/yyyy");
         return start + " - " + end;
       }
     },
   },
   methods: {
-    // doc: doc,
-    // deleteDoc: deleteDoc,
     format: format,
+    parseISO: parseISO,
     closeEdit() {
       this.showEdit = false;
     },

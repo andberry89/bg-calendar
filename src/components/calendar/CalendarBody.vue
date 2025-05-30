@@ -46,6 +46,7 @@
 </template>
 <script>
 import CalendarDay from "./CalendarDay.vue";
+import assignEvents from "./utils/assignEvents";
 
 export default {
   name: "CalendarBody",
@@ -80,6 +81,7 @@ export default {
     },
   },
   methods: {
+    assignEvents: assignEvents,
     deleteEvent(event) {
       this.$emit("delete", event);
     },
@@ -97,18 +99,7 @@ export default {
         return;
       }
 
-      let updatedEvents = Array.from({ length: this.currentMonthDays }, () => []);
-      this.currentMonthEvents.forEach((e) => {
-        const startIdx = e.start.split("-")[2] - 1;
-        const endIdx = e.end.split("-")[2] - 1;
-
-        for (let i = startIdx; i < endIdx + 1; i++) {
-          updatedEvents[i].push(e);
-        }
-      });
-
-      this.events = updatedEvents;
-
+      this.events = assignEvents(this.currentMonthEvents, this.currentDate.month, this.currentMonthDays);
       this.dataReady = true;
     },
   },

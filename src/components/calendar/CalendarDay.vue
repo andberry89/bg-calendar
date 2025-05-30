@@ -1,5 +1,5 @@
 <template>
-  <div :class="[dayClass, { weekend: isWeekend }, 'container']">
+  <div :class="[dayClass, { weekend: isWeekend }, { fullClose: hasFullClosureHoliday }, 'container']">
     <EventModal
       v-if="showEventDetails"
       :event="modalEvent"
@@ -62,6 +62,13 @@ export default {
     getDay() {
       let date = { ...this.currentDate };
       return new Date(date.year, date.month, this.date).getDay();
+    },
+    hasFullClosureHoliday() {
+      if (this.holidays.length > 0) {
+        const e = this.holidays.find((x) => x.closed === "full");
+        if (e) return true;
+      }
+      return false;
     },
     isWeekend() {
       let date = { ...this.currentDate };
@@ -146,7 +153,9 @@ export default {
     color: var(--white);
   }
 }
-
+.fullClose {
+  background-color: var(--ocean-dark-gray);
+}
 .weekend {
   background-color: var(--ocean-dark-blue);
 

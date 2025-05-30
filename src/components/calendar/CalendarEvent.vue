@@ -25,6 +25,7 @@
       v-if="event.class === 'auto-show'"
       :class="event.class"
     >
+      <strong>Auto Show</strong><br />
       {{ event.details }}
     </div>
     <div
@@ -37,7 +38,18 @@
       v-if="event.class === 'holiday'"
       :class="event.class"
     >
-      <strong>{{ event.details }}</strong>
+      <strong>{{ event.details }}</strong
+      ><br />
+      <span
+        class="office-closure"
+        v-if="event.closed === 'half'"
+        >Early Close</span
+      >
+      <span
+        class="office-closure"
+        v-if="event.closed === 'full'"
+        >Office Closed</span
+      >
     </div>
   </div>
 </template>

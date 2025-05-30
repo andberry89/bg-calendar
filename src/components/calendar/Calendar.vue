@@ -31,8 +31,12 @@
       />
     </article>
   </main>
+  <footer>
+    <em>Version 1.0.0</em>
+  </footer>
 </template>
 <script>
+//TODO: Work on events that span across months
 import CalendarHeader from "./CalendarHeader.vue";
 import CalendarBody from "./CalendarBody.vue";
 import StaffList from "./StaffList.vue";
@@ -74,9 +78,9 @@ export default {
       const currentYearEvents = this.sortedEvents[this.currentDate.year];
       if (currentYearEvents) {
         return currentYearEvents.filter((e) => {
-          const split = e.start.split("-");
-          const month = split[1] - 1;
-          return this.currentDate.month === month;
+          const start = e.start.split("-")[1] - 1;
+          const end = e.end.split("-")[1] - 1;
+          return this.currentDate.month === start || this.currentDate.month === end;
         });
       } else {
         return [];
@@ -174,6 +178,7 @@ export default {
 
         sortedEvents[year] = yearEvents;
       });
+
       return sortedEvents;
 
       // TODO: work on this function
@@ -210,5 +215,8 @@ main {
     user-select: none;
     position: relative;
   }
+}
+footer {
+  text-align: center;
 }
 </style>

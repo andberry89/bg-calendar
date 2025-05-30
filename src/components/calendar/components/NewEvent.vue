@@ -140,7 +140,7 @@ export default {
       },
       errors: [],
       showErrMsg: false,
-      showForm: true,
+      showForm: false,
     };
   },
   props: {
@@ -221,7 +221,7 @@ export default {
               error = "";
               break;
           }
-          if (error !== "") errors.push(error);
+          if (error !== "" && event.type !== "Vacation" && event.type !== "Birthday") errors.push(error);
         }
       });
 
