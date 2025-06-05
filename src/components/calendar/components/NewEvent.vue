@@ -180,6 +180,7 @@ export default {
         }
         this.$emit("update", this.newEvent);
         this.resetNewEvent();
+        this.showForm = false;
       }
     },
     compareDates(val) {
@@ -202,6 +203,11 @@ export default {
       let errors = [];
 
       keys.forEach((k) => {
+        if (k === "staff" && event[k].length === 0 && event.type !== "Holiday" && event.type !== "C/D Event") {
+          console.log("Staff is required for this event type.");
+          errors.push("Staff");
+        }
+
         if (event[k] === "" || event === []) {
           let error = k.charAt(0).toUpperCase() + k.slice(1);
           switch (error) {
@@ -221,7 +227,11 @@ export default {
               error = "";
               break;
           }
-          if (error !== "" && event.type !== "Vacation" && event.type !== "Birthday") errors.push(error);
+          if (error === "Details" && (event.type !== "Vacation" || event.type !== "Birthday")) {
+            errors.push(error);
+          } else {
+            errors.push(error);
+          }
         }
       });
 

@@ -3,11 +3,6 @@
     :class="['event-modal', day < 4 ? 'right' : 'left']"
     v-click-outside="closeModal"
   >
-    <ModalOverlay
-      v-if="showEdit"
-      @update="closeEdit"
-      >EDIT MODAL</ModalOverlay
-    >
     <div
       class="close-btn"
       @click="closeModal"
@@ -37,14 +32,12 @@
       </div>
     </div>
     <div class="event-options">
-      <span @click="openEdit">Edit Event &#x270E;</span>
       <span @click="deleteEvent">Delete Event &#x2718;</span>
     </div>
   </div>
 </template>
 <script>
 import { format, parseISO } from "date-fns";
-import ModalOverlay from "../common/ModalOverlay.vue";
 
 export default {
   name: "EventModal",
@@ -52,9 +45,6 @@ export default {
     return {
       showEdit: false,
     };
-  },
-  components: {
-    ModalOverlay,
   },
   props: {
     day: {
@@ -153,12 +143,11 @@ export default {
   }
 
   .event-options {
-    border-top: 1px solid var(--black);
     margin-top: 35px;
     padding-top: 5px;
     display: flex;
     flex-flow: row nowrap;
-    justify-content: space-between;
+    justify-content: flex-end;
     font-size: 0.8rem;
 
     span {
