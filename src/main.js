@@ -4,6 +4,7 @@ import "./main.css";
 import VueTextareaAutosize from "vue-textarea-autosize";
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
+import ClickOutside from "./components/calendar/utils/click-outside";
 
 firebase.initializeApp({
   apiKey: "AIzaSyCxs88m_I6zgEhBQteOjZpT4ViSAAQbH5k",
@@ -16,4 +17,4 @@ firebase.initializeApp({
 
 export const db = firebase.firestore();
 
-createApp(App).use(VueTextareaAutosize).mount("#app");
+createApp(App).directive("click-outside", ClickOutside).use(VueTextareaAutosize).mount("#app");

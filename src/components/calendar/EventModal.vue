@@ -1,5 +1,8 @@
 <template>
-  <div :class="['event-modal', day < 4 ? 'right' : 'left']">
+  <div
+    :class="['event-modal', day < 4 ? 'right' : 'left']"
+    v-click-outside="closeModal"
+  >
     <ModalOverlay
       v-if="showEdit"
       @update="closeEdit"
@@ -13,7 +16,10 @@
     </div>
     <div class="event-header">
       <div class="event-name">
-        <span class="event-type">{{ event.type }} {{ event.class === "Birthday" ? "🎂" : "" }}</span>
+        <span class="event-type"
+          >{{ event.class === "cd-event" ? event.details : event.type }}
+          {{ event.class === "Birthday" ? "🎂" : "" }}</span
+        >
       </div>
       <div class="event-dates">
         {{ eventDates }}
@@ -63,7 +69,6 @@ export default {
   computed: {
     eventDates() {
       // We use the .replace regex so the format method does not subtract a day
-      console.log(this.event);
       const startDate = new Date(this.event.start.replace(/-/g, "/"));
       const start = this.format(startDate, "MM/dd/yyyy");
       if (this.event.start === this.event.end) {
@@ -97,12 +102,12 @@ export default {
 .event-modal {
   position: absolute;
   text-align: left;
-  width: 250px;
+  width: 275px;
   top: -25px;
   z-index: 99;
-  background-color: var(--ocean-event-detail);
-  color: var(--white);
-  padding: 8px;
+  background-color: var(--light-gray);
+  color: var(--black);
+  padding: 12px 8px 4px;
   border: 1px solid var(--black);
   border-radius: 8px;
   font: 400 0.9rem/1 "Arial", sans-serif;
@@ -115,8 +120,8 @@ export default {
     position: absolute;
     padding: 3px 6px;
     border-radius: 10px;
-    border: 1px solid var(--white);
-    background-color: var(--ocean-slate-blue);
+    border: 1px solid var(--black);
+    background-color: var(--ocean-event-detail);
     transition: 0.2s;
     top: -15px;
     left: -12px;
@@ -133,7 +138,7 @@ export default {
     .event-name {
       font-weight: 700;
       font-size: 1rem;
-      border-bottom: 1px solid var(--white);
+      border-bottom: 1px solid var(--black);
 
       .event-type {
         font-weight: 400;
@@ -148,8 +153,8 @@ export default {
   }
 
   .event-options {
-    border-top: 1px solid var(--white);
-    margin-top: 15px;
+    border-top: 1px solid var(--black);
+    margin-top: 35px;
     padding-top: 5px;
     display: flex;
     flex-flow: row nowrap;
@@ -161,7 +166,7 @@ export default {
       transition: 0.2s;
 
       &:hover {
-        color: var(--ocean-lt-blue);
+        color: var(--ocean-event-detail);
         cursor: pointer;
       }
     }
