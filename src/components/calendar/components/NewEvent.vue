@@ -227,9 +227,9 @@ export default {
               error = "";
               break;
           }
-          if (error === "Details" && (event.type !== "Vacation" || event.type !== "Birthday")) {
+          if (error === "Event Details" && event.type !== "Vacation" && event.type !== "Birthday") {
             errors.push(error);
-          } else {
+          } else if (error !== "Event Details" && error !== "") {
             errors.push(error);
           }
         }
