@@ -7,9 +7,9 @@
     />
     <article id="calendar">
       <!-- <article
-    id="calendar"
-    :style="{ 'background-image': 'url(' + require('@/assets/calendar/' + currentDate.month + '.jpg') + ')' }"
-  > -->
+      id="calendar"
+      :style="{ 'background-image': 'url(' + require('@/assets/calendar/' + currentDate.month + '.jpg') + ')' }"
+    > -->
       <CalendarHeader
         :currentDate="currentDate"
         :prevMonthDays="prevMonthDays"
@@ -30,16 +30,20 @@
         @delete="updateEvents('delete', $event)"
       />
     </article>
+    <EventList
+      :events="currentMonthEvents"
+      :currentDate="currentDate"
+    />
   </main>
   <footer>
     <em>Version 1.0.0</em>
   </footer>
 </template>
 <script>
-//TODO: Work on events that span across months
 import CalendarHeader from "./CalendarHeader.vue";
 import CalendarBody from "./CalendarBody.vue";
 import StaffList from "./StaffList.vue";
+import EventList from "./components/EventList.vue";
 import { db } from "@/main";
 import { addEvent, deleteEvent } from "@/router/events";
 import { addStaff, deleteStaff } from "@/router/staff";
@@ -63,6 +67,7 @@ export default {
   components: {
     CalendarHeader,
     CalendarBody,
+    EventList,
     StaffList,
   },
   computed: {
@@ -77,11 +82,18 @@ export default {
     currentMonthEvents() {
       const currentYearEvents = this.sortedEvents[this.currentDate.year];
       if (currentYearEvents) {
-        return currentYearEvents.filter((e) => {
-          const start = e.start.split("-")[1] - 1;
-          const end = e.end.split("-")[1] - 1;
-          return this.currentDate.month === start || this.currentDate.month === end;
-        });
+        return currentYearEvents
+          .filter((e) => {
+            const start = e.start.split("-")[1] - 1;
+            const end = e.end.split("-")[1] - 1;
+            return this.currentDate.month === start || this.currentDate.month === end;
+          })
+          .sort((a, b) => {
+            return (
+              new Date(a.start.replace(/-/g, "/").replace(/T.+/, "")) -
+              new Date(b.start.replace(/-/g, "/").replace(/T.+/, ""))
+            );
+          });
       } else {
         return [];
       }
@@ -199,6 +211,8 @@ export default {
 main {
   display: flex;
   flex-flow: row nowrap;
+  justify-content: space-around;
+  padding: 0 30px;
 
   #calendar {
     width: 1032px;
@@ -206,7 +220,6 @@ main {
     flex-flow: column nowrap;
     justify-content: flex-start;
     gap: 10px;
-    margin: 0 auto;
     background-color: var(--ocean-dark-blue);
     font-family: "Anton";
     border-radius: 15px;

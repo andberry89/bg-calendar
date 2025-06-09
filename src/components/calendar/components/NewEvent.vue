@@ -54,15 +54,20 @@
               />Office Open
             </label>
           </div>
-          <label for="details">Event Details</label>
-          <input
-            type="text"
-            placeholder="Details"
-            v-model="newEvent.details"
-            name="details"
-            id="details"
-          />
-          <label for="startDate">Start Date</label>
+          <div
+            class="details-div"
+            v-if="this.newEvent.type !== 'Birthday'"
+          >
+            <label for="details">Event Details</label>
+            <input
+              type="text"
+              placeholder="Details"
+              v-model="newEvent.details"
+              name="details"
+              id="details"
+            />
+          </div>
+          <label for="startDate">{{ this.newEvent.type === "Birthday" ? "" : "Start" }} Date</label>
           <input
             type="date"
             v-model="newEvent.start"
@@ -70,14 +75,19 @@
             id="startDate"
             @input="compareDates('end')"
           />
-          <label for="endDate">End Date</label>
-          <input
-            type="date"
-            v-model="newEvent.end"
-            name="endDate"
-            id="endDate"
-            @input="compareDates('start')"
-          />
+          <div
+            class="end-date-div"
+            v-if="this.newEvent.type !== 'Birthday'"
+          >
+            <label for="endDate">End Date</label>
+            <input
+              type="date"
+              v-model="newEvent.end"
+              name="endDate"
+              id="endDate"
+              @input="compareDates('start')"
+            />
+          </div>
           <ul v-if="this.newEvent.type !== 'Holiday'">
             <li
               v-for="(s, idx) in staff"
@@ -188,6 +198,8 @@ export default {
         this.newEvent.end = this.newEvent.start;
       } else if (this.newEvent.start === "") {
         this.newEvent.start = this.newEvent.end;
+      } else if (this.newEvent.type === "Birthday") {
+        this.newEvent.end = this.newEvent.start;
       } else {
         const startDate = parse(this.newEvent.start, "yyyy-MM-dd", new Date());
         const endDate = parse(this.newEvent.end, "yyyy-MM-dd", new Date());

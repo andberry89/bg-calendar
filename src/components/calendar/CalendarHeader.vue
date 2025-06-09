@@ -27,6 +27,10 @@
         <div @click="monthUp">&gt;</div>
       </div>
     </div>
+    <div class="calendar-title">
+      <h1>C/D Buyers Guide</h1>
+      <h2>Team Calendar</h2>
+    </div>
     <NewEvent
       :staff="staff"
       key="new-event"
@@ -35,7 +39,6 @@
   </header>
 </template>
 <script>
-// import Button from "@/components/common/Button.vue";
 import NewEvent from "./components/NewEvent.vue";
 import { month, weekdayNames } from "./utils/selectOptions";
 
