@@ -192,13 +192,10 @@ export default {
       });
 
       return sortedEvents;
-
-      // TODO: work on this function
     },
   },
   created() {
     this.getCurrentDate();
-    // console.log(new Date(this.events[0].start.replace(/-/g, "/").replace(/T.+/, "")));
   },
   mounted() {
     this.getEvents();

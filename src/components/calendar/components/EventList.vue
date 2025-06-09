@@ -25,7 +25,6 @@
   </div>
 </template>
 <script>
-//TODO: Style the event list
 import { month } from "@/components/calendar/utils/selectOptions";
 
 export default {

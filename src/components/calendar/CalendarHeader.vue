@@ -146,8 +146,6 @@ export default {
     this.newDate = this.currentDate;
   },
 };
-
-// TODO: continue working on new event form
 </script>
 <style lang="scss" scoped>
 @mixin arrow-style() {

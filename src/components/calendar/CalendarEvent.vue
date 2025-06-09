@@ -117,5 +117,3 @@ export default {
   background-color: var(--ocean-press-trip);
 }
 </style>
-
-// TODO: format calendar events based on type
