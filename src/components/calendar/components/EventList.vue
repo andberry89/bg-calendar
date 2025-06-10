@@ -25,6 +25,7 @@
   </div>
 </template>
 <script>
+//TODO: List office closures for holidays if applicable
 import { month } from "@/components/calendar/utils/selectOptions";
 
 export default {

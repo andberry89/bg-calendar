@@ -7,7 +7,7 @@
     >
       <div class="profile-picture">
         <img
-          :src="require('@/assets/photos/' + s.lastName + '.jpg')"
+          :src="imgUrl(s.lastName)"
           :alt="s.firstName + ' ' + s.lastName"
         />
       </div>
@@ -40,6 +40,17 @@ export default {
     emitStaff(staffFn) {
       this.$emit("update", staffFn);
     },
+    imgUrl(name) {
+      // Use require.context to dynamically load images from the staff folder
+      const images = require.context("@/assets/staff", false, /\.(jpg|png)$/);
+      console.log(images);
+      try {
+        return images(`./${name}.jpg`);
+      } catch (e) {
+        // Return a fallback image if not found
+        return images("./user.png");
+      }
+    },
   },
 };
 </script>
@@ -55,7 +66,6 @@ export default {
 
     .profile-picture {
       border-radius: 40%;
-      border: 1px solid var(--black);
       overflow: hidden;
       position: relative;
       height: 75px;
