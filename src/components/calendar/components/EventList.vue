@@ -12,6 +12,12 @@
         ><br />
         <span class="event-type">{{ eventTitle(event) }}</span
         ><br />
+        <span
+          v-if="event.type === 'Holiday'"
+          class="holiday-details"
+        >
+          {{ holidayDetails(event) }}
+        </span>
         <span class="event-staff">
           <span
             v-for="(s, sIdx) in event.staff"
@@ -25,7 +31,6 @@
   </div>
 </template>
 <script>
-//TODO: List office closures for holidays if applicable
 import { month } from "@/components/calendar/utils/selectOptions";
 
 export default {
@@ -54,6 +59,16 @@ export default {
         return event.type;
       }
     },
+    holidayDetails(event) {
+      if (event.closed === "none") {
+        return "";
+      } else if (event.closed === "full") {
+        return "Office closed";
+      } else if (event.closed === "half") {
+        return "Early close";
+      }
+      return "";
+    },
   },
 };
 </script>
@@ -68,14 +83,25 @@ export default {
 
     li {
       margin: 10px 0;
-      background: #ffffff;
-      background: linear-gradient(180deg, rgba(255, 255, 255, 1) 80%, rgba(39, 76, 119, 0.75) 100%);
+      background: #fdfd96;
       border: 1px solid var(--dark-gray);
       border-radius: 5px;
       padding: 5px 10px 10px;
+      filter: drop-shadow(4px 4px rgba(0, 0, 0, 0.7));
+
+      &:hover {
+        background: #ffd858;
+      }
+
+      .holiday-details {
+        font-style: italic;
+        color: #888;
+      }
       .event-date {
+        display: inline-block;
         font-weight: bold;
         color: #333;
+        margin: 5px 0;
       }
       .event-staff {
         font-style: italic;

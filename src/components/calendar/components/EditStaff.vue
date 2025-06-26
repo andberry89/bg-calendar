@@ -109,12 +109,15 @@ export default {
 <style lang="scss" scoped>
 .edit-staff-container {
   .staff-button {
+    font: 400 14px/1.2 "Public Sans", sans-serif;
+    background-color: #c4a1ff;
     margin: 0 2px;
+    padding: 5px 10px;
     transition: all 0.3s;
 
     &:hover {
       color: var(--ocean-gray);
-      background-color: var(--ocean-dark-blue);
+      background-color: #a388ee;
       cursor: pointer;
     }
   }

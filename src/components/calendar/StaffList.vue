@@ -1,5 +1,6 @@
 <template>
   <article id="staff-list">
+    <h2>Staff List</h2>
     <div
       v-for="(s, idx) in staff"
       :key="idx"
@@ -56,20 +57,30 @@ export default {
 </script>
 <style lang="scss" scoped>
 #staff-list {
+  font: 400 14px/1.2 "Arial", sans-serif;
+
   .staff-card {
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
     gap: 10px;
     height: 70px;
+    background-color: #bafca2;
+    border: 2px solid var(--black);
+    overflow: hidden;
     margin: 10px 0;
+    padding: 10px 5px;
+
+    &:hover {
+      background-color: #90ee90;
+    }
 
     .profile-picture {
-      border-radius: 40%;
       overflow: hidden;
       position: relative;
       height: 75px;
       width: 75px;
+      border: 2px solid var(--black);
 
       img {
         height: auto;
