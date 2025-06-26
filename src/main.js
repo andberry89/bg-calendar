@@ -6,14 +6,16 @@ import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
 import ClickOutside from "@/directives/click-outside";
 
-firebase.initializeApp({
-  apiKey: "AIzaSyCxs88m_I6zgEhBQteOjZpT4ViSAAQbH5k",
-  authDomain: "bg-calendar-6f750.firebaseapp.com",
-  projectId: "bg-calendar-6f750",
-  storageBucket: "bg-calendar-6f750.firebasestorage.app",
-  messagingSenderId: "661066526224",
-  appId: "1:661066526224:web:8d857fc1de1cde3e982495",
-});
+const firebaseConfig = {
+  apiKey: process.env.VUE_APP_FIREBASE_API_KEY,
+  authDomain: process.env.VUE_APP_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.VUE_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.VUE_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.VUE_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.VUE_APP_FIREBASE_APP_ID,
+};
+
+firebase.initializeApp(firebaseConfig);
 
 export const db = firebase.firestore();
 
