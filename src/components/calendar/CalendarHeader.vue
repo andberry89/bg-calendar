@@ -22,9 +22,19 @@
         </div>
       </div>
       <div class="date-nav">
-        <div @click="monthDown">&lt;</div>
+        <div
+          @click="monthDown"
+          class="small-month"
+        >
+          &lt; {{ lastMonth }}
+        </div>
         <div @click="dateFn">Today</div>
-        <div @click="monthUp">&gt;</div>
+        <div
+          @click="monthUp"
+          class="small-month"
+        >
+          {{ nextMonth }} &gt;
+        </div>
       </div>
     </div>
     <div class="calendar-title">
@@ -75,6 +85,20 @@ export default {
   computed: {
     currentDay() {
       return new Date(this.currentDate.year, this.currentDate.month, this.currentDate.date).getDay();
+    },
+    lastMonth() {
+      let lastMonth = month[this.currentDate.month - 1];
+      if (this.currentDate.month === 0) {
+        lastMonth = month[11];
+      }
+      return lastMonth.substring(0, 3);
+    },
+    nextMonth() {
+      let nextMonth = month[this.currentDate.month + 1];
+      if (this.currentDate.month === 11) {
+        nextMonth = month[0];
+      }
+      return nextMonth.substring(0, 3);
     },
     today() {
       const today = new Date();
@@ -235,6 +259,10 @@ header {
           background-color: var(--ocean-lt-blue);
           cursor: pointer;
         }
+      }
+
+      .small-month {
+        font-size: 1rem;
       }
     }
   }

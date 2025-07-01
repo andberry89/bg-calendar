@@ -19,7 +19,7 @@
       v-if="event.class === 'vacation'"
       :class="event.class"
     >
-      {{ event.staff[0].initials }} Off (Vacation)
+      {{ event.staff[0].initials }} Off (PTO)
     </div>
     <div
       v-if="event.class === 'auto-show'"

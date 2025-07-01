@@ -35,9 +35,7 @@
       :currentDate="currentDate"
     />
   </main>
-  <footer>
-    <em>Version 1.0.0</em>
-  </footer>
+  <footer><em>Version 1.0.1</em> - 7/1/2025</footer>
 </template>
 <script>
 import CalendarHeader from "./CalendarHeader.vue";
