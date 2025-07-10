@@ -1,10 +1,12 @@
 <template>
   <main>
-    <StaffList
-      :staff="staff"
-      key="staff-list"
-      @update="updateStaff($event)"
-    />
+    <article id="staff-list">
+      <StaffList
+        :staff="staff"
+        key="staff-list"
+        @update="updateStaff($event)"
+      />
+    </article>
     <article id="calendar">
       <!-- <article
       id="calendar"
@@ -33,6 +35,7 @@
     <EventList
       :events="currentMonthEvents"
       :currentDate="currentDate"
+      v-if="showEvents"
     />
   </main>
   <footer><em>Version 1.0.1</em> - 7/1/2025</footer>
@@ -60,6 +63,7 @@ export default {
       sortedEvents: {
         type: Object,
       },
+      showEvents: false,
     };
   },
   components: {
@@ -206,12 +210,15 @@ export default {
 main {
   display: flex;
   flex-flow: row nowrap;
-  justify-content: space-around;
-  padding: 0 30px;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 15px;
+  padding: 0 10px;
 
   #calendar {
     width: 1032px;
     display: flex;
+    flex-basis: 1050px;
     flex-flow: column nowrap;
     justify-content: flex-start;
     gap: 10px;
