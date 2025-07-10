@@ -57,7 +57,7 @@ export default {
 </script>
 <style lang="scss" scoped>
 #staff-list {
-  font: 400 14px/1.2 "Arial", sans-serif;
+  font: 400 12px/1.2 "Arial", sans-serif;
 
   .staff-card {
     display: flex;
@@ -69,7 +69,7 @@ export default {
     border: 2px solid var(--black);
     overflow: hidden;
     margin: 10px 0;
-    padding: 10px 5px;
+    padding: 5px;
 
     &:hover {
       background-color: #90ee90;
@@ -78,13 +78,13 @@ export default {
     .profile-picture {
       overflow: hidden;
       position: relative;
-      height: 75px;
-      width: 75px;
+      height: 60px;
+      width: 60px;
       border: 2px solid var(--black);
 
       img {
         height: auto;
-        width: 75px;
+        width: 60px;
         position: absolute;
         left: 0;
         bottom: 0;
@@ -93,10 +93,10 @@ export default {
 
     .staff-name {
       font-family: "Arial";
-      font-size: 14px;
+      font-size: 12px;
 
       .last-name {
-        font-size: 18px;
+        font-size: 14px;
         font-weight: 700;
       }
     }

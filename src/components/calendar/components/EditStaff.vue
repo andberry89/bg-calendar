@@ -108,11 +108,16 @@ export default {
 </script>
 <style lang="scss" scoped>
 .edit-staff-container {
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: flex-start;
+  gap: 5px;
+
   .staff-button {
     font: 400 14px/1.2 "Public Sans", sans-serif;
     background-color: #c4a1ff;
     margin: 0 2px;
-    padding: 5px 10px;
+    padding: 5px 8px;
     transition: all 0.3s;
 
     &:hover {
