@@ -1,6 +1,9 @@
 <template>
-  <button type="button">
-    <slot></slot>
+  <button
+    type="button"
+    class="px-5 py-2 rounded-[8px] font-anton text-2xl font-normal leading-snug cursor-pointer transition-colors duration-200 btn-primary"
+  >
+    <slot />
   </button>
 </template>
 <script>
@@ -8,18 +11,3 @@ export default {
   name: "Button",
 };
 </script>
-<style lang="scss" scoped>
-button {
-  padding: 8px 20px;
-  border-radius: 8px;
-  font: 400 24px/1.2 "Anton", sans-serif;
-  cursor: pointer;
-  background-color: var(--ocean-md-blue);
-  color: var(--white);
-  transition: 0.2s;
-
-  &:hover {
-    background-color: var(--ocean-dark-gray);
-  }
-}
-</style>

@@ -1,0 +1,39 @@
+  .btn-primary {
+    background-color: var(--ocean-md-blue);
+    color: var(--white);
+  }
+  .btn-primary:hover {
+    background-color: var(--ocean-dark-gray);
+  }
+
+  /* CalendarEvent.vue */
+  .event-chip {
+  font: 400 9pt/1.1 "Roboto", "Verdana", sans-serif;
+  text-align: center;
+  padding: 4px;
+  margin: 2px 0;
+  border-radius: 8px;
+  width: 115px;
+  transition: all 0.2s;
+}
+.event-chip:hover {
+  transform: scale(1.05);
+  cursor: pointer;
+}
+
+/* EditStaff.vue */
+.staff-button {
+  @apply
+    mx-[2px]
+    px-[8px]
+    py-[5px]
+    font-public
+    text-[14px]
+    leading-[1.2]
+    bg-[#c4a1ff]
+    transition-all
+    duration-300
+    hover:bg-[#a388ee]
+    hover:text-[var(--ocean-gray)]
+    hover:cursor-pointer;
+}

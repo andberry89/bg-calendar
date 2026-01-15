@@ -1,11 +1,11 @@
 <template>
-  <div class="edit-modal">
-    <div class="slot-container">
+  <div class="fixed inset-0 z-[4] flex items-center justify-around">
+    <div class="relative z-[5] inline-block max-h-[90%] max-w-[95%] overflow-y-auto">
       <slot></slot>
     </div>
     <div
-      class="background-overlay"
-      @click.self="this.$emit('update')"
+      class="absolute inset-0 bg-[var(--black)] opacity-75"
+      @click.self="$emit('update')"
     ></div>
   </div>
 </template>
@@ -14,31 +14,3 @@ export default {
   name: "ModalOverlay",
 };
 </script>
-<style lang="scss" scoped>
-.edit-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  z-index: 4;
-
-  .background-overlay {
-    position: absolute;
-    background-color: var(--black);
-    opacity: 0.75;
-    width: 100%;
-    height: 100%;
-  }
-  .slot-container {
-    display: inline-block;
-    z-index: 5;
-    max-height: 90%;
-    overflow-y: auto;
-    max-width: 95%;
-  }
-}
-</style>
