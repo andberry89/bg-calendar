@@ -1,5 +1,16 @@
 <template>
-  <div :class="[dayClass, { weekend: isWeekend }, { fullClose: hasFullClosureHoliday }, 'container']">
+  <div
+    :class="[
+      'relative h-[200px] text-[0.75rem]',
+      dayClass === 'day'
+        ? 'border border-[var(--white)] bg-[var(--ocean-md-blue)] text-[var(--white)]'
+        : dayClass === 'day-hidden'
+          ? 'opacity-50 border border-[var(--ocean-gray)] bg-[var(--ocean-dark-blue)]'
+          : '',
+      isWeekend ? 'bg-[var(--ocean-dark-blue)]' : '',
+      hasFullClosureHoliday ? 'bg-[var(--ocean-dark-gray)]' : ''
+    ]"
+  >
     <EventModal
       v-if="showEventDetails"
       :event="modalEvent"
@@ -7,7 +18,13 @@
       @update="closeModal"
       @delete="deleteEvent($event)"
     />
-    <div class="date-text">
+
+    <div
+      :class="[
+        'mb-[5px] flex w-full flex-col items-center border-b border-[var(--ocean-gray)] text-center text-[1rem]',
+        dayClass === 'day-hidden' ? 'text-[var(--white)]' : ''
+      ]"
+    >
       {{ date }}
       <CalendarEvent
         v-for="(event, idx) in holidays"
@@ -15,6 +32,7 @@
         :event="event"
       />
     </div>
+
     <CalendarEvent
       v-for="(event, idx) in filteredEvents"
       :key="'event-' + idx"
@@ -24,6 +42,7 @@
     />
   </div>
 </template>
+
 <script>
 import CalendarEvent from "./CalendarEvent.vue";
 import EventModal from "./EventModal.vue";
@@ -128,49 +147,3 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
-.container {
-  font-size: 0.75rem;
-  height: 200px;
-  position: relative;
-}
-.day {
-  border: 1px solid var(--white);
-  background-color: var(--ocean-md-blue);
-  color: var(--white);
-
-  // &:hover {
-  //   background-color: var(--ocean-gray);
-  //   color: var(--ocean-yellow);
-  // }
-}
-.day-hidden {
-  opacity: 0.5;
-  border: 1px solid var(--ocean-gray);
-  background-color: var(--ocean-dark-blue);
-
-  .date-text {
-    color: var(--white);
-  }
-}
-.fullClose {
-  background-color: var(--ocean-dark-gray);
-}
-.weekend {
-  background-color: var(--ocean-dark-blue);
-
-  // &:hover {
-  //   color: var(--red);
-  // }
-}
-.date-text {
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: center;
-  font-size: 1rem;
-  border-bottom: 1px solid var(--ocean-gray);
-  width: 100%;
-  text-align: center;
-  margin-bottom: 5px;
-}
-</style>

@@ -1,24 +1,35 @@
 <template>
-  <div class="events-list">
+  <div class="font-['Arial',_sans-serif] text-[14px] leading-[1.2]">
     <h2>Events for {{ month[currentDate.month] }} {{ currentDate.year }}</h2>
-    <ul>
+
+    <ul class="list-none p-0 m-0">
       <li
         v-for="(event, idx) in events"
         :key="'event-' + idx"
+        class="my-[10px] rounded-[5px] border border-[var(--dark-gray)]
+               bg-[#fdfd96] px-[10px] pt-[5px] pb-[10px]
+               drop-shadow-[4px_4px_rgba(0,0,0,0.7)]
+               hover:bg-[#ffd858]"
       >
-        <span class="event-date"
-          >{{ event.start.split("-").slice(1).join("/") }}
-          {{ event.start !== event.end ? " - " + event.end.split("-").slice(1).join("/") + " " : " " }}</span
-        ><br />
-        <span class="event-type">{{ eventTitle(event) }}</span
-        ><br />
+        <span class="inline-block font-bold text-[#333] my-[5px]">
+          {{ event.start.split("-").slice(1).join("/") }}
+          {{ event.start !== event.end ? " - " + event.end.split("-").slice(1).join("/") + " " : " " }}
+        </span>
+        <br />
+
+        <span>
+          {{ eventTitle(event) }}
+        </span>
+        <br />
+
         <span
           v-if="event.type === 'Holiday'"
-          class="holiday-details"
+          class="italic text-[#888]"
         >
           {{ holidayDetails(event) }}
         </span>
-        <span class="event-staff">
+
+        <span class="italic text-[#666]">
           <span
             v-for="(s, sIdx) in event.staff"
             :key="'staff-' + sIdx"
@@ -30,6 +41,7 @@
     </ul>
   </div>
 </template>
+
 <script>
 import { month } from "@/components/calendar/utils/selectOptions";
 
@@ -72,42 +84,3 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
-.events-list {
-  font: 400 14px/1.2 "Arial", sans-serif;
-
-  ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-
-    li {
-      margin: 10px 0;
-      background: #fdfd96;
-      border: 1px solid var(--dark-gray);
-      border-radius: 5px;
-      padding: 5px 10px 10px;
-      filter: drop-shadow(4px 4px rgba(0, 0, 0, 0.7));
-
-      &:hover {
-        background: #ffd858;
-      }
-
-      .holiday-details {
-        font-style: italic;
-        color: #888;
-      }
-      .event-date {
-        display: inline-block;
-        font-weight: bold;
-        color: #333;
-        margin: 5px 0;
-      }
-      .event-staff {
-        font-style: italic;
-        color: #666;
-      }
-    }
-  }
-}
-</style>

@@ -1,24 +1,24 @@
 <template>
-  <div class="new-event-container">
+  <div class="relative w-1/4 font-['Arial',_sans-serif] text-[1rem] leading-[1] text-[var(--black)] [text-shadow:none]">
     <Button @click="toggleForm">New Event</Button>
+
     <Transition name="drop-form">
       <div
         v-if="showForm"
-        class="new-event-form-container"
+        class="absolute top-[70px] right-[18px] z-[99]
+               border border-[var(--white)] bg-[var(--ocean-lt-blue)]
+               pt-[15px] pr-[30px] pb-[15px] pl-[10px]
+               text-left"
       >
-        <div class="new-event-form">
-          <label for="eventType">Event Type</label>
+        <div>
+          <label for="eventType" class="block text-[0.7rem] font-bold">Event Type</label>
           <select
             name="eventType"
             id="eventType"
             v-model="newEvent.type"
+            class="mb-[5px]"
           >
-            <option
-              disabled
-              value="Event Type"
-            >
-              --Event Type--
-            </option>
+            <option disabled value="Event Type">--Event Type--</option>
             <option
               v-for="(event, idx) in eventType"
               :key="'event-' + idx"
@@ -27,71 +27,85 @@
               {{ event }}
             </option>
           </select>
+
           <div
-            class="holiday-options"
             v-if="this.newEvent.type === 'Holiday'"
+            class="mb-[4px] rounded-[4px] bg-[var(--ocean-md-blue)] p-[2px]"
           >
-            <span class="office-closure-label">Office Closed?</span>
-            <label>
+            <span class="text-[14px]">Office Closed?</span>
+
+            <label class="block text-[0.7rem] font-bold">
               <input
+                class="cursor-pointer"
                 type="radio"
                 value="full"
                 v-model="newEvent.closed"
-              />Full Day
+              />
+              Full Day
             </label>
-            <label>
+
+            <label class="block text-[0.7rem] font-bold">
               <input
+                class="cursor-pointer"
                 type="radio"
                 value="half"
                 v-model="newEvent.closed"
-              />Half Day
+              />
+              Half Day
             </label>
-            <label>
+
+            <label class="block text-[0.7rem] font-bold">
               <input
+                class="cursor-pointer"
                 type="radio"
                 value="none"
                 v-model="newEvent.closed"
-              />Office Open
+              />
+              Office Open
             </label>
           </div>
-          <div
-            class="details-div"
-            v-if="this.newEvent.type !== 'Birthday'"
-          >
-            <label for="details">Event Details</label>
+
+          <div v-if="this.newEvent.type !== 'Birthday'">
+            <label for="details" class="block text-[0.7rem] font-bold">Event Details</label>
             <input
               type="text"
               placeholder="Details"
               v-model="newEvent.details"
               name="details"
               id="details"
+              class="mb-[5px]"
             />
           </div>
-          <label for="startDate">{{ this.newEvent.type === "Birthday" ? "" : "Start" }} Date</label>
+
+          <label for="startDate" class="block text-[0.7rem] font-bold">
+            {{ this.newEvent.type === "Birthday" ? "" : "Start" }} Date
+          </label>
           <input
             type="date"
             v-model="newEvent.start"
             name="startDate"
             id="startDate"
             @input="compareDates('end')"
+            class="mb-[5px]"
           />
-          <div
-            class="end-date-div"
-            v-if="this.newEvent.type !== 'Birthday'"
-          >
-            <label for="endDate">End Date</label>
+
+          <div v-if="this.newEvent.type !== 'Birthday'">
+            <label for="endDate" class="block text-[0.7rem] font-bold">End Date</label>
             <input
               type="date"
               v-model="newEvent.end"
               name="endDate"
               id="endDate"
               @input="compareDates('start')"
+              class="mb-[5px]"
             />
           </div>
-          <ul v-if="this.newEvent.type !== 'Holiday'">
+
+          <ul v-if="this.newEvent.type !== 'Holiday'" class="m-0 list-none p-0">
             <li
               v-for="(s, idx) in staff"
               :key="'staff-' + idx"
+              class="flex items-center"
             >
               <input
                 type="checkbox"
@@ -99,22 +113,30 @@
                 :name="'staff-' + idx"
                 :value="s"
                 v-model="newEvent.staff"
-              /><label :for="'staff' + idx">{{ s.shortName }}</label>
+              />
+              <label
+                :for="'staff' + idx"
+                class="inline text-[0.7rem] font-bold"
+              >
+                {{ s.shortName }}
+              </label>
             </li>
           </ul>
+
           <button
-            class="submit-event-button"
+            class="mt-[5px]"
             @click="emitNewEvent"
           >
             Add Event
           </button>
+
           <div
-            class="err-msg"
             v-if="showErrMsg"
+            class="mt-[10px] font-['Arial',_sans-serif] text-[12px] font-bold leading-[1.1] text-[var(--red)]"
           >
             This is not a valid event!<br />
             Make sure to check the following:
-            <ul>
+            <ul class="mt-[2px] list-disc font-normal">
               <li
                 v-for="error in errors"
                 :key="error"
@@ -128,6 +150,7 @@
     </Transition>
   </div>
 </template>
+
 <script>
 import Button from "@/components/common/Button.vue";
 import { eventType } from "../utils/selectOptions";
@@ -268,90 +291,15 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
-.new-event-container {
-  position: relative;
-  width: 25%;
-  font: 400 1rem/1 "Arial", sans-serif;
-  text-shadow: none;
-  color: var(--black);
+<style>
+.drop-form-enter-active,
+.drop-form-leave-active {
+  transition: all 0.5s ease;
+}
 
-  .drop-form-enter-active,
-  .drop-form-leave-active {
-    transition: all 0.5s ease;
-  }
-
-  .drop-form-enter-from,
-  .drop-form-leave-to {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-
-  .new-event-form-container {
-    position: absolute;
-    top: 70px;
-    right: 18px;
-    border: 1px solid var(--white);
-    background-color: var(--ocean-lt-blue);
-    padding: 15px 30px 15px 10px;
-    text-align: left;
-    z-index: 99;
-
-    .new-event-form {
-      .holiday-options {
-        margin-bottom: 4px;
-        background-color: var(--ocean-md-blue);
-        padding: 2px;
-        border-radius: 4px;
-
-        .office-closure-label {
-          font-size: 14px;
-        }
-
-        input {
-          cursor: pointer;
-        }
-      }
-
-      label {
-        font-size: 0.7rem;
-        font-weight: 700;
-        display: block;
-      }
-      input,
-      select {
-        margin-bottom: 5px;
-      }
-      ul {
-        padding: 0;
-        list-style: none;
-        margin: 0;
-
-        li {
-          display: flex;
-          align-items: center;
-
-          label {
-            display: inline;
-          }
-        }
-      }
-      button {
-        margin-top: 5px;
-      }
-
-      .err-msg {
-        font: 700 12px/1.1 "Arial", sans-serif;
-        color: var(--red);
-        margin-top: 10px;
-
-        ul {
-          font-weight: 400;
-          list-style: disc;
-          margin-top: 2px;
-        }
-      }
-    }
-  }
+.drop-form-enter-from,
+.drop-form-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 </style>

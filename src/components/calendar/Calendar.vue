@@ -1,5 +1,5 @@
 <template>
-  <main>
+  <main class="flex flex-nowrap justify-center items-start gap-[15px] px-[10px]">
     <article id="staff-list">
       <StaffList
         :staff="staff"
@@ -7,11 +7,18 @@
         @update="updateStaff($event)"
       />
     </article>
-    <article id="calendar">
-      <!-- <article
+
+    <article
       id="calendar"
+      class="relative flex basis-[1050px] w-[1032px] flex-col justify-start gap-[10px]
+             overflow-hidden rounded-[15px] bg-[var(--ocean-dark-blue)]
+             bg-cover select-none font-anton"
+    >
+      <!-- Optional background image version kept as comment -->
+      <!--
       :style="{ 'background-image': 'url(' + require('@/assets/calendar/' + currentDate.month + '.jpg') + ')' }"
-    > -->
+      -->
+
       <CalendarHeader
         :currentDate="currentDate"
         :prevMonthDays="prevMonthDays"
@@ -22,6 +29,7 @@
         :staff="staff"
         key="calendar-header"
       />
+
       <CalendarBody
         :currentDate="currentDate"
         :prevMonthDays="prevMonthDays"
@@ -32,14 +40,19 @@
         @delete="updateEvents('delete', $event)"
       />
     </article>
+
     <EventList
       :events="currentMonthEvents"
       :currentDate="currentDate"
       v-if="showEvents"
     />
   </main>
-  <footer><em>Version 1.0.2</em> - 7/10/2025</footer>
+
+  <footer class="text-center">
+    <em>Version 1.1.0</em> - 7/10/2025
+  </footer>
 </template>
+
 <script>
 import CalendarHeader from "./CalendarHeader.vue";
 import CalendarBody from "./CalendarBody.vue";
@@ -205,33 +218,3 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
-@import url("https://fonts.googleapis.com/css?family=Anton");
-main {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 15px;
-  padding: 0 10px;
-
-  #calendar {
-    width: 1032px;
-    display: flex;
-    flex-basis: 1050px;
-    flex-flow: column nowrap;
-    justify-content: flex-start;
-    gap: 10px;
-    background-color: var(--ocean-dark-blue);
-    font-family: "Anton";
-    border-radius: 15px;
-    overflow: hidden;
-    background-size: cover;
-    user-select: none;
-    position: relative;
-  }
-}
-footer {
-  text-align: center;
-}
-</style>

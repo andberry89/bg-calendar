@@ -1,61 +1,52 @@
 <template>
-  <div class="edit-staff-container">
-    <button
-      class="staff-button"
-      @click="toggleEditStaffForm('add')"
-    >
+  <div class="flex flex-col items-start gap-[5px]">
+    <button class="staff-button" @click="toggleEditStaffForm('add')">
       Add Staff
     </button>
-    <button
-      class="staff-button"
-      @click="toggleEditStaffForm('remove')"
-    >
+
+    <button class="staff-button" @click="toggleEditStaffForm('remove')">
       Remove Staff
     </button>
-    <div class="edit-staff-form">
-      <div
-        class="add-staff-form"
-        v-if="showForm.add"
-      >
+
+    <div class="mt-[15px]">
+      <div v-if="showForm.add" class="flex flex-col gap-[3px]">
         <input
           type="text"
           placeholder="First Name"
           v-model="newStaff.firstName"
-          name="newFirstName"
-          id="newFirstName"
           ref="firstNameInput"
+          class="border border-black/20 px-2 py-1 font-public"
         />
         <input
           type="text"
           placeholder="Last Name"
           v-model="newStaff.lastName"
-          name="newLastName"
-          id="newLastName"
+          class="border border-black/20 px-2 py-1 font-public"
         />
-        <button
-          class="staff-button"
-          @click="emitStaff('add')"
-        >
+        <button class="staff-button" @click="emitStaff('add')">
           Add {{ newStaff.firstName + " " + newStaff.lastName }}
         </button>
       </div>
-      <div
-        class="remove-staff-form"
-        v-if="showForm.remove"
-      >
+
+      <div v-if="showForm.remove" class="flex flex-col gap-[5px]">
         <div
           v-for="(person, idx) in staff"
           :key="'staff-' + idx"
-          class="remove-staff-card"
           @click="emitStaff(person)"
+          class="flex items-center justify-between p-[3px] font-public text-[14px] leading-[1.2] bg-[linear-gradient(var(--ocean-red)_0_0)] bg-no-repeat [background-size:var(--p,0)_100%] [background-position:var(--bgpos,left)] transition-[background-size,color] duration-500 hover:[--p:100%] hover:[--bgpos:right] hover:text-[var(--white)] hover:cursor-pointer"
         >
-          <div class="remove-staff-name">{{ person.firstName + " " + person.lastName }}</div>
-          <div class="remove-text">Remove?</div>
+          <div>
+            {{ person.firstName + " " + person.lastName }}
+          </div>
+          <div class="text-[12px] text-[var(--white)]">
+            Remove?
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 <script>
 import { nextTick } from "vue";
 
@@ -106,64 +97,3 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
-.edit-staff-container {
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: flex-start;
-  gap: 5px;
-
-  .staff-button {
-    font: 400 14px/1.2 "Public Sans", sans-serif;
-    background-color: #c4a1ff;
-    margin: 0 2px;
-    padding: 5px 8px;
-    transition: all 0.3s;
-
-    &:hover {
-      color: var(--ocean-gray);
-      background-color: #a388ee;
-      cursor: pointer;
-    }
-  }
-
-  .edit-staff-form {
-    margin-top: 15px;
-
-    .add-staff-form {
-      display: flex;
-      flex-flow: column nowrap;
-      gap: 3px;
-    }
-
-    .remove-staff-form {
-      display: flex;
-      flex-flow: column nowrap;
-      gap: 5px;
-
-      .remove-staff-card {
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: space-between;
-        align-items: center;
-        background: linear-gradient(var(--ocean-red) 0 0) var(--p, 0) / var(--p, 0) no-repeat;
-        transition: 0.5s, background-position 0s;
-        padding: 3px;
-        font: 400 14px/1.2 "Arial", sans-serif;
-
-        &:hover {
-          cursor: pointer;
-          --p: 100%;
-          background-position: right;
-          color: var(--white);
-        }
-
-        .remove-text {
-          font-size: 12px;
-          color: var(--white);
-        }
-      }
-    }
-  }
-}
-</style>

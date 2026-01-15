@@ -1,17 +1,28 @@
 <template>
-  <section class="calendar-body">
-    <div class="weekdays">
+  <section class="flex h-full flex-col">
+    <!-- Weekdays row -->
+    <div
+      class="grid grid-cols-[repeat(auto-fit,minmax(130px,1fr))] gap-y-[10px] gap-x-[2px]
+             px-[20px] pt-[10px] pb-[10px]
+             bg-[var(--md-tran-black)] border-b border-[var(--white)]
+             text-[1.5em] text-[var(--ocean-gray)]"
+    >
       <div
-        class="weekday"
         v-for="(weekday, idx) in weekdays"
         :key="idx"
+        class="flex flex-col flex-wrap items-center justify-start rounded-[5px]
+               first:text-[var(--red)] [&:nth-child(7n)]:text-[var(--red)]"
       >
         {{ weekday }}
       </div>
     </div>
+
+    <!-- Dates grid -->
     <div
-      class="date"
       v-if="dataReady"
+      class="grid grid-cols-[repeat(auto-fit,minmax(130px,1fr))] gap-y-[10px] gap-x-[2px]
+             px-[20px] pt-[10px] pb-[20px]
+             bg-[var(--lt-tran-black)] flex-grow"
     >
       <CalendarDay
         dayClass="day-hidden"
@@ -21,18 +32,23 @@
         :currentDate="activeDate"
         month="prev"
       />
+
       <CalendarDay
         dayClass="day"
         v-for="(n, idx) in currentMonthDays"
-        :class="{ active: n === activeDate.date }"
-        @click="updateDate(n)"
-        @update="updateEvents"
-        @delete="deleteEvent($event)"
         :key="'day' + idx"
         :date="n"
         :currentDate="activeDate"
         :events="this.events[n - 1]"
+        @click="updateDate(n)"
+        @update="updateEvents"
+        @delete="deleteEvent($event)"
+        :class="[
+          'flex flex-col flex-wrap items-center justify-start rounded-[5px]',
+          n === activeDate.date ? 'bg-[var(--ocean-lt-blue)]' : ''
+        ]"
       />
+
       <CalendarDay
         dayClass="day-hidden"
         v-for="(n, idx) in 43 - (currentMonthDays + firstMonthDay)"
@@ -44,6 +60,7 @@
     </div>
   </section>
 </template>
+
 <script>
 import CalendarDay from "./CalendarDay.vue";
 import assignEvents from "./utils/assignEvents";
@@ -129,49 +146,3 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
-@mixin calendar-layout($property) {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  grid-gap: 10px 2px;
-  padding: $property;
-
-  div {
-    display: flex;
-    flex-flow: column wrap;
-    justify-content: flex-start;
-    align-items: center;
-    border-radius: 5px;
-  }
-}
-
-.calendar-body {
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: flex-start;
-  height: 100%;
-}
-
-.weekdays {
-  @include calendar-layout(10px 20px 10px);
-  background-color: var(--md-tran-black);
-  border-bottom: 1px solid var(--white);
-  font-size: 1.5em;
-  color: var(--ocean-gray);
-
-  div:first-child,
-  div:nth-child(7n) {
-    color: var(--red);
-  }
-}
-
-.date {
-  @include calendar-layout(10px 20px 20px);
-  background-color: var(--lt-tran-black);
-  flex-grow: 4;
-
-  .active {
-    background-color: var(--ocean-lt-blue);
-  }
-}
-</style>

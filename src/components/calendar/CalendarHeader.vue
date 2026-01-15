@@ -1,19 +1,25 @@
 <template>
-  <header>
-    <div class="date-container">
-      <div class="today">
-        <div>{{ currentDate.date }}</div>
-        <div>{{ month[currentDate.month] }}</div>
-        <div>{{ currentDate.year }}</div>
+  <header
+    class="flex items-center justify-between px-[50px] text-center text-[var(--light-gray)]
+           [text-shadow:1px_1px_1px_var(--dark-gray),1px_-1px_1px_var(--dark-gray),-1px_1px_1px_var(--dark-gray),-1px_-1px_1px_var(--dark-gray)]
+           h-[15vh]"
+  >
+    <div class="flex w-[30%] flex-col items-center gap-[25px]">
+      <div class="relative grid grid-cols-[40px_auto_70px_auto] gap-[10px] text-[2rem]">
+        <div class="flex justify-center">{{ currentDate.date }}</div>
+        <div class="flex justify-center">{{ month[currentDate.month] }}</div>
+        <div class="flex justify-center">{{ currentDate.year }}</div>
+
         <div
-          class="date-picker-btn"
+          class="flex justify-center px-[4px] hover:cursor-pointer"
           @click="toggleDatePicker"
         >
           &#10552;
         </div>
+
         <div
           v-if="showDatePicker"
-          class="date-picker"
+          class="absolute right-0 bottom-[-20px]"
         >
           <input
             type="date"
@@ -21,26 +27,36 @@
           />
         </div>
       </div>
-      <div class="date-nav">
+
+      <div class="flex items-center gap-[8px] text-[1.5rem]">
         <div
           @click="monthDown"
-          class="small-month"
+          class="rounded-[8px] border border-[var(--white)] px-[14px] py-[2px] text-[1rem] transition-[background-color] duration-[400ms] hover:bg-[var(--ocean-lt-blue)] hover:cursor-pointer"
         >
           &lt; {{ lastMonth }}
         </div>
-        <div @click="dateFn">Today</div>
+
+        <div
+          @click="dateFn"
+          class="rounded-[8px] border border-[var(--white)] px-[14px] py-[2px] transition-[background-color] duration-[400ms] hover:bg-[var(--ocean-lt-blue)] hover:cursor-pointer"
+        >
+          Today
+        </div>
+
         <div
           @click="monthUp"
-          class="small-month"
+          class="rounded-[8px] border border-[var(--white)] px-[14px] py-[2px] text-[1rem] transition-[background-color] duration-[400ms] hover:bg-[var(--ocean-lt-blue)] hover:cursor-pointer"
         >
           {{ nextMonth }} &gt;
         </div>
       </div>
     </div>
+
     <div class="calendar-title">
       <h1>C/D Buyers Guide</h1>
       <h2>Team Calendar</h2>
     </div>
+
     <NewEvent
       :staff="staff"
       key="new-event"
@@ -48,6 +64,7 @@
     />
   </header>
 </template>
+
 <script>
 import NewEvent from "./components/NewEvent.vue";
 import { month, weekdayNames } from "./utils/selectOptions";
@@ -171,100 +188,3 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
-@mixin arrow-style() {
-  width: 0;
-  height: 0;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  cursor: pointer;
-}
-
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 50px;
-  text-align: center;
-  color: var(--light-gray);
-  text-shadow: 1px 1px 1px var(--dark-gray), 1px -1px 1px var(--dark-gray), -1px 1px 1px var(--dark-gray),
-    -1px -1px 1px var(--dark-gray);
-  height: 15vh;
-
-  .date-container {
-    display: flex;
-    flex-flow: column nowrap;
-    align-items: center;
-    gap: 25px;
-    width: 30%;
-
-    .arrow-left {
-      @include arrow-style();
-      border-right: 10px solid var(--white);
-
-      &:hover {
-        border-right: 10px solid var(--md-tran-black);
-      }
-    }
-    .arrow-right {
-      @include arrow-style();
-      border-left: 10px solid var(--white);
-
-      &:hover {
-        border-left: 10px solid var(--md-tran-black);
-      }
-    }
-
-    .today {
-      display: grid;
-      grid-template-columns: 40px auto 70px auto;
-      grid-gap: 10px;
-      font-size: 2rem;
-      position: relative;
-
-      div {
-        display: flex;
-        justify-content: center;
-      }
-
-      .date-picker-btn {
-        padding: 0 4px;
-
-        &:hover {
-          cursor: pointer;
-        }
-      }
-
-      .date-picker {
-        position: absolute;
-        bottom: -20px;
-        right: 0;
-      }
-    }
-
-    .date-nav {
-      display: flex;
-      flex-flow: row nowrap;
-      align-items: center;
-      font-size: 1.5rem;
-      gap: 8px;
-
-      div {
-        border: 1px solid var(--white);
-        border-radius: 8px;
-        padding: 2px 14px;
-        transition: 0.4s;
-
-        &:hover {
-          background-color: var(--ocean-lt-blue);
-          cursor: pointer;
-        }
-      }
-
-      .small-month {
-        font-size: 1rem;
-      }
-    }
-  }
-}
-</style>

@@ -1,41 +1,54 @@
 <template>
   <div
-    :class="['event-modal', day < 4 ? 'right' : 'left']"
     v-click-outside="closeModal"
+    :class="[
+      'absolute top-[-25px] z-[99] w-[275px] rounded-[8px] border border-[var(--black)] bg-[var(--light-gray)] text-[var(--black)] px-[8px] pt-[12px] pb-[4px] text-left font-[\'Arial\',_sans-serif] text-[0.9rem] leading-[1]',
+      day < 4 ? 'left-[25%]' : 'right-[25%]'
+    ]"
   >
     <div
-      class="close-btn"
+      class="absolute top-[-15px] left-[-12px] rounded-[10px] border border-[var(--black)]
+             bg-[var(--ocean-event-detail)] px-[6px] py-[3px] transition duration-200
+             hover:bg-[var(--white)] hover:text-[var(--black)] hover:cursor-pointer"
       @click="closeModal"
     >
       X
     </div>
-    <div class="event-header">
-      <div class="event-name">
-        <span class="event-type"
-          >{{ event.class === "cd-event" ? event.details : event.type }}
-          {{ event.class === "Birthday" ? "🎂" : "" }}</span
-        >
+
+    <div class="my-[5px]">
+      <div class="my-[5px] border-b border-[var(--black)] text-[1rem] font-bold">
+        <span class="font-normal">
+          {{ event.class === "cd-event" ? event.details : event.type }}
+          {{ event.class === "Birthday" ? "🎂" : "" }}
+        </span>
       </div>
-      <div class="event-dates">
+
+      <div class="my-[5px]">
         {{ eventDates }}
       </div>
-      <div
-        class="event-staff"
-        v-if="event.staff.length > 0"
-      >
+
+      <div v-if="event.staff.length > 0" class="my-[5px]">
         <p
           v-for="person in event.staff"
           :key="person.lastName"
+          class="m-0"
         >
           {{ person.shortName }}
         </p>
       </div>
     </div>
-    <div class="event-options">
-      <span @click="deleteEvent">Delete Event &#x2718;</span>
+
+    <div class="mt-[35px] flex justify-end pt-[5px] text-[0.8rem]">
+      <span
+        class="inline-block transition duration-200 hover:text-[var(--ocean-event-detail)] hover:cursor-pointer"
+        @click="deleteEvent"
+      >
+        Delete Event &#x2718;
+      </span>
     </div>
   </div>
 </template>
+
 <script>
 import { format, parseISO } from "date-fns";
 
@@ -58,7 +71,6 @@ export default {
   },
   computed: {
     eventDates() {
-      // We use the .replace regex so the format method does not subtract a day
       const startDate = new Date(this.event.start.replace(/-/g, "/"));
       const start = this.format(startDate, "MM/dd/yyyy");
       if (this.event.start === this.event.end) {
@@ -88,83 +100,3 @@ export default {
   },
 };
 </script>
-<style lang="scss" scoped>
-.event-modal {
-  position: absolute;
-  text-align: left;
-  width: 275px;
-  top: -25px;
-  z-index: 99;
-  background-color: var(--light-gray);
-  color: var(--black);
-  padding: 12px 8px 4px;
-  border: 1px solid var(--black);
-  border-radius: 8px;
-  font: 400 0.9rem/1 "Arial", sans-serif;
-
-  div {
-    margin: 5px 0;
-  }
-
-  .close-btn {
-    position: absolute;
-    padding: 3px 6px;
-    border-radius: 10px;
-    border: 1px solid var(--black);
-    background-color: var(--ocean-event-detail);
-    transition: 0.2s;
-    top: -15px;
-    left: -12px;
-
-    &:hover {
-      background-color: var(--white);
-      border-color: var(--black);
-      color: var(--black);
-      cursor: pointer;
-    }
-  }
-
-  .event-header {
-    .event-name {
-      font-weight: 700;
-      font-size: 1rem;
-      border-bottom: 1px solid var(--black);
-
-      .event-type {
-        font-weight: 400;
-      }
-    }
-
-    .event-staff {
-      p {
-        margin: 0;
-      }
-    }
-  }
-
-  .event-options {
-    margin-top: 35px;
-    padding-top: 5px;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: flex-end;
-    font-size: 0.8rem;
-
-    span {
-      display: inline-block;
-      transition: 0.2s;
-
-      &:hover {
-        color: var(--ocean-event-detail);
-        cursor: pointer;
-      }
-    }
-  }
-}
-.left {
-  right: 25%;
-}
-.right {
-  left: 25%;
-}
-</style>
