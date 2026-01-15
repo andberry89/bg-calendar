@@ -139,8 +139,17 @@ export default {
   created() {
     this.getCurrentDate();
   },
+  watch: {
+  currentDate: {
+    handler(val) {
+      useEventsStore().fetchEventsForMonth(val.year, val.month);
+    },
+    deep: true,
+  },
+},
+
   mounted() {
-    useEventsStore().fetchEvents();
+    useEventsStore().fetchEventsForMonth(this.currentDate.year, this.currentDate.month);
     useStaffStore().fetchStaff();
   },
 };
