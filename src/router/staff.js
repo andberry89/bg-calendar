@@ -1,4 +1,4 @@
-import { db } from "@/main";
+import { db } from "@/firebase";
 import { doc, setDoc, deleteDoc, getDoc } from "firebase/firestore";
 
 export const addStaff = async (person) => {
@@ -18,7 +18,6 @@ export const addStaff = async (person) => {
     // Check if document already exists
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      console.warn(`Staff member with ID "${id}" already exists.`);
       return {
         success: false,
         message: "Staff member already exists.",
@@ -27,20 +26,18 @@ export const addStaff = async (person) => {
 
     // Add the new member to the database
     await setDoc(docRef, {
-      firstName: firstName,
-      lastName: lastName,
-      initials: initials,
-      shortName: shortName,
+      firstName,
+      lastName,
+      initials,
+      shortName,
     });
 
     //Success feedback
-    console.log(`Successfully added staff member: ${shortName}`);
     return {
       success: true,
       message: "Staff member added succesfully.",
     };
   } catch (err) {
-    console.error("Error adding staff:", err);
     return {
       success: false,
       message: "An error occurred while adding the staff member.",
@@ -51,26 +48,18 @@ export const addStaff = async (person) => {
 
 export const deleteStaff = async (id) => {
   try {
+    if (!id || typeof id !== "string") {
+      return { success: false, message: "Invalid ID provided." };
+    }
+
     const docRef = doc(db, "staff", id);
     await deleteDoc(docRef);
 
-    if (!id || typeof id !== "string") {
-      return {
-        success: false,
-        message: "Invalid ID provided.",
-      };
-    }
-
-    console.log(`Staff with ID "${id}" deleted successfully.`);
-    return {
-      success: true,
-      message: `Staff with ID "${id} deleted successfully.`,
-    };
+    return { success: true, message: `Staff with ID "${id}" deleted successfully.` };
   } catch (err) {
-    console.error(`Error deleting staff with ID "${id}:`, err);
     return {
       success: false,
-      message: `Failed to delete staff with ID "${id}.`,
+      message: `Failed to delete staff with ID "${id}".`,
       error: err,
     };
   }

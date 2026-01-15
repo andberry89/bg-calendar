@@ -58,9 +58,8 @@ import CalendarHeader from "./CalendarHeader.vue";
 import CalendarBody from "./CalendarBody.vue";
 import StaffList from "./StaffList.vue";
 import EventList from "./components/EventList.vue";
-import { db } from "@/main";
-import { addEvent, deleteEvent } from "@/router/events";
-import { addStaff, deleteStaff } from "@/router/staff";
+import { useStaffStore } from "@/stores/staff";
+import { useEventsStore } from "@/stores/events";
 
 export default {
   name: "Calendar",
@@ -70,11 +69,6 @@ export default {
         date: 0,
         month: 0,
         year: 0,
-      },
-      events: [],
-      staff: [],
-      sortedEvents: {
-        type: Object,
       },
       showEvents: false,
     };
@@ -95,126 +89,59 @@ export default {
       return new Date(this.currentDate.year, this.currentDate.month + 1, 0).getDate();
     },
     currentMonthEvents() {
-      const currentYearEvents = this.sortedEvents[this.currentDate.year];
-      if (currentYearEvents) {
-        return currentYearEvents
-          .filter((e) => {
-            const start = e.start.split("-")[1] - 1;
-            const end = e.end.split("-")[1] - 1;
-            return this.currentDate.month === start || this.currentDate.month === end;
-          })
-          .sort((a, b) => {
-            return (
-              new Date(a.start.replace(/-/g, "/").replace(/T.+/, "")) -
-              new Date(b.start.replace(/-/g, "/").replace(/T.+/, ""))
-            );
-          });
-      } else {
-        return [];
-      }
+      const store = useEventsStore();
+      return store.eventsForMonth(this.currentDate.year, this.currentDate.month);
     },
+    staff() {
+      return useStaffStore().staff;
+    }
   },
   methods: {
-    addStaff: addStaff,
-    deleteStaff: deleteStaff,
-    addEvent: addEvent,
-    deleteEvent: deleteEvent,
     getCurrentDate() {
       let today = new Date();
       this.currentDate.date = today.getDate();
       this.currentDate.month = today.getMonth();
       this.currentDate.year = today.getFullYear();
     },
-    async getEvents() {
-      let snapshot = await db.collection("calEvent").get();
-      let events = [];
-      snapshot.forEach((doc) => {
-        let appData = doc.data();
-        appData.id = doc.id;
-        events.push(appData);
-      });
-      this.events = events;
-      this.sortedEvents = this.sortEvents(events);
-    },
-    async getStaff() {
-      let snapshot = await db.collection("staff").get();
-      let staff = [];
-      snapshot.forEach((doc) => {
-        let appData = doc.data();
-        appData.id = doc.id;
-        staff.push(appData);
-      });
-      this.staff = staff.sort((a, b) => (a.lastName > b.lastName ? 1 : b.lastName > a.lastName ? -1 : 0));
-    },
     updateDate(newDate) {
       this.currentDate = newDate;
     },
     async updateEvents(fn, event) {
-      if (fn === "add") {
-        try {
-          await addEvent(event);
-        } catch (err) {
-          console.warn(err);
+      const store = useEventsStore();
+
+      try {
+        if (fn === "add") {
+          await store.addEvent(event);
+        } else {
+          await store.removeEvent(event.id);
         }
-      } else {
-        try {
-          await deleteEvent(event.id);
-        } catch (err) {
-          console.warn(err);
-        }
+      } catch (err) {
+        console.warn(err);
       }
-      this.getEvents();
     },
+
     async updateStaff(staffFn) {
+      const store = useStaffStore();
       const fn = staffFn[0];
       const person = staffFn[1];
-      if (fn === "add") {
-        try {
-          await addStaff(person);
-        } catch (err) {
-          console.warn(err);
+
+      try {
+        if (fn === "add") {
+          await store.addStaff(person);
+        } else {
+          await store.removeStaff(person.id);
         }
-      } else {
-        try {
-          await deleteStaff(person.id);
-        } catch (err) {
-          console.warn(err);
-        }
+      } catch (err) {
+        console.warn(err);
       }
-
-      this.getStaff();
-    },
-    sortEvents(events) {
-      let yearsWithEvents = events
-        .map((e) => {
-          const start = e.start.split("-")[0];
-          const end = e.end.split("-")[0];
-          if (start === end) return start;
-          else return [start, end];
-        })
-        .flat();
-
-      const uniqueYears = [...new Set(yearsWithEvents)];
-      let sortedEvents = {};
-      uniqueYears.forEach((year) => {
-        const yearEvents = events.filter((e) => {
-          const start = e.start.split("-")[0];
-          const end = e.end.split("-")[0];
-          return start === year || end === year;
-        });
-
-        sortedEvents[year] = yearEvents;
-      });
-
-      return sortedEvents;
     },
   },
   created() {
     this.getCurrentDate();
   },
   mounted() {
-    this.getEvents();
-    this.getStaff();
+    useEventsStore().fetchEvents();
+    useStaffStore().fetchStaff();
   },
 };
 </script>

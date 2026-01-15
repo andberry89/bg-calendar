@@ -1,19 +1,28 @@
-import { db } from "@/main";
-import { doc, addDoc, deleteDoc, collection } from "firebase/firestore";
+import { db } from "@/firebase";
+import { doc, addDoc, deleteDoc, collection, Timestamp } from "firebase/firestore";
+
+function toMidnightTimestamp(yyyyMmDd) {
+  // store as UTC midnight to avoid timezone issues
+  const [y, m, d] = yyyyMmDd.split("-").map(Number);
+  return Timestamp.fromDate(new Date(Date.UTC(y, m-1, d, 0, 0, 0)));
+}
 
 export const addEvent = async (event) => {
   try {
-    // Add new event to database
-    const docRef = await addDoc(collection(db, "calEvent"), event);
+    const payload = {
+      ...event,
+      startAt: toMidnightTimestamp(event.start),
+      endAt: toMidnightTimestamp(event.end || event.start),
+    };
 
-    // Success feedback
-    console.log("Successfully added event with ID: ", docRef.id);
+    const docRef = await addDoc(collection(db, "calEvent"), payload);
+
     return {
       success: true,
       message: "Event added successfully.",
+      id: docRef.id,
     };
   } catch (err) {
-    console.error("Error adding event.");
     return {
       success: false,
       message: "An error occurred while adding the event.",
@@ -24,10 +33,6 @@ export const addEvent = async (event) => {
 
 export const deleteEvent = async (id) => {
   try {
-    const docRef = doc(db, "calEvent", id);
-    await deleteDoc(docRef);
-
-    // Validate id
     if (!id || typeof id !== "string") {
       return {
         success: false,
@@ -35,13 +40,14 @@ export const deleteEvent = async (id) => {
       };
     }
 
-    console.log(`Event with ID ${id} deleted successfully.`);
+    const docRef = doc(db, "calEvent", id);
+    await deleteDoc(docRef);
+
     return {
       success: true,
       message: `Event with ID ${id} deleted successfully.`,
     };
   } catch (err) {
-    console.error(`Error deleting event with ID ${id}`);
     return {
       success: false,
       message: `Failed to delete event with ID ${id}`,
