@@ -29,7 +29,9 @@
     </article>
     <EventList :events="currentMonthEvents" :currentDate="currentDate" v-if="showEvents" />
   </main>
-  <footer><em>Version 1.0.2</em> - 7/10/2025</footer>
+  <footer>
+  <em>Version {{ __APP_VERSION__ }}</em>
+</footer>
 </template>
 <script>
 import CalendarHeader from './CalendarHeader.vue';
