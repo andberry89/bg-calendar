@@ -132,10 +132,9 @@ export default {
   created() {
     this.getCurrentDate();
   },
-  mounted() {
-    this.getEvents();
-    this.getStaff();
-  }
+  async mounted() {
+  await Promise.all([this.getEvents(), this.getStaff()]);
+}
 };
 </script>
 <style lang="scss" scoped>
