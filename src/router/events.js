@@ -1,10 +1,10 @@
-import { db } from "@/services/firebase";
+import { db, collections } from "@/services/firebase";
 import { doc, addDoc, deleteDoc, collection } from "firebase/firestore";
 
 export const addEvent = async (event) => {
   try {
     // Add new event to database
-    const docRef = await addDoc(collection(db, "calEvent"), event);
+    const docRef = await addDoc(collection(db, collections.events), event);
 
     // Success feedback
     console.log("Successfully added event with ID: ", docRef.id);

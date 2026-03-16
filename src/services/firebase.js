@@ -17,3 +17,8 @@ if (!firebase.apps.length) {
 const app = firebase.app();
 export const db = app.firestore();
 export { app as firebaseApp };
+
+export const collections = {
+  events: "calEvent",
+  staff: "staff",
+};

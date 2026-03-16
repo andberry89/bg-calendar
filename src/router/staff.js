@@ -1,4 +1,4 @@
-import { db } from "@/services/firebase";
+import { db, collections } from "@/services/firebase";
 import { doc, setDoc, deleteDoc, getDoc } from "firebase/firestore";
 
 export const addStaff = async (person) => {
@@ -13,7 +13,7 @@ export const addStaff = async (person) => {
     const id = (firstName + "-" + lastName).toLowerCase();
 
     // Reference to the staff document
-    const docRef = doc(db, "staff", id);
+    const docRef = doc(db, collections.staff, id);
 
     // Check if document already exists
     const docSnap = await getDoc(docRef);
