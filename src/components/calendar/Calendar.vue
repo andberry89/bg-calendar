@@ -1,7 +1,7 @@
 <template>
   <main>
     <article id="staff-list">
-      <StaffList :staff="staff" @update="updateStaff($event)" />
+      <StaffList :staff="staff" @update="updateStaff" />
     </article>
     <article id="calendar">
       <!-- <article
@@ -12,7 +12,7 @@
         :currentDate="currentDate"
         :prevMonthDays="prevMonthDays"
         :currentMonthDays="currentMonthDays"
-        @date="updateDate($event)"
+        @date="updateDate"
         @update="updateEvents('add', $event)"
         :dateFn="getCurrentDate"
         :staff="staff"
@@ -23,7 +23,7 @@
         :currentMonthDays="currentMonthDays"
         :currentMonthEvents="currentMonthEvents"
         :key="currentDate.month + '-' + currentDate.year"
-        @date="updateDate($event)"
+        @date="updateDate"
         @delete="updateEvents('delete', $event)"
       />
     </article>
