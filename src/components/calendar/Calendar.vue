@@ -45,7 +45,7 @@ import CalendarHeader from "./CalendarHeader.vue";
 import CalendarBody from "./CalendarBody.vue";
 import StaffList from "./StaffList.vue";
 import EventList from "./components/EventList.vue";
-import { db } from "@/main";
+import { db } from "@/services/firebase";
 import { addEvent, deleteEvent } from "@/router/events";
 import { addStaff, deleteStaff } from "@/router/staff";
 

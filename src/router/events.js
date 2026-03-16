@@ -1,4 +1,4 @@
-import { db } from "@/main";
+import { db } from "@/services/firebase";
 import { doc, addDoc, deleteDoc, collection } from "firebase/firestore";
 
 export const addEvent = async (event) => {
