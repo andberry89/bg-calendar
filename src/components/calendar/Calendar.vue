@@ -55,7 +55,6 @@ export default {
   data() {
     return {
       currentDate: {
-        date: 0,
         month: 0,
         year: 0,
       },
@@ -102,9 +101,8 @@ export default {
   methods: {
     getCurrentDate() {
       let today = new Date();
-      this.currentDate.date = today.getDate();
-      this.currentDate.month = today.getMonth();
-      this.currentDate.year = today.getFullYear();
+this.currentDate.month = today.getMonth();
+this.currentDate.year = today.getFullYear();
     },
 async getEvents() {
   const events = await fetchEvents();
