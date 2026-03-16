@@ -57,7 +57,8 @@ export default {
       staff: [],
       sortedEvents: {},
       showEvents: false,
-      isLoading: true
+      isLoading: true,
+      loadError: null
     };
   },
   components: {
@@ -124,6 +125,9 @@ export default {
 
     try {
       await Promise.all([this.getEvents(), this.getStaff()]);
+    } catch (err) {
+      console.warn(err);
+      this.loadError = 'Failed to load calendar data.';
     } finally {
       this.isLoading = false;
     }
