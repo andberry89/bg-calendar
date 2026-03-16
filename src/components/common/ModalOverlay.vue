@@ -3,15 +3,12 @@
     <div class="slot-container">
       <slot></slot>
     </div>
-    <div
-      class="background-overlay"
-      @click.self="this.$emit('update')"
-    ></div>
+    <div class="background-overlay" @click.self="this.$emit('update')"></div>
   </div>
 </template>
 <script>
 export default {
-  name: "ModalOverlay",
+  name: 'ModalOverlay'
 };
 </script>
 <style lang="scss" scoped>

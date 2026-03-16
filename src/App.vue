@@ -3,12 +3,12 @@
 </template>
 
 <script>
-import Calendar from "./components/calendar/Calendar";
+import Calendar from './components/calendar/Calendar';
 
 export default {
-  name: "App",
+  name: 'App',
   components: {
-    Calendar,
-  },
+    Calendar
+  }
 };
 </script>

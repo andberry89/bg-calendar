@@ -1,84 +1,58 @@
 <template>
-  <div
-    class="event-container"
-    @click="emitEvent"
-  >
-    <div
-      v-if="event.class === 'birthday'"
-      :class="event.class"
-    >
+  <div class="event-container" @click="emitEvent">
+    <div v-if="event.class === 'birthday'" :class="event.class">
       {{ event.staff[0].shortName }}'s Birthday! 🎂
     </div>
-    <div
-      v-if="event.class === 'press-trip'"
-      :class="event.class"
-    >
+    <div v-if="event.class === 'press-trip'" :class="event.class">
       {{ event.staff[0].initials }} Press Trip
     </div>
-    <div
-      v-if="event.class === 'vacation'"
-      :class="event.class"
-    >
+    <div v-if="event.class === 'vacation'" :class="event.class">
       {{ event.staff[0].initials }} Off (PTO)
     </div>
-    <div
-      v-if="event.class === 'auto-show'"
-      :class="event.class"
-    >
+    <div v-if="event.class === 'auto-show'" :class="event.class">
       <strong>Auto Show</strong><br />
       {{ event.details }}
     </div>
-    <div
-      v-if="event.class === 'cd-event'"
-      :class="event.class"
-    >
+    <div v-if="event.class === 'cd-event'" :class="event.class">
       {{ event.details }}
     </div>
-    <div
-      v-if="event.class === 'holiday'"
-      :class="event.class"
-    >
+    <div v-if="event.class === 'holiday'" :class="event.class">
       <strong>{{ event.details }}</strong
       ><br />
-      <span
-        class="office-closure"
-        v-if="event.closed === 'half'"
-        >Early Close</span
-      >
-      <span
-        class="office-closure"
-        v-if="event.closed === 'full'"
-        >Office Closed</span
-      >
+      <span class="office-closure" v-if="event.closed === 'half'">Early Close</span>
+      <span class="office-closure" v-if="event.closed === 'full'">Office Closed</span>
     </div>
   </div>
 </template>
 <script>
-import { differenceInDays } from "date-fns";
+import { differenceInDays } from 'date-fns';
 
 export default {
-  name: "CalendarEvent",
+  name: 'CalendarEvent',
   props: {
     event: {
-      type: Object,
-    },
+      type: Object
+    }
   },
   computed: {
     numberOfDays() {
       return differenceInDays(this.event.end, this.event.start) + 1;
-    },
+    }
   },
   methods: {
     differenceInDays: differenceInDays,
     emitEvent() {
-      this.$emit("update", this.event);
-    },
-  },
+      this.$emit('update', this.event);
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>
 .event-container div {
-  font: 400 9pt/1.1 "Roboto", "Verdana", sans-serif;
+  font:
+    400 9pt/1.1 'Roboto',
+    'Verdana',
+    sans-serif;
   text-align: center;
   padding: 4px;
   margin: 2px 0;

@@ -1,4 +1,4 @@
-import { getStaffCollection } from "@/services";
+import { getStaffCollection } from '@/services';
 
 export const addStaff = async (person) => {
   try {
@@ -7,8 +7,8 @@ export const addStaff = async (person) => {
     const firstInitial = firstName.charAt(0).toUpperCase();
     const lastInitial = lastName.charAt(0).toUpperCase();
     const initials = firstInitial + lastInitial;
-    const shortName = firstInitial + ". " + lastName;
-    const id = (firstName + "-" + lastName).toLowerCase();
+    const shortName = firstInitial + '. ' + lastName;
+    const id = (firstName + '-' + lastName).toLowerCase();
 
     const docRef = getStaffCollection().doc(id);
     const docSnap = await docRef.get();
@@ -17,7 +17,7 @@ export const addStaff = async (person) => {
       console.warn(`Staff member with ID "${id}" already exists.`);
       return {
         success: false,
-        message: "Staff member already exists.",
+        message: 'Staff member already exists.'
       };
     }
 
@@ -25,32 +25,32 @@ export const addStaff = async (person) => {
       firstName,
       lastName,
       initials,
-      shortName,
+      shortName
     });
 
     console.log(`Successfully added staff member: ${shortName}`);
 
     return {
       success: true,
-      message: "Staff member added succesfully.",
+      message: 'Staff member added succesfully.'
     };
   } catch (err) {
-    console.error("Error adding staff:", err);
+    console.error('Error adding staff:', err);
 
     return {
       success: false,
-      message: "An error occurred while adding the staff member.",
-      error: err,
+      message: 'An error occurred while adding the staff member.',
+      error: err
     };
   }
 };
 
 export const deleteStaff = async (id) => {
   try {
-    if (!id || typeof id !== "string") {
+    if (!id || typeof id !== 'string') {
       return {
         success: false,
-        message: "Invalid ID provided.",
+        message: 'Invalid ID provided.'
       };
     }
 
@@ -61,7 +61,7 @@ export const deleteStaff = async (id) => {
 
     return {
       success: true,
-      message: `Staff with ID "${id}" deleted successfully.`,
+      message: `Staff with ID "${id}" deleted successfully.`
     };
   } catch (err) {
     console.error(`Error deleting staff with ID "${id}"`, err);
@@ -69,7 +69,7 @@ export const deleteStaff = async (id) => {
     return {
       success: false,
       message: `Failed to delete staff with ID "${id}".`,
-      error: err,
+      error: err
     };
   }
 };

@@ -1,11 +1,7 @@
 <template>
   <main>
     <article id="staff-list">
-      <StaffList
-        :staff="staff"
-        key="staff-list"
-        @update="updateStaff($event)"
-      />
+      <StaffList :staff="staff" key="staff-list" @update="updateStaff($event)" />
     </article>
     <article id="calendar">
       <!-- <article
@@ -32,42 +28,38 @@
         @delete="updateEvents('delete', $event)"
       />
     </article>
-    <EventList
-      :events="currentMonthEvents"
-      :currentDate="currentDate"
-      v-if="showEvents"
-    />
+    <EventList :events="currentMonthEvents" :currentDate="currentDate" v-if="showEvents" />
   </main>
   <footer><em>Version 1.0.2</em> - 7/10/2025</footer>
 </template>
 <script>
-import CalendarHeader from "./CalendarHeader.vue";
-import CalendarBody from "./CalendarBody.vue";
-import StaffList from "./StaffList.vue";
-import EventList from "./components/EventList.vue";
-import { fetchEvents, fetchStaff } from "@/services";
-import { addEvent, deleteEvent } from "@/router/events";
-import { addStaff, deleteStaff } from "@/router/staff";
-import { sortEvents } from '@/features/calendar/utils/sortEvents'
+import CalendarHeader from './CalendarHeader.vue';
+import CalendarBody from './CalendarBody.vue';
+import StaffList from './StaffList.vue';
+import EventList from './components/EventList.vue';
+import { fetchEvents, fetchStaff } from '@/services';
+import { addEvent, deleteEvent } from '@/router/events';
+import { addStaff, deleteStaff } from '@/router/staff';
+import { sortEvents } from '@/features/calendar/utils/sortEvents';
 
 export default {
-  name: "Calendar",
+  name: 'Calendar',
   data() {
     return {
       currentDate: {
         month: 0,
-        year: 0,
+        year: 0
       },
       staff: [],
       sortedEvents: {},
-      showEvents: false,
+      showEvents: false
     };
   },
   components: {
     CalendarHeader,
     CalendarBody,
     EventList,
-    StaffList,
+    StaffList
   },
   computed: {
     prevMonthDays() {
@@ -83,39 +75,40 @@ export default {
       if (currentYearEvents) {
         return currentYearEvents
           .filter((e) => {
-            const start = e.start.split("-")[1] - 1;
-            const end = e.end.split("-")[1] - 1;
+            const start = e.start.split('-')[1] - 1;
+            const end = e.end.split('-')[1] - 1;
             return this.currentDate.month === start || this.currentDate.month === end;
           })
           .sort((a, b) => {
             return (
-              new Date(a.start.replace(/-/g, "/").replace(/T.+/, "")) -
-              new Date(b.start.replace(/-/g, "/").replace(/T.+/, ""))
+              new Date(a.start.replace(/-/g, '/').replace(/T.+/, '')) -
+              new Date(b.start.replace(/-/g, '/').replace(/T.+/, ''))
             );
           });
       } else {
         return [];
       }
-    },
+    }
   },
   methods: {
     getCurrentDate() {
       let today = new Date();
-this.currentDate.month = today.getMonth();
-this.currentDate.year = today.getFullYear();
+      this.currentDate.month = today.getMonth();
+      this.currentDate.year = today.getFullYear();
     },
-async getEvents() {
-  const events = await fetchEvents();
-  this.sortedEvents = sortEvents(events);
-},
+    async getEvents() {
+      const events = await fetchEvents();
+      this.sortedEvents = sortEvents(events);
+    },
+
     async getStaff() {
-  this.staff = await fetchStaff();
-},
+      this.staff = await fetchStaff();
+    },
     updateDate(newDate) {
       this.currentDate = newDate;
     },
     async updateEvents(fn, event) {
-      if (fn === "add") {
+      if (fn === 'add') {
         try {
           await addEvent(event);
         } catch (err) {
@@ -133,7 +126,7 @@ async getEvents() {
     async updateStaff(staffFn) {
       const fn = staffFn[0];
       const person = staffFn[1];
-      if (fn === "add") {
+      if (fn === 'add') {
         try {
           await addStaff(person);
         } catch (err) {
@@ -148,7 +141,7 @@ async getEvents() {
       }
 
       this.getStaff();
-    },
+    }
   },
   created() {
     this.getCurrentDate();
@@ -156,11 +149,11 @@ async getEvents() {
   mounted() {
     this.getEvents();
     this.getStaff();
-  },
+  }
 };
 </script>
 <style lang="scss" scoped>
-@import url("https://fonts.googleapis.com/css?family=Anton");
+@import url('https://fonts.googleapis.com/css?family=Anton');
 main {
   display: flex;
   flex-flow: row nowrap;
@@ -177,7 +170,7 @@ main {
     justify-content: flex-start;
     gap: 10px;
     background-color: var(--ocean-dark-blue);
-    font-family: "Anton";
+    font-family: 'Anton';
     border-radius: 15px;
     overflow: hidden;
     background-size: cover;

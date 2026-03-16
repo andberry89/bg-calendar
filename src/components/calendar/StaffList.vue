@@ -1,16 +1,9 @@
 <template>
   <article id="staff-list">
     <h2>Staff List</h2>
-    <div
-      v-for="(s, idx) in staff"
-      :key="idx"
-      class="staff-card"
-    >
+    <div v-for="(s, idx) in staff" :key="idx" class="staff-card">
       <div class="profile-picture">
-        <img
-          :src="imgUrl(s.lastName)"
-          :alt="s.firstName + ' ' + s.lastName"
-        />
+        <img :src="imgUrl(s.lastName)" :alt="s.firstName + ' ' + s.lastName" />
       </div>
       <div class="staff-name">
         <span class="first-name">{{ s.firstName }}</span
@@ -19,45 +12,43 @@
       </div>
     </div>
     <hr />
-    <EditStaff
-      :staff="staff"
-      key="edit-staff"
-      @update="emitStaff($event)"
-    />
+    <EditStaff :staff="staff" key="edit-staff" @update="emitStaff($event)" />
   </article>
 </template>
 <script>
-import EditStaff from "./components/EditStaff.vue";
+import EditStaff from './components/EditStaff.vue';
 
 export default {
-  name: "StaffList",
+  name: 'StaffList',
   props: {
-    staff: Array,
+    staff: Array
   },
   components: {
-    EditStaff,
+    EditStaff
   },
   methods: {
     emitStaff(staffFn) {
-      this.$emit("update", staffFn);
+      this.$emit('update', staffFn);
     },
     imgUrl(name) {
       // Use require.context to dynamically load images from the staff folder
-      const images = require.context("@/assets/staff", false, /\.(jpg|png)$/);
+      const images = require.context('@/assets/staff', false, /\.(jpg|png)$/);
       console.log(images);
       try {
         return images(`./${name}.jpg`);
       } catch (e) {
         // Return a fallback image if not found
-        return images("./user.png");
+        return images('./user.png');
       }
-    },
-  },
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>
 #staff-list {
-  font: 400 12px/1.2 "Arial", sans-serif;
+  font:
+    400 12px/1.2 'Arial',
+    sans-serif;
 
   .staff-card {
     display: flex;
@@ -92,7 +83,7 @@ export default {
     }
 
     .staff-name {
-      font-family: "Arial";
+      font-family: 'Arial';
       font-size: 12px;
 
       .last-name {

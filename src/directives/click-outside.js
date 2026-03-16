@@ -6,10 +6,10 @@ export default {
       }
     };
     setTimeout(() => {
-      document.body.addEventListener("click", el.__ClickOutsideHandler__);
+      document.body.addEventListener('click', el.__ClickOutsideHandler__);
     }, 0);
   },
   unmounted(el) {
-    document.body.removeEventListener("click", el.__ClickOutsideHandler__);
-  },
+    document.body.removeEventListener('click', el.__ClickOutsideHandler__);
+  }
 };

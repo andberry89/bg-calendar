@@ -5,86 +5,65 @@
         <div>{{ currentDate.date }}</div>
         <div>{{ month[currentDate.month] }}</div>
         <div>{{ currentDate.year }}</div>
-        <div
-          class="date-picker-btn"
-          @click="toggleDatePicker"
-        >
-          &#10552;
-        </div>
-        <div
-          v-if="showDatePicker"
-          class="date-picker"
-        >
-          <input
-            type="date"
-            @input="updateDate($event.target.value)"
-          />
+        <div class="date-picker-btn" @click="toggleDatePicker">&#10552;</div>
+        <div v-if="showDatePicker" class="date-picker">
+          <input type="date" @input="updateDate($event.target.value)" />
         </div>
       </div>
       <div class="date-nav">
-        <div
-          @click="monthDown"
-          class="small-month"
-        >
-          &lt; {{ lastMonth }}
-        </div>
+        <div @click="monthDown" class="small-month">&lt; {{ lastMonth }}</div>
         <div @click="dateFn">Today</div>
-        <div
-          @click="monthUp"
-          class="small-month"
-        >
-          {{ nextMonth }} &gt;
-        </div>
+        <div @click="monthUp" class="small-month">{{ nextMonth }} &gt;</div>
       </div>
     </div>
     <div class="calendar-title">
       <h1>C/D Buyers Guide</h1>
       <h2>Team Calendar</h2>
     </div>
-    <NewEvent
-      :staff="staff"
-      key="new-event"
-      @update="addEvent($event)"
-    />
+    <NewEvent :staff="staff" key="new-event" @update="addEvent($event)" />
   </header>
 </template>
 <script>
-import NewEvent from "./components/NewEvent.vue";
-import { month, weekdayNames } from "./utils/selectOptions";
+import NewEvent from './components/NewEvent.vue';
+import { month, weekdayNames } from './utils/selectOptions';
 
 export default {
-  name: "CalendarHeader",
+  name: 'CalendarHeader',
   data() {
     return {
       showDatePicker: false,
       newDate: {
         date: 0,
         month: 0,
-        year: 0,
+        year: 0
       },
       month: month,
-      weekdayNames: weekdayNames,
+      weekdayNames: weekdayNames
     };
   },
   components: {
-    NewEvent,
+    NewEvent
   },
   props: {
     currentDate: {
       type: Object,
-      required: true,
+      required: true
     },
     prevMonthDays: Number,
     currentMonthDays: Number,
     staff: Array,
     dateFn: {
       type: Function,
-      required: false,
-    },
+      required: false
+    }
   },
   computed: {
     currentDay() {
-      return new Date(this.currentDate.year, this.currentDate.month, this.currentDate.date).getDay();
+      return new Date(
+        this.currentDate.year,
+        this.currentDate.month,
+        this.currentDate.date
+      ).getDay();
     },
     lastMonth() {
       let lastMonth = month[this.currentDate.month - 1];
@@ -102,12 +81,12 @@ export default {
     },
     today() {
       const today = new Date();
-      return today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate();
-    },
+      return today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    }
   },
   methods: {
     addEvent(event) {
-      this.$emit("update", event);
+      this.$emit('update', event);
     },
     dateUp() {
       if (this.newDate.date === this.currentMonthDays) {
@@ -151,24 +130,24 @@ export default {
       this.showDatePicker = !this.showDatePicker;
     },
     updateDate(date) {
-      const split = date.split("-");
+      const split = date.split('-');
       this.newDate.year = parseInt(split[0]);
       this.newDate.month = parseInt(split[1] - 1);
       this.newDate.date = parseInt(split[2]);
       this.toggleDatePicker();
-    },
+    }
   },
   watch: {
     newDate: {
       handler(val) {
-        this.$emit("date", val);
+        this.$emit('date', val);
       },
-      deep: true,
-    },
+      deep: true
+    }
   },
   created() {
     this.newDate = this.currentDate;
-  },
+  }
 };
 </script>
 <style lang="scss" scoped>
@@ -187,7 +166,10 @@ header {
   padding: 0 50px;
   text-align: center;
   color: var(--light-gray);
-  text-shadow: 1px 1px 1px var(--dark-gray), 1px -1px 1px var(--dark-gray), -1px 1px 1px var(--dark-gray),
+  text-shadow:
+    1px 1px 1px var(--dark-gray),
+    1px -1px 1px var(--dark-gray),
+    -1px 1px 1px var(--dark-gray),
     -1px -1px 1px var(--dark-gray);
   height: 15vh;
 

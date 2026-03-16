@@ -1,32 +1,18 @@
 <template>
-  <div
-    :class="['event-modal', day < 4 ? 'right' : 'left']"
-    v-click-outside="closeModal"
-  >
-    <div
-      class="close-btn"
-      @click="closeModal"
-    >
-      X
-    </div>
+  <div :class="['event-modal', day < 4 ? 'right' : 'left']" v-click-outside="closeModal">
+    <div class="close-btn" @click="closeModal">X</div>
     <div class="event-header">
       <div class="event-name">
         <span class="event-type"
-          >{{ event.class === "cd-event" ? event.details : event.type }}
-          {{ event.class === "Birthday" ? "🎂" : "" }}</span
+          >{{ event.class === 'cd-event' ? event.details : event.type }}
+          {{ event.class === 'Birthday' ? '🎂' : '' }}</span
         >
       </div>
       <div class="event-dates">
         {{ eventDates }}
       </div>
-      <div
-        class="event-staff"
-        v-if="event.staff.length > 0"
-      >
-        <p
-          v-for="person in event.staff"
-          :key="person.lastName"
-        >
+      <div class="event-staff" v-if="event.staff.length > 0">
+        <p v-for="person in event.staff" :key="person.lastName">
           {{ person.shortName }}
         </p>
       </div>
@@ -37,38 +23,38 @@
   </div>
 </template>
 <script>
-import { format, parseISO } from "date-fns";
+import { format, parseISO } from 'date-fns';
 
 export default {
-  name: "EventModal",
+  name: 'EventModal',
   data() {
     return {
-      showEdit: false,
+      showEdit: false
     };
   },
   props: {
     day: {
       type: Number,
-      required: true,
+      required: true
     },
     event: {
       type: Object,
-      required: true,
-    },
+      required: true
+    }
   },
   computed: {
     eventDates() {
       // We use the .replace regex so the format method does not subtract a day
-      const startDate = new Date(this.event.start.replace(/-/g, "/"));
-      const start = this.format(startDate, "MM/dd/yyyy");
+      const startDate = new Date(this.event.start.replace(/-/g, '/'));
+      const start = this.format(startDate, 'MM/dd/yyyy');
       if (this.event.start === this.event.end) {
         return start;
       } else {
-        const endDate = new Date(this.event.end.replace(/-/g, "/"));
-        const end = this.format(endDate, "MM/dd/yyyy");
-        return start + " - " + end;
+        const endDate = new Date(this.event.end.replace(/-/g, '/'));
+        const end = this.format(endDate, 'MM/dd/yyyy');
+        return start + ' - ' + end;
       }
-    },
+    }
   },
   methods: {
     format: format,
@@ -77,15 +63,15 @@ export default {
       this.showEdit = false;
     },
     closeModal() {
-      this.$emit("update");
+      this.$emit('update');
     },
     deleteEvent() {
-      this.$emit("delete", this.event);
+      this.$emit('delete', this.event);
     },
     openEdit() {
       this.showEdit = true;
-    },
-  },
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>
@@ -100,7 +86,9 @@ export default {
   padding: 12px 8px 4px;
   border: 1px solid var(--black);
   border-radius: 8px;
-  font: 400 0.9rem/1 "Arial", sans-serif;
+  font:
+    400 0.9rem/1 'Arial',
+    sans-serif;
 
   div {
     margin: 5px 0;

@@ -1,4 +1,4 @@
-import { getEventsCollection, getStaffCollection } from "@/services";
+import { getEventsCollection, getStaffCollection } from '@/services';
 
 export const fetchEvents = async () => {
   const snapshot = await getEventsCollection().get();

@@ -1,18 +1,11 @@
 <template>
   <section class="calendar-body">
     <div class="weekdays">
-      <div
-        class="weekday"
-        v-for="(weekday, idx) in weekdays"
-        :key="idx"
-      >
+      <div class="weekday" v-for="(weekday, idx) in weekdays" :key="idx">
         {{ weekday }}
       </div>
     </div>
-    <div
-      class="date"
-      v-if="dataReady"
-    >
+    <div class="date" v-if="dataReady">
       <CalendarDay
         dayClass="day-hidden"
         v-for="(n, idx) in firstMonthDay - 1"
@@ -45,45 +38,45 @@
   </section>
 </template>
 <script>
-import CalendarDay from "./CalendarDay.vue";
-import assignEvents from "./utils/assignEvents";
+import CalendarDay from './CalendarDay.vue';
+import assignEvents from './utils/assignEvents';
 
 export default {
-  name: "CalendarBody",
+  name: 'CalendarBody',
   data() {
     return {
       activeDate: {
         date: 0,
         month: 0,
-        year: 0,
+        year: 0
       },
       dataReady: false,
       events: [],
-      weekdays: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
+      weekdays: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
     };
   },
   components: {
-    CalendarDay,
+    CalendarDay
   },
   props: {
     currentDate: {
       type: Object,
-      required: true,
+      required: true
     },
     prevMonthDays: Number,
     currentMonthDays: Number,
-    currentMonthEvents: Array,
+    currentMonthEvents: Array
   },
   computed: {
     firstMonthDay() {
       let firstDay = new Date(this.activeDate.year, this.activeDate.month, 1).getDay();
       return firstDay + 1;
-    },
+    }
   },
   methods: {
     assignEvents: assignEvents,
     deleteEvent(event) {
-      this.$emit("delete", event);
+      this.$emit('delete', event);
     },
     getDay(date) {
       const day = new Date(date.year, date.month, date.date).getDay();
@@ -91,7 +84,7 @@ export default {
     },
     updateDate(date) {
       this.activeDate.date = date;
-      this.$emit("date", this.activeDate);
+      this.$emit('date', this.activeDate);
     },
     updateEvents() {
       if (!this.currentMonthDays || !this.currentMonthEvents) {
@@ -99,34 +92,38 @@ export default {
         return;
       }
 
-      this.events = assignEvents(this.currentMonthEvents, this.currentDate.month, this.currentMonthDays);
+      this.events = assignEvents(
+        this.currentMonthEvents,
+        this.currentDate.month,
+        this.currentMonthDays
+      );
       this.dataReady = true;
-    },
+    }
   },
   watch: {
     activeDate: {
       handler() {
         this.updateEvents();
       },
-      deep: true,
+      deep: true
     },
     currentMonthDays: {
       handler() {
         this.updateEvents();
       },
-      immediate: true, // Trigger immediately when the component is initialized
+      immediate: true // Trigger immediately when the component is initialized
     },
     currentMonthEvents: {
       handler() {
         this.updateEvents();
       },
-      immediate: true, // Trigger immediately when the component is initialized
-    },
+      immediate: true // Trigger immediately when the component is initialized
+    }
   },
   created() {
     this.activeDate = { ...this.currentDate };
     this.updateEvents();
-  },
+  }
 };
 </script>
 <style lang="scss" scoped>

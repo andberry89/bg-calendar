@@ -1,8 +1,8 @@
-import { db } from "./firebase";
+import { db } from './firebase';
 
 const collections = {
-  events: "calEvent",
-  staff: "staff",
+  events: 'calEvent',
+  staff: 'staff'
 };
 
 export const getEventsCollection = () => {
