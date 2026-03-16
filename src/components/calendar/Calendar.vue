@@ -82,14 +82,6 @@ export default {
     getCurrentDate() {
       this.currentDate = getInitialCurrentDate();
     },
-    async getEvents() {
-      const events = await fetchEvents();
-      this.sortedEvents = sortEvents(events);
-    },
-
-    async getStaff() {
-      this.staff = await fetchStaff();
-    },
     updateDate(newDate) {
       this.currentDate = newDate;
     },
@@ -124,7 +116,9 @@ export default {
     this.getCurrentDate();
 
     try {
-      await Promise.all([this.getEvents(), this.getStaff()]);
+      const [events, staff] = await Promise.all([fetchEvents(), fetchStaff()]);
+      this.sortedEvents = sortEvents(events);
+      this.staff = staff;
     } catch (err) {
       console.warn(err);
       this.loadError = 'Failed to load calendar data.';
