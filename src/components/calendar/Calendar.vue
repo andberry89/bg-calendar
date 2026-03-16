@@ -44,6 +44,7 @@ import { addStaff, deleteStaff } from '@/router/staff';
 import { sortEvents } from '@/features/calendar/utils/sortEvents';
 import { getCurrentMonthEvents } from '@/features/calendar/utils/getCurrentMonthEvents';
 import { getPrevMonthDays, getCurrentMonthDays } from '@/features/calendar/utils/getMonthDayCounts';
+import { getCurrentDate as getInitialCurrentDate } from '@/features/calendar/utils/getCurrentDate';
 
 export default {
   name: 'Calendar',
@@ -77,9 +78,7 @@ export default {
   },
   methods: {
     getCurrentDate() {
-      let today = new Date();
-      this.currentDate.month = today.getMonth();
-      this.currentDate.year = today.getFullYear();
+      this.currentDate = getInitialCurrentDate();
     },
     async getEvents() {
       const events = await fetchEvents();
