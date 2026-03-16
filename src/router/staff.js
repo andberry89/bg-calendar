@@ -1,9 +1,7 @@
 import { getStaffCollection } from "@/services";
-import { doc, setDoc, deleteDoc, getDoc } from "firebase/firestore";
 
 export const addStaff = async (person) => {
   try {
-    // format the values for the final object
     const firstName = person.firstName.trim();
     const lastName = person.lastName.trim();
     const firstInitial = firstName.charAt(0).toUpperCase();
@@ -12,12 +10,10 @@ export const addStaff = async (person) => {
     const shortName = firstInitial + ". " + lastName;
     const id = (firstName + "-" + lastName).toLowerCase();
 
-    // Reference to the staff document
-    const docRef = doc(getStaffCollection(), id);
+    const docRef = getStaffCollection().doc(id);
+    const docSnap = await docRef.get();
 
-    // Check if document already exists
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
+    if (docSnap.exists) {
       console.warn(`Staff member with ID "${id}" already exists.`);
       return {
         success: false,
@@ -25,22 +21,22 @@ export const addStaff = async (person) => {
       };
     }
 
-    // Add the new member to the database
-    await setDoc(docRef, {
-      firstName: firstName,
-      lastName: lastName,
-      initials: initials,
-      shortName: shortName,
+    await docRef.set({
+      firstName,
+      lastName,
+      initials,
+      shortName,
     });
 
-    //Success feedback
     console.log(`Successfully added staff member: ${shortName}`);
+
     return {
       success: true,
       message: "Staff member added succesfully.",
     };
   } catch (err) {
     console.error("Error adding staff:", err);
+
     return {
       success: false,
       message: "An error occurred while adding the staff member.",
@@ -51,7 +47,6 @@ export const addStaff = async (person) => {
 
 export const deleteStaff = async (id) => {
   try {
-    // Validate id before touching Firestore
     if (!id || typeof id !== "string") {
       return {
         success: false,
@@ -59,8 +54,8 @@ export const deleteStaff = async (id) => {
       };
     }
 
-    const docRef = doc(getStaffCollection(), id);
-    await deleteDoc(docRef);
+    const docRef = getStaffCollection().doc(id);
+    await docRef.delete();
 
     console.log(`Staff with ID "${id}" deleted successfully.`);
 

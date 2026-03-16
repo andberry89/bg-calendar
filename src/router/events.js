@@ -1,19 +1,18 @@
 import { getEventsCollection } from "@/services";
-import { doc, addDoc, deleteDoc } from "firebase/firestore";
 
 export const addEvent = async (event) => {
   try {
-    // Add new event to database
-    const docRef = await addDoc(getEventsCollection(), event);
+    const docRef = await getEventsCollection().add(event);
 
-    // Success feedback
     console.log("Successfully added event with ID: ", docRef.id);
+
     return {
       success: true,
       message: "Event added successfully.",
     };
   } catch (err) {
-    console.error("Error adding event.");
+    console.error("Error adding event.", err);
+
     return {
       success: false,
       message: "An error occurred while adding the event.",
@@ -24,7 +23,6 @@ export const addEvent = async (event) => {
 
 export const deleteEvent = async (id) => {
   try {
-    // Validate id before touching Firestore
     if (!id || typeof id !== "string") {
       return {
         success: false,
@@ -32,8 +30,8 @@ export const deleteEvent = async (id) => {
       };
     }
 
-    const docRef = doc(getEventsCollection(), id);
-    await deleteDoc(docRef);
+    const docRef = getEventsCollection().doc(id);
+    await docRef.delete();
 
     console.log(`Event with ID ${id} deleted successfully.`);
 
@@ -42,7 +40,7 @@ export const deleteEvent = async (id) => {
       message: `Event with ID ${id} deleted successfully.`,
     };
   } catch (err) {
-    console.error(`Error deleting event with ID ${id}`);
+    console.error(`Error deleting event with ID ${id}`, err);
 
     return {
       success: false,
