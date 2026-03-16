@@ -45,7 +45,7 @@ import CalendarHeader from "./CalendarHeader.vue";
 import CalendarBody from "./CalendarBody.vue";
 import StaffList from "./StaffList.vue";
 import EventList from "./components/EventList.vue";
-import { db } from "@/services";
+import { fetchEvents, fetchStaff } from "@/services";
 import { addEvent, deleteEvent } from "@/router/events";
 import { addStaff, deleteStaff } from "@/router/staff";
 
@@ -112,27 +112,14 @@ export default {
       this.currentDate.month = today.getMonth();
       this.currentDate.year = today.getFullYear();
     },
-    async getEvents() {
-      let snapshot = await db.collection("calEvent").get();
-      let events = [];
-      snapshot.forEach((doc) => {
-        let appData = doc.data();
-        appData.id = doc.id;
-        events.push(appData);
-      });
-      this.events = events;
-      this.sortedEvents = this.sortEvents(events);
-    },
+async getEvents() {
+  const events = await fetchEvents();
+  this.events = events;
+  this.sortedEvents = this.sortEvents(events);
+},
     async getStaff() {
-      let snapshot = await db.collection("staff").get();
-      let staff = [];
-      snapshot.forEach((doc) => {
-        let appData = doc.data();
-        appData.id = doc.id;
-        staff.push(appData);
-      });
-      this.staff = staff.sort((a, b) => (a.lastName > b.lastName ? 1 : b.lastName > a.lastName ? -1 : 0));
-    },
+  this.staff = await fetchStaff();
+},
     updateDate(newDate) {
       this.currentDate = newDate;
     },
