@@ -48,6 +48,7 @@ import EventList from "./components/EventList.vue";
 import { fetchEvents, fetchStaff } from "@/services";
 import { addEvent, deleteEvent } from "@/router/events";
 import { addStaff, deleteStaff } from "@/router/staff";
+import { sortEvents } from '@/features/calendar/utils/sortEvents'
 
 export default {
   name: "Calendar",
@@ -105,6 +106,7 @@ export default {
     deleteStaff: deleteStaff,
     addEvent: addEvent,
     deleteEvent: deleteEvent,
+    sortEvents: sortEvents,
     getCurrentDate() {
       let today = new Date();
       this.currentDate.date = today.getDate();
@@ -156,30 +158,6 @@ async getEvents() {
       }
 
       this.getStaff();
-    },
-    sortEvents(events) {
-      let yearsWithEvents = events
-        .map((e) => {
-          const start = e.start.split("-")[0];
-          const end = e.end.split("-")[0];
-          if (start === end) return start;
-          else return [start, end];
-        })
-        .flat();
-
-      const uniqueYears = [...new Set(yearsWithEvents)];
-      let sortedEvents = {};
-      uniqueYears.forEach((year) => {
-        const yearEvents = events.filter((e) => {
-          const start = e.start.split("-")[0];
-          const end = e.end.split("-")[0];
-          return start === year || end === year;
-        });
-
-        sortedEvents[year] = yearEvents;
-      });
-
-      return sortedEvents;
     },
   },
   created() {
