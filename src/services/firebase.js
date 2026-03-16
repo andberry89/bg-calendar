@@ -20,16 +20,3 @@ if (!firebase.apps.length) {
 
 export const db = app.firestore();
 export { app as firebaseApp };
-
-export const collections = {
-  events: "calEvent",
-  staff: "staff",
-};
-
-export const getEventsCollection = () => {
-  return db.collection(collections.events);
-};
-
-export const getStaffCollection = () => {
-  return db.collection(collections.staff);
-};
