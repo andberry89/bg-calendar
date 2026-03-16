@@ -100,11 +100,6 @@ export default {
     },
   },
   methods: {
-    addStaff: addStaff,
-    deleteStaff: deleteStaff,
-    addEvent: addEvent,
-    deleteEvent: deleteEvent,
-    sortEvents: sortEvents,
     getCurrentDate() {
       let today = new Date();
       this.currentDate.date = today.getDate();
