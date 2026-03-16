@@ -10,11 +10,14 @@ const firebaseConfig = {
   appId: process.env.VUE_APP_FIREBASE_APP_ID,
 };
 
+let app;
+
 if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
+  app = firebase.initializeApp(firebaseConfig);
+} else {
+  app = firebase.app();
 }
 
-const app = firebase.app();
 export const db = app.firestore();
 export { app as firebaseApp };
 
