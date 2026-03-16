@@ -30,8 +30,8 @@
     <EventList :events="currentMonthEvents" :currentDate="currentDate" v-if="showEvents" />
   </main>
   <footer>
-  <em>Version {{ __APP_VERSION__ }}</em>
-</footer>
+    <em>Version {{ __APP_VERSION__ }}</em>
+  </footer>
 </template>
 <script>
 import CalendarHeader from './CalendarHeader.vue';
@@ -42,6 +42,7 @@ import { fetchEvents, fetchStaff } from '@/services';
 import { addEvent, deleteEvent } from '@/router/events';
 import { addStaff, deleteStaff } from '@/router/staff';
 import { sortEvents } from '@/features/calendar/utils/sortEvents';
+import { getCurrentMonthEvents } from '@/features/calendar/utils/getCurrentMonthEvents';
 
 export default {
   name: 'Calendar',
@@ -72,23 +73,7 @@ export default {
       return new Date(this.currentDate.year, this.currentDate.month + 1, 0).getDate();
     },
     currentMonthEvents() {
-      const currentYearEvents = this.sortedEvents[this.currentDate.year];
-      if (currentYearEvents) {
-        return currentYearEvents
-          .filter((e) => {
-            const start = e.start.split('-')[1] - 1;
-            const end = e.end.split('-')[1] - 1;
-            return this.currentDate.month === start || this.currentDate.month === end;
-          })
-          .sort((a, b) => {
-            return (
-              new Date(a.start.replace(/-/g, '/').replace(/T.+/, '')) -
-              new Date(b.start.replace(/-/g, '/').replace(/T.+/, ''))
-            );
-          });
-      } else {
-        return [];
-      }
+      return getCurrentMonthEvents(this.sortedEvents, this.currentDate);
     }
   },
   methods: {

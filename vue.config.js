@@ -1,6 +1,6 @@
-const { defineConfig } = require('@vue/cli-service')
-const webpack = require('webpack')
-const pkg = require('./package.json')
+const { defineConfig } = require('@vue/cli-service');
+const webpack = require('webpack');
+const pkg = require('./package.json');
 
 module.exports = defineConfig({
   transpileDependencies: true,
@@ -11,4 +11,4 @@ module.exports = defineConfig({
       })
     ]
   }
-})
+});

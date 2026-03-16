@@ -23,5 +23,5 @@ export const fetchStaff = async () => {
     staff.push(appData);
   });
 
-  return staff.sort((a, b) => a.lastName.localeCompare(b.lastName));;
+  return staff.sort((a, b) => a.lastName.localeCompare(b.lastName));
 };
