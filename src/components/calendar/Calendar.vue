@@ -3,7 +3,7 @@
     <article id="staff-list">
       <StaffList :staff="staff" @update="updateStaff" />
     </article>
-    <article id="calendar">
+    <article id="calendar" :aria-busy="isLoading">
       <!-- <article
       id="calendar"
       :style="{ 'background-image': 'url(' + require('@/assets/calendar/' + currentDate.month + '.jpg') + ')' }"
@@ -56,7 +56,8 @@ export default {
       },
       staff: [],
       sortedEvents: {},
-      showEvents: false
+      showEvents: false,
+      isLoading: true
     };
   },
   components: {
@@ -120,7 +121,12 @@ export default {
   },
   async mounted() {
     this.getCurrentDate();
-    await Promise.all([this.getEvents(), this.getStaff()]);
+
+    try {
+      await Promise.all([this.getEvents(), this.getStaff()]);
+    } finally {
+      this.isLoading = false;
+    }
   }
 };
 </script>
