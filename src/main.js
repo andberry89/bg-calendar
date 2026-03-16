@@ -1,6 +1,7 @@
 import { createApp } from "vue";
+import { createPinia } from "pinia";
 import App from "./App.vue";
-import "./main.css";
+import "./styles/main.scss";
 import VueTextareaAutosize from "vue-textarea-autosize";
 import firebase from "firebase/compat/app";
 import "firebase/compat/firestore";
@@ -19,4 +20,10 @@ firebase.initializeApp(firebaseConfig);
 
 export const db = firebase.firestore();
 
-createApp(App).directive("click-outside", ClickOutside).use(VueTextareaAutosize).mount("#app");
+const app = createApp(App);
+const pinia = createPinia();
+
+app.directive("click-outside", ClickOutside);
+app.use(pinia);
+app.use(VueTextareaAutosize);
+app.mount("#app");
