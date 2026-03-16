@@ -1,10 +1,10 @@
-import { db, collections } from "@/services";
-import { doc, addDoc, deleteDoc, collection } from "firebase/firestore";
+import { getEventsCollection } from "@/services";
+import { doc, addDoc, deleteDoc } from "firebase/firestore";
 
 export const addEvent = async (event) => {
   try {
     // Add new event to database
-    const docRef = await addDoc(collection(db, collections.events), event);
+    const docRef = await addDoc(getEventsCollection(), event);
 
     // Success feedback
     console.log("Successfully added event with ID: ", docRef.id);
@@ -24,7 +24,7 @@ export const addEvent = async (event) => {
 
 export const deleteEvent = async (id) => {
   try {
-    const docRef = doc(db, "calEvent", id);
+    const docRef = doc(getEventsCollection(), id);
     await deleteDoc(docRef);
 
     // Validate id
