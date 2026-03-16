@@ -1,7 +1,7 @@
 <template>
   <main>
     <article id="staff-list">
-      <StaffList :staff="staff" key="staff-list" @update="updateStaff($event)" />
+      <StaffList :staff="staff" @update="updateStaff($event)" />
     </article>
     <article id="calendar">
       <!-- <article
@@ -16,7 +16,6 @@
         @update="updateEvents('add', $event)"
         :dateFn="getCurrentDate"
         :staff="staff"
-        key="calendar-header"
       />
       <CalendarBody
         :currentDate="currentDate"
