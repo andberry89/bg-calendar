@@ -24,10 +24,7 @@ export const addEvent = async (event) => {
 
 export const deleteEvent = async (id) => {
   try {
-    const docRef = doc(getEventsCollection(), id);
-    await deleteDoc(docRef);
-
-    // Validate id
+    // Validate id before touching Firestore
     if (!id || typeof id !== "string") {
       return {
         success: false,
@@ -35,13 +32,18 @@ export const deleteEvent = async (id) => {
       };
     }
 
+    const docRef = doc(getEventsCollection(), id);
+    await deleteDoc(docRef);
+
     console.log(`Event with ID ${id} deleted successfully.`);
+
     return {
       success: true,
       message: `Event with ID ${id} deleted successfully.`,
     };
   } catch (err) {
     console.error(`Error deleting event with ID ${id}`);
+
     return {
       success: false,
       message: `Failed to delete event with ID ${id}`,

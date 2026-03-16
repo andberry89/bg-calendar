@@ -51,9 +51,7 @@ export const addStaff = async (person) => {
 
 export const deleteStaff = async (id) => {
   try {
-    const docRef = doc(getStaffCollection(), id);
-    await deleteDoc(docRef);
-
+    // Validate id before touching Firestore
     if (!id || typeof id !== "string") {
       return {
         success: false,
@@ -61,16 +59,21 @@ export const deleteStaff = async (id) => {
       };
     }
 
+    const docRef = doc(getStaffCollection(), id);
+    await deleteDoc(docRef);
+
     console.log(`Staff with ID "${id}" deleted successfully.`);
+
     return {
       success: true,
-      message: `Staff with ID "${id} deleted successfully.`,
+      message: `Staff with ID "${id}" deleted successfully.`,
     };
   } catch (err) {
-    console.error(`Error deleting staff with ID "${id}:`, err);
+    console.error(`Error deleting staff with ID "${id}"`, err);
+
     return {
       success: false,
-      message: `Failed to delete staff with ID "${id}.`,
+      message: `Failed to delete staff with ID "${id}".`,
       error: err,
     };
   }
