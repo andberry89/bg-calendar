@@ -94,36 +94,27 @@ export default {
       this.currentDate = newDate;
     },
     async updateEvents(fn, event) {
-      if (fn === 'add') {
-        try {
+      try {
+        if (fn === 'add') {
           await addEvent(event);
-        } catch (err) {
-          console.warn(err);
-        }
-      } else {
-        try {
+        } else {
           await deleteEvent(event.id);
-        } catch (err) {
-          console.warn(err);
         }
+      } catch (err) {
+        console.warn(err);
       }
+
       await this.getEvents();
     },
-    async updateStaff(staffFn) {
-      const fn = staffFn[0];
-      const person = staffFn[1];
-      if (fn === 'add') {
-        try {
+    async updateStaff([fn, person]) {
+      try {
+        if (fn === 'add') {
           await addStaff(person);
-        } catch (err) {
-          console.warn(err);
-        }
-      } else {
-        try {
+        } else {
           await deleteStaff(person.id);
-        } catch (err) {
-          console.warn(err);
         }
+      } catch (err) {
+        console.warn(err);
       }
 
       await this.getStaff();
