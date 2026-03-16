@@ -129,12 +129,10 @@ export default {
       await this.getStaff();
     }
   },
-  created() {
-    this.getCurrentDate();
-  },
   async mounted() {
-  await Promise.all([this.getEvents(), this.getStaff()]);
-}
+    this.getCurrentDate();
+    await Promise.all([this.getEvents(), this.getStaff()]);
+  }
 };
 </script>
 <style lang="scss" scoped>
