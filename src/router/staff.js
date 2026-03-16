@@ -1,4 +1,4 @@
-import { db, collections } from "@/services/firebase";
+import { db, collections } from "@/services";
 import { doc, setDoc, deleteDoc, getDoc } from "firebase/firestore";
 
 export const addStaff = async (person) => {
