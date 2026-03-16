@@ -25,3 +25,12 @@ export const fetchStaff = async () => {
 
   return staff.sort((a, b) => a.lastName.localeCompare(b.lastName));
 };
+
+export const fetchCalendarPageData = async () => {
+  const [events, staff] = await Promise.all([fetchEvents(), fetchStaff()]);
+
+  return {
+    events,
+    staff
+  };
+};

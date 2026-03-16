@@ -38,7 +38,7 @@ import CalendarHeader from './CalendarHeader.vue';
 import CalendarBody from './CalendarBody.vue';
 import StaffList from './StaffList.vue';
 import EventList from './components/EventList.vue';
-import { fetchEvents, fetchStaff } from '@/services';
+import { fetchCalendarPageData } from '@/services';
 import { addEvent, deleteEvent } from '@/router/events';
 import { addStaff, deleteStaff } from '@/router/staff';
 import { sortEvents } from '@/features/calendar/utils/sortEvents';
@@ -116,7 +116,7 @@ export default {
     this.getCurrentDate();
 
     try {
-      const [events, staff] = await Promise.all([fetchEvents(), fetchStaff()]);
+      const { events, staff } = await fetchCalendarPageData();
       this.sortedEvents = sortEvents(events);
       this.staff = staff;
     } catch (err) {
