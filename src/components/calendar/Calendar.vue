@@ -122,7 +122,7 @@ export default {
           console.warn(err);
         }
       }
-      this.getEvents();
+      await this.getEvents();
     },
     async updateStaff(staffFn) {
       const fn = staffFn[0];
@@ -141,7 +141,7 @@ export default {
         }
       }
 
-      this.getStaff();
+      await this.getStaff();
     }
   },
   created() {
