@@ -60,9 +60,7 @@ export default {
         year: 0,
       },
       staff: [],
-      sortedEvents: {
-        type: Object,
-      },
+      sortedEvents: {},
       showEvents: false,
     };
   },
@@ -115,8 +113,7 @@ export default {
     },
 async getEvents() {
   const events = await fetchEvents();
-  this.events = events;
-  this.sortedEvents = this.sortEvents(events);
+  this.sortedEvents = sortEvents(events);
 },
     async getStaff() {
   this.staff = await fetchStaff();
