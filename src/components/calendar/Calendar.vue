@@ -43,6 +43,7 @@ import { addEvent, deleteEvent } from '@/router/events';
 import { addStaff, deleteStaff } from '@/router/staff';
 import { sortEvents } from '@/features/calendar/utils/sortEvents';
 import { getCurrentMonthEvents } from '@/features/calendar/utils/getCurrentMonthEvents';
+import { getPrevMonthDays, getCurrentMonthDays } from '@/features/calendar/utils/getMonthDayCounts';
 
 export default {
   name: 'Calendar',
@@ -65,12 +66,10 @@ export default {
   },
   computed: {
     prevMonthDays() {
-      let year = this.currentDate.month === 0 ? this.currentDate.year - 1 : this.currentDate.year;
-      let month = this.currentDate.month === 0 ? 12 : this.currentDate.month;
-      return new Date(year, month, 0).getDate();
+      return getPrevMonthDays(this.currentDate);
     },
     currentMonthDays() {
-      return new Date(this.currentDate.year, this.currentDate.month + 1, 0).getDate();
+      return getCurrentMonthDays(this.currentDate);
     },
     currentMonthEvents() {
       return getCurrentMonthEvents(this.sortedEvents, this.currentDate);
