@@ -13,9 +13,6 @@ export const getCurrentMonthEvents = (sortedEvents, currentDate) => {
       return currentDate.month === startMonth || currentDate.month === endMonth;
     })
     .sort((a, b) => {
-      return (
-        new Date(a.start.replace(/-/g, '/').replace(/T.+/, '')) -
-        new Date(b.start.replace(/-/g, '/').replace(/T.+/, ''))
-      );
+      return new Date(a.start) - new Date(b.start);
     });
 };
