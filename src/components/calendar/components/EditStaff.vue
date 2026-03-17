@@ -37,57 +37,58 @@
     </div>
   </div>
 </template>
-<script>
-import { nextTick } from 'vue';
+<script setup>
+import { ref, nextTick } from 'vue';
 
-export default {
-  name: 'EditStaff',
-  data() {
-    return {
-      newStaff: {
-        firstName: '',
-        lastName: ''
-      },
-      showForm: {
-        add: false,
-        remove: false
-      }
-    };
-  },
-  props: {
-    staff: {
-      type: Array,
-      required: true
-    }
-  },
-  methods: {
-    emitStaff(fn) {
-      fn === 'add'
-        ? this.$emit('update', [fn, this.newStaff])
-        : this.$emit('update', ['remove', fn]);
-      this.newStaff.firstName = '';
-      this.newStaff.lastName = '';
-      this.showForm.add = false;
-      this.showForm.remove = false;
-    },
-    toggleEditStaffForm(form) {
-      if (form === 'add') {
-        this.showForm.remove = false;
-        this.showForm.add = !this.showForm.add;
-
-        // Adds focus to the first name input when it is rendered
-        if (this.showForm.add) {
-          nextTick(() => {
-            this.$refs.firstNameInput.focus();
-          });
-        }
-      } else {
-        this.showForm.add = false;
-        this.showForm.remove = !this.showForm.remove;
-      }
-    }
+defineProps({
+  staff: {
+    type: Array,
+    required: true
   }
-};
+});
+
+const emit = defineEmits(['update']);
+
+const firstNameInput = ref(null);
+
+const newStaff = ref({
+  firstName: '',
+  lastName: ''
+});
+
+const showForm = ref({
+  add: false,
+  remove: false
+});
+
+function emitStaff(fn) {
+  if (fn === 'add') {
+    emit('update', [fn, newStaff.value]);
+  } else {
+    emit('update', ['remove', fn]);
+  }
+
+  newStaff.value.firstName = '';
+  newStaff.value.lastName = '';
+  showForm.value.add = false;
+  showForm.value.remove = false;
+}
+
+function toggleEditStaffForm(form) {
+  if (form === 'add') {
+    showForm.value.remove = false;
+    showForm.value.add = !showForm.value.add;
+
+    if (showForm.value.add) {
+      nextTick(() => {
+        firstNameInput.value.focus();
+      });
+    }
+  } else {
+    showForm.value.add = false;
+    showForm.value.remove = !showForm.value.remove;
+  }
+}
 </script>
 <style lang="scss" scoped>
 .edit-staff-container {
