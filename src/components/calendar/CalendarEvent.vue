@@ -24,28 +24,18 @@
     </div>
   </div>
 </template>
-<script>
-import { differenceInDays } from 'date-fns';
-
-export default {
-  name: 'CalendarEvent',
-  props: {
-    event: {
-      type: Object
-    }
-  },
-  computed: {
-    numberOfDays() {
-      return differenceInDays(this.event.end, this.event.start) + 1;
-    }
-  },
-  methods: {
-    differenceInDays: differenceInDays,
-    emitEvent() {
-      this.$emit('update', this.event);
-    }
+<script setup>
+const props = defineProps({
+  event: {
+    type: Object
   }
-};
+});
+
+const emit = defineEmits(['update']);
+
+function emitEvent() {
+  emit('update', props.event);
+}
 </script>
 <style lang="scss" scoped>
 .event-container div {
