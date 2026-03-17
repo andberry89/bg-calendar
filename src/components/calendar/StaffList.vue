@@ -24,18 +24,21 @@ defineProps({
 
 const emit = defineEmits(['update']);
 
+const images = import.meta.glob('@/assets/staff/*.{jpg,png}', {
+  eager: true,
+  import: 'default'
+});
+
 function emitStaff(staffFn) {
   emit('update', staffFn);
 }
 
 function imgUrl(name) {
-  const images = require.context('@/assets/staff', false, /\.(jpg|png)$/);
-
-  try {
-    return images(`./${name}.jpg`);
-  } catch (e) {
-    return images('./user.png');
-  }
+  return (
+    images[`/src/assets/staff/${name}.jpg`] ||
+    images[`/src/assets/staff/${name}.png`] ||
+    images['/src/assets/staff/user.png']
+  );
 }
 </script>
 <style lang="scss" scoped>
