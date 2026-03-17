@@ -11,9 +11,9 @@
         </div>
       </div>
       <div class="date-nav">
-        <div @click="monthDown" class="small-month">&lt; {{ lastMonth }}</div>
-        <div @click="dateFn">Today</div>
-        <div @click="monthUp" class="small-month">{{ nextMonth }} &gt;</div>
+        <div @click="goToPreviousMonth" class="small-month">&lt; {{ lastMonth }}</div>
+        <div @click="goToToday">Today</div>
+        <div @click="goToNextMonth" class="small-month">{{ nextMonth }} &gt;</div>
       </div>
     </div>
     <div class="calendar-title">
@@ -80,73 +80,60 @@ export default {
       return nextMonth.substring(0, 3);
     },
     today() {
-      const today = new Date();
-      return today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+      return new Date();
     }
   },
   methods: {
     addEvent(event) {
       this.$emit('update', event);
     },
-    dateUp() {
-      if (this.newDate.date === this.currentMonthDays) {
-        this.newDate.date = 1;
-        this.monthUp();
+    goToToday() {
+      this.$emit('date', {
+        date: this.today.getDate(),
+        month: this.today.getMonth(),
+        year: this.today.getFullYear()
+      });
+    },
+    goToNextMonth() {
+      const nextDate = { ...this.currentDate };
+
+      if (nextDate.month === 11) {
+        nextDate.month = 0;
+        nextDate.year++;
       } else {
-        this.newDate.date++;
+        nextDate.month++;
       }
+
+      nextDate.date = 1;
+      this.$emit('date', nextDate);
     },
-    dateDown() {
-      if (this.newDate.date === 1) {
-        this.newDate.date = this.prevMonthDays;
-        this.monthDown();
+    goToPreviousMonth() {
+      const prevDate = { ...this.currentDate };
+
+      if (prevDate.month === 0) {
+        prevDate.month = 11;
+        prevDate.year--;
       } else {
-        this.newDate.date--;
+        prevDate.month--;
       }
-    },
-    monthUp() {
-      if (this.newDate.month === 11) {
-        this.newDate.month = 0;
-        this.newDate.year++;
-      } else {
-        this.newDate.month++;
-      }
-    },
-    monthDown() {
-      if (this.newDate.month === 0) {
-        this.newDate.month = 11;
-        this.newDate.year--;
-      } else {
-        this.newDate.month--;
-      }
-    },
-    yearUp() {
-      this.newDate.year++;
-    },
-    yearDown() {
-      this.newDate.year--;
+
+      prevDate.date = 1;
+      this.$emit('date', prevDate);
     },
     toggleDatePicker() {
       this.showDatePicker = !this.showDatePicker;
     },
     updateDate(date) {
       const split = date.split('-');
-      this.newDate.year = parseInt(split[0]);
-      this.newDate.month = parseInt(split[1] - 1);
-      this.newDate.date = parseInt(split[2]);
+
+      this.$emit('date', {
+        year: parseInt(split[0], 10),
+        month: parseInt(split[1], 10) - 1,
+        date: parseInt(split[2], 10)
+      });
+
       this.toggleDatePicker();
     }
-  },
-  watch: {
-    newDate: {
-      handler(val) {
-        this.$emit('date', val);
-      },
-      deep: true
-    }
-  },
-  created() {
-    this.newDate = this.currentDate;
   }
 };
 </script>

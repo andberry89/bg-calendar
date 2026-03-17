@@ -30,10 +30,11 @@
     <EventList :events="currentMonthEvents" :currentDate="currentDate" v-if="showEvents" />
   </main>
   <footer>
-    <em>Version {{ __APP_VERSION__ }}</em>
+    <em>Version {{ appVersion }}</em>
   </footer>
 </template>
 <script>
+/* global __APP_VERSION__ */
 import CalendarHeader from './CalendarHeader.vue';
 import CalendarBody from './CalendarBody.vue';
 import StaffList from './StaffList.vue';
@@ -51,6 +52,7 @@ export default {
   data() {
     return {
       currentDate: {
+        date: 0,
         month: 0,
         year: 0
       },
@@ -68,6 +70,9 @@ export default {
     StaffList
   },
   computed: {
+    appVersion() {
+      return __APP_VERSION__;
+    },
     prevMonthDays() {
       return getPrevMonthDays(this.currentDate);
     },
@@ -85,6 +90,11 @@ export default {
     updateDate(newDate) {
       this.currentDate = newDate;
     },
+    async refreshCalendarData() {
+      const { events, staff } = await fetchCalendarPageData();
+      this.sortedEvents = sortEvents(events);
+      this.staff = staff;
+    },
     async updateEvents(fn, event) {
       try {
         if (fn === 'add') {
@@ -92,11 +102,11 @@ export default {
         } else {
           await deleteEvent(event.id);
         }
+
+        await this.refreshCalendarData();
       } catch (err) {
         console.warn(err);
       }
-
-      await this.getEvents();
     },
     async updateStaff([fn, person]) {
       try {
@@ -105,20 +115,18 @@ export default {
         } else {
           await deleteStaff(person.id);
         }
+
+        await this.refreshCalendarData();
       } catch (err) {
         console.warn(err);
       }
-
-      await this.getStaff();
     }
   },
   async mounted() {
     this.getCurrentDate();
 
     try {
-      const { events, staff } = await fetchCalendarPageData();
-      this.sortedEvents = sortEvents(events);
-      this.staff = staff;
+      await this.refreshCalendarData();
     } catch (err) {
       console.warn(err);
       this.loadError = 'Failed to load calendar data.';

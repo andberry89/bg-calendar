@@ -107,6 +107,13 @@ export default {
       },
       deep: true
     },
+    currentDate: {
+      handler(val) {
+        this.activeDate = { ...val };
+      },
+      deep: true,
+      immediate: true
+    },
     currentMonthDays: {
       handler() {
         this.updateEvents();
