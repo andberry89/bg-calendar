@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import Calendar from './components/calendar/Calendar';
+import Calendar from '@/components/calendar/Calendar.vue';
 
 export default {
   name: 'App',

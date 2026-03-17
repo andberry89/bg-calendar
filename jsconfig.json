@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2020",
     "module": "esnext",
     "baseUrl": "./",
     "moduleResolution": "node",
@@ -8,5 +8,6 @@
       "@/*": ["src/*"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
-  }
+  },
+  "include": ["src/**/*.js", "src/**/*.vue"]
 }
