@@ -3,13 +3,11 @@
     <div class="slot-container">
       <slot></slot>
     </div>
-    <div class="background-overlay" @click.self="this.$emit('update')"></div>
+    <div class="background-overlay" @click.self="emit('update')"></div>
   </div>
 </template>
-<script>
-export default {
-  name: 'ModalOverlay'
-};
+<script setup>
+const emit = defineEmits(['update']);
 </script>
 <style lang="scss" scoped>
 .edit-modal {
