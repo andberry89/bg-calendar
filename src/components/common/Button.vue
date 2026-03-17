@@ -3,11 +3,7 @@
     <slot></slot>
   </button>
 </template>
-<script>
-export default {
-  name: 'Button'
-};
-</script>
+<script></script>
 <style lang="scss" scoped>
 button {
   padding: 8px 20px;
