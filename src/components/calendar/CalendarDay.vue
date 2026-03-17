@@ -22,109 +22,88 @@
     />
   </div>
 </template>
-<script>
+<script setup>
+import { computed, ref } from 'vue';
 import CalendarEvent from './CalendarEvent.vue';
 import EventModal from './EventModal.vue';
 
-export default {
-  name: 'CalendarDay',
-  data() {
-    return {
-      holidays: [],
-      filteredEvents: [],
-      showEventDetails: false,
-      modalEvent: {}
-    };
+const props = defineProps({
+  date: Number,
+  dayClass: String,
+  currentDate: {
+    type: Object
   },
-  components: {
-    CalendarEvent,
-    EventModal
+  month: {
+    type: String,
+    required: false
   },
-  props: {
-    date: Number,
-    dayClass: String,
-    currentDate: {
-      type: Object
-    },
-    month: {
-      type: String,
-      required: false
-    },
-    events: {
-      type: Array,
-      default: () => [],
-      required: false
-    }
-  },
-  computed: {
-    getDay() {
-      let date = { ...this.currentDate };
-      return new Date(date.year, date.month, this.date).getDay();
-    },
-    hasFullClosureHoliday() {
-      if (this.holidays.length > 0) {
-        const e = this.holidays.find((x) => x.closed === 'full');
-        if (e) return true;
-      }
-      return false;
-    },
-    isWeekend() {
-      let date = { ...this.currentDate };
-      if (this.month === 'prev') {
-        if (date.month === 0) {
-          date.month = 11;
-          date.year--;
-        } else {
-          date.month--;
-        }
-      }
-      if (this.month === 'next') {
-        if (date.month === 11) {
-          date.month = 0;
-          date.year++;
-        } else {
-          date.month++;
-        }
-      }
+  events: {
+    type: Array,
+    default: () => [],
+    required: false
+  }
+});
 
-      const day = new Date(date.year, date.month, this.date).getDay();
-      return day === 0 || day === 6;
-    }
-  },
-  methods: {
-    closeModal() {
-      this.modalEvent = {};
-      this.showEventDetails = false;
-    },
-    deleteEvent(event) {
-      this.$emit('delete', event);
-      this.closeModal();
-    },
-    openEventModal(event) {
-      this.modalEvent = event;
-      this.showEventDetails = true;
-    },
-    sortEvents() {
-      this.holidays = this.events.filter((e) => e.type === 'Holiday');
-      this.filteredEvents = this.events.filter((e) => e.type !== 'Holiday');
-    },
-    updateEvents() {
-      this.$emit('update');
-    }
-  },
-  created() {
-    this.sortEvents();
-  },
-  watch: {
-    events: {
-      handler() {
-        this.sortEvents();
-      },
-      immediate: true, // Trigger the watcher immediately
-      deep: true // Watch deeply to account for nested changes in the array
+const emit = defineEmits(['delete', 'update']);
+
+const showEventDetails = ref(false);
+const modalEvent = ref({});
+
+const holidays = computed(() => props.events.filter((e) => e.type === 'Holiday'));
+const filteredEvents = computed(() => props.events.filter((e) => e.type !== 'Holiday'));
+
+const getDay = computed(() => {
+  const date = { ...props.currentDate };
+  return new Date(date.year, date.month, props.date).getDay();
+});
+
+const hasFullClosureHoliday = computed(() => {
+  return holidays.value.some((event) => event.closed === 'full');
+});
+
+const isWeekend = computed(() => {
+  const date = { ...props.currentDate };
+
+  if (props.month === 'prev') {
+    if (date.month === 0) {
+      date.month = 11;
+      date.year--;
+    } else {
+      date.month--;
     }
   }
-};
+
+  if (props.month === 'next') {
+    if (date.month === 11) {
+      date.month = 0;
+      date.year++;
+    } else {
+      date.month++;
+    }
+  }
+
+  const day = new Date(date.year, date.month, props.date).getDay();
+  return day === 0 || day === 6;
+});
+
+function closeModal() {
+  modalEvent.value = {};
+  showEventDetails.value = false;
+}
+
+function deleteEvent(event) {
+  emit('delete', event);
+  closeModal();
+}
+
+function openEventModal(event) {
+  modalEvent.value = event;
+  showEventDetails.value = true;
+}
+
+function updateEvents() {
+  emit('update');
+}
 </script>
 <style lang="scss" scoped>
 .container {
