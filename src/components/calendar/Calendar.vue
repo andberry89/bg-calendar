@@ -10,11 +10,8 @@
     > -->
       <CalendarHeader
         :currentDate="currentDate"
-        :prevMonthDays="prevMonthDays"
-        :currentMonthDays="currentMonthDays"
         @date="updateDate"
         @update="updateEvents('add', $event)"
-        :dateFn="getCurrentDate"
         :staff="staff"
       />
       <CalendarBody
@@ -33,8 +30,9 @@
     <em>Version {{ appVersion }}</em>
   </footer>
 </template>
-<script>
+<script setup>
 /* global __APP_VERSION__ */
+import { computed, onMounted, ref } from 'vue';
 import CalendarHeader from './CalendarHeader.vue';
 import CalendarBody from './CalendarBody.vue';
 import StaffList from './StaffList.vue';
@@ -47,94 +45,79 @@ import { getCurrentMonthEvents } from '@/features/calendar/utils/getCurrentMonth
 import { getPrevMonthDays, getCurrentMonthDays } from '@/features/calendar/utils/getMonthDayCounts';
 import { getCurrentDate as getInitialCurrentDate } from '@/features/calendar/utils/getCurrentDate';
 
-export default {
-  name: 'Calendar',
-  data() {
-    return {
-      currentDate: {
-        date: 0,
-        month: 0,
-        year: 0
-      },
-      staff: [],
-      sortedEvents: {},
-      showEvents: false,
-      isLoading: true,
-      loadError: null
-    };
-  },
-  components: {
-    CalendarHeader,
-    CalendarBody,
-    EventList,
-    StaffList
-  },
-  computed: {
-    appVersion() {
-      return __APP_VERSION__;
-    },
-    prevMonthDays() {
-      return getPrevMonthDays(this.currentDate);
-    },
-    currentMonthDays() {
-      return getCurrentMonthDays(this.currentDate);
-    },
-    currentMonthEvents() {
-      return getCurrentMonthEvents(this.sortedEvents, this.currentDate);
-    }
-  },
-  methods: {
-    getCurrentDate() {
-      this.currentDate = getInitialCurrentDate();
-    },
-    updateDate(newDate) {
-      this.currentDate = newDate;
-    },
-    async refreshCalendarData() {
-      const { events, staff } = await fetchCalendarPageData();
-      this.sortedEvents = sortEvents(events);
-      this.staff = staff;
-    },
-    async updateEvents(fn, event) {
-      try {
-        if (fn === 'add') {
-          await addEvent(event);
-        } else {
-          await deleteEvent(event.id);
-        }
+const currentDate = ref({
+  date: 0,
+  month: 0,
+  year: 0
+});
 
-        await this.refreshCalendarData();
-      } catch (err) {
-        console.warn(err);
-      }
-    },
-    async updateStaff([fn, person]) {
-      try {
-        if (fn === 'add') {
-          await addStaff(person);
-        } else {
-          await deleteStaff(person.id);
-        }
+const staff = ref([]);
+const sortedEvents = ref({});
+const showEvents = ref(false);
+const isLoading = ref(true);
+const loadError = ref(null);
 
-        await this.refreshCalendarData();
-      } catch (err) {
-        console.warn(err);
-      }
-    }
-  },
-  async mounted() {
-    this.getCurrentDate();
+const appVersion = computed(() => __APP_VERSION__);
+const prevMonthDays = computed(() => getPrevMonthDays(currentDate.value));
+const currentMonthDays = computed(() => getCurrentMonthDays(currentDate.value));
+const currentMonthEvents = computed(() =>
+  getCurrentMonthEvents(sortedEvents.value, currentDate.value)
+);
 
-    try {
-      await this.refreshCalendarData();
-    } catch (err) {
-      console.warn(err);
-      this.loadError = 'Failed to load calendar data.';
-    } finally {
-      this.isLoading = false;
+function getCurrentDate() {
+  currentDate.value = getInitialCurrentDate();
+}
+
+function updateDate(newDate) {
+  currentDate.value = newDate;
+}
+
+async function refreshCalendarData() {
+  const { events, staff: staffData } = await fetchCalendarPageData();
+  sortedEvents.value = sortEvents(events);
+  staff.value = staffData;
+}
+
+async function updateEvents(fn, event) {
+  try {
+    if (fn === 'add') {
+      await addEvent(event);
+    } else {
+      await deleteEvent(event.id);
     }
+
+    await refreshCalendarData();
+  } catch (err) {
+    console.warn(err);
   }
-};
+}
+
+async function updateStaff([fn, person]) {
+  try {
+    if (fn === 'add') {
+      await addStaff(person);
+    } else {
+      await deleteStaff(person.id);
+    }
+
+    await refreshCalendarData();
+  } catch (err) {
+    console.warn(err);
+  }
+}
+
+onMounted(async () => {
+  getCurrentDate();
+
+  try {
+    await refreshCalendarData();
+  } catch (err) {
+    console.warn(err);
+    loadError.value = 'Failed to load calendar data.';
+  } finally {
+    isLoading.value = false;
+  }
+});
 </script>
 <style lang="scss" scoped>
 @import url('https://fonts.googleapis.com/css?family=Anton');
