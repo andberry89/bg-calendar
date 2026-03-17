@@ -22,57 +22,44 @@
     </div>
   </div>
 </template>
-<script>
-import { format, parseISO } from 'date-fns';
+<script setup>
+import { computed } from 'vue';
+import { format } from 'date-fns';
 
-export default {
-  name: 'EventModal',
-  data() {
-    return {
-      showEdit: false
-    };
+const props = defineProps({
+  day: {
+    type: Number,
+    required: true
   },
-  props: {
-    day: {
-      type: Number,
-      required: true
-    },
-    event: {
-      type: Object,
-      required: true
-    }
-  },
-  computed: {
-    eventDates() {
-      // We use the .replace regex so the format method does not subtract a day
-      const startDate = new Date(this.event.start.replace(/-/g, '/'));
-      const start = this.format(startDate, 'MM/dd/yyyy');
-      if (this.event.start === this.event.end) {
-        return start;
-      } else {
-        const endDate = new Date(this.event.end.replace(/-/g, '/'));
-        const end = this.format(endDate, 'MM/dd/yyyy');
-        return start + ' - ' + end;
-      }
-    }
-  },
-  methods: {
-    format: format,
-    parseISO: parseISO,
-    closeEdit() {
-      this.showEdit = false;
-    },
-    closeModal() {
-      this.$emit('update');
-    },
-    deleteEvent() {
-      this.$emit('delete', this.event);
-    },
-    openEdit() {
-      this.showEdit = true;
-    }
+  event: {
+    type: Object,
+    required: true
   }
-};
+});
+
+const emit = defineEmits(['update', 'delete']);
+
+const eventDates = computed(() => {
+  const startDate = new Date(props.event.start.replace(/-/g, '/'));
+  const start = format(startDate, 'MM/dd/yyyy');
+
+  if (props.event.start === props.event.end) {
+    return start;
+  }
+
+  const endDate = new Date(props.event.end.replace(/-/g, '/'));
+  const end = format(endDate, 'MM/dd/yyyy');
+
+  return start + ' - ' + end;
+});
+
+function closeModal() {
+  emit('update');
+}
+
+function deleteEvent() {
+  emit('delete', props.event);
+}
 </script>
 <style lang="scss" scoped>
 .event-modal {

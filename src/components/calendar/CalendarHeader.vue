@@ -23,119 +23,100 @@
     <NewEvent :staff="staff" key="new-event" @update="addEvent($event)" />
   </header>
 </template>
-<script>
+<script setup>
+import { computed, ref } from 'vue';
 import NewEvent from './components/NewEvent.vue';
-import { month, weekdayNames } from './utils/selectOptions';
+import { month } from './utils/selectOptions';
 
-export default {
-  name: 'CalendarHeader',
-  data() {
-    return {
-      showDatePicker: false,
-      newDate: {
-        date: 0,
-        month: 0,
-        year: 0
-      },
-      month: month,
-      weekdayNames: weekdayNames
-    };
+const props = defineProps({
+  currentDate: {
+    type: Object,
+    required: true
   },
-  components: {
-    NewEvent
-  },
-  props: {
-    currentDate: {
-      type: Object,
-      required: true
-    },
-    prevMonthDays: Number,
-    currentMonthDays: Number,
-    staff: Array,
-    dateFn: {
-      type: Function,
-      required: false
-    }
-  },
-  computed: {
-    currentDay() {
-      return new Date(
-        this.currentDate.year,
-        this.currentDate.month,
-        this.currentDate.date
-      ).getDay();
-    },
-    lastMonth() {
-      let lastMonth = month[this.currentDate.month - 1];
-      if (this.currentDate.month === 0) {
-        lastMonth = month[11];
-      }
-      return lastMonth.substring(0, 3);
-    },
-    nextMonth() {
-      let nextMonth = month[this.currentDate.month + 1];
-      if (this.currentDate.month === 11) {
-        nextMonth = month[0];
-      }
-      return nextMonth.substring(0, 3);
-    },
-    today() {
-      return new Date();
-    }
-  },
-  methods: {
-    addEvent(event) {
-      this.$emit('update', event);
-    },
-    goToToday() {
-      this.$emit('date', {
-        date: this.today.getDate(),
-        month: this.today.getMonth(),
-        year: this.today.getFullYear()
-      });
-    },
-    goToNextMonth() {
-      const nextDate = { ...this.currentDate };
+  staff: Array
+});
 
-      if (nextDate.month === 11) {
-        nextDate.month = 0;
-        nextDate.year++;
-      } else {
-        nextDate.month++;
-      }
+const emit = defineEmits(['date', 'update']);
 
-      nextDate.date = 1;
-      this.$emit('date', nextDate);
-    },
-    goToPreviousMonth() {
-      const prevDate = { ...this.currentDate };
+const showDatePicker = ref(false);
 
-      if (prevDate.month === 0) {
-        prevDate.month = 11;
-        prevDate.year--;
-      } else {
-        prevDate.month--;
-      }
+const lastMonth = computed(() => {
+  let previousMonth = month[props.currentDate.month - 1];
 
-      prevDate.date = 1;
-      this.$emit('date', prevDate);
-    },
-    toggleDatePicker() {
-      this.showDatePicker = !this.showDatePicker;
-    },
-    updateDate(date) {
-      const split = date.split('-');
-
-      this.$emit('date', {
-        year: parseInt(split[0], 10),
-        month: parseInt(split[1], 10) - 1,
-        date: parseInt(split[2], 10)
-      });
-
-      this.toggleDatePicker();
-    }
+  if (props.currentDate.month === 0) {
+    previousMonth = month[11];
   }
-};
+
+  return previousMonth.substring(0, 3);
+});
+
+const nextMonth = computed(() => {
+  let upcomingMonth = month[props.currentDate.month + 1];
+
+  if (props.currentDate.month === 11) {
+    upcomingMonth = month[0];
+  }
+
+  return upcomingMonth.substring(0, 3);
+});
+
+function addEvent(event) {
+  emit('update', event);
+}
+
+function goToToday() {
+  const today = new Date();
+
+  emit('date', {
+    date: today.getDate(),
+    month: today.getMonth(),
+    year: today.getFullYear()
+  });
+}
+
+function goToNextMonth() {
+  const nextDate = { ...props.currentDate };
+
+  if (nextDate.month === 11) {
+    nextDate.month = 0;
+    nextDate.year++;
+  } else {
+    nextDate.month++;
+  }
+
+  nextDate.date = 1;
+  emit('date', nextDate);
+}
+
+function goToPreviousMonth() {
+  const previousDate = { ...props.currentDate };
+
+  if (previousDate.month === 0) {
+    previousDate.month = 11;
+    previousDate.year--;
+  } else {
+    previousDate.month--;
+  }
+
+  previousDate.date = 1;
+  emit('date', previousDate);
+}
+
+function toggleDatePicker() {
+  showDatePicker.value = !showDatePicker.value;
+}
+
+function updateDate(date) {
+  const split = date.split('-');
+
+  emit('date', {
+    year: parseInt(split[0], 10),
+    month: parseInt(split[1], 10) - 1,
+    date: parseInt(split[2], 10)
+  });
+
+  toggleDatePicker();
+}
 </script>
 <style lang="scss" scoped>
 @mixin arrow-style() {

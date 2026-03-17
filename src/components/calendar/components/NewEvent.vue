@@ -11,7 +11,7 @@
               {{ event }}
             </option>
           </select>
-          <div class="holiday-options" v-if="this.newEvent.type === 'Holiday'">
+          <div class="holiday-options" v-if="newEvent.type === 'Holiday'">
             <span class="office-closure-label">Office Closed?</span>
             <label> <input type="radio" value="full" v-model="newEvent.closed" />Full Day </label>
             <label> <input type="radio" value="half" v-model="newEvent.closed" />Half Day </label>
@@ -19,7 +19,7 @@
               <input type="radio" value="none" v-model="newEvent.closed" />Office Open
             </label>
           </div>
-          <div class="details-div" v-if="this.newEvent.type !== 'Birthday'">
+          <div class="details-div" v-if="newEvent.type !== 'Birthday'">
             <label for="details">Event Details</label>
             <input
               type="text"
@@ -29,7 +29,7 @@
               id="details"
             />
           </div>
-          <label for="startDate">{{ this.newEvent.type === 'Birthday' ? '' : 'Start' }} Date</label>
+          <label for="startDate">{{ newEvent.type === 'Birthday' ? '' : 'Start' }} Date</label>
           <input
             type="date"
             v-model="newEvent.start"
@@ -37,7 +37,7 @@
             id="startDate"
             @input="compareDates('end')"
           />
-          <div class="end-date-div" v-if="this.newEvent.type !== 'Birthday'">
+          <div class="end-date-div" v-if="newEvent.type !== 'Birthday'">
             <label for="endDate">End Date</label>
             <input
               type="date"
@@ -47,7 +47,7 @@
               @input="compareDates('start')"
             />
           </div>
-          <ul v-if="this.newEvent.type !== 'Holiday'">
+          <ul v-if="newEvent.type !== 'Holiday'">
             <li v-for="(s, idx) in staff" :key="'staff-' + idx">
               <input
                 type="checkbox"
@@ -73,150 +73,147 @@
     </Transition>
   </div>
 </template>
-<script>
+<script setup>
+import { ref } from 'vue';
+import { compareDesc, parse } from 'date-fns';
 import Button from '@/components/common/Button.vue';
 import { eventType } from '../utils/selectOptions';
-import { compareDesc, parse } from 'date-fns';
 
-export default {
-  name: 'NewEvent',
-  data() {
-    return {
-      eventType: eventType,
-      isValidEvent: false,
-      newEvent: {
-        class: '',
-        closed: '',
-        details: '',
-        end: '',
-        type: '',
-        start: '',
-        staff: []
-      },
-      errors: [],
-      showErrMsg: false,
-      showForm: false
-    };
-  },
-  props: {
-    staff: Array
-  },
-  components: {
-    Button
-  },
-  methods: {
-    compareDesc: compareDesc,
-    parse: parse,
-    emitNewEvent() {
-      this.errors = this.validateEvent(this.newEvent);
+defineProps({
+  staff: Array
+});
 
-      if (this.errors.length > 0) {
-        this.showErrMsg = true;
-      } else {
-        if (this.newEvent.type !== 'Holiday') {
-          this.newEvent.closed = 'none';
-        } else {
-          this.newEvent.staff = [];
-        }
+const emit = defineEmits(['update']);
 
-        switch (this.newEvent.type) {
-          case 'Auto Show':
-            this.newEvent.class = 'auto-show';
-            break;
-          case 'Press Trip':
-            this.newEvent.class = 'press-trip';
-            break;
-          case 'C/D Event':
-            this.newEvent.class = 'cd-event';
-            break;
-          default:
-            this.newEvent.class = this.newEvent.type.toLowerCase();
-            break;
-        }
-        this.$emit('update', this.newEvent);
-        this.resetNewEvent();
-        this.showForm = false;
-      }
-    },
-    compareDates(val) {
-      if (this.newEvent.end === '') {
-        this.newEvent.end = this.newEvent.start;
-      } else if (this.newEvent.start === '') {
-        this.newEvent.start = this.newEvent.end;
-      } else if (this.newEvent.type === 'Birthday') {
-        this.newEvent.end = this.newEvent.start;
-      } else {
-        const startDate = parse(this.newEvent.start, 'yyyy-MM-dd', new Date());
-        const endDate = parse(this.newEvent.end, 'yyyy-MM-dd', new Date());
-        const result = compareDesc(startDate, endDate);
-        if (result < 0) {
-          if (val === 'end') this.newEvent.end = this.newEvent.start;
-          if (val === 'start') this.newEvent.start = this.newEvent.end;
-        }
-      }
-    },
-    validateEvent(event) {
-      const keys = Object.keys(event);
-      let errors = [];
+const errors = ref([]);
+const showErrMsg = ref(false);
+const showForm = ref(false);
 
-      keys.forEach((k) => {
-        if (
-          k === 'staff' &&
-          event[k].length === 0 &&
-          event.type !== 'Holiday' &&
-          event.type !== 'C/D Event'
-        ) {
-          console.log('Staff is required for this event type.');
-          errors.push('Staff');
-        }
+const newEvent = ref({
+  class: '',
+  closed: '',
+  details: '',
+  end: '',
+  type: '',
+  start: '',
+  staff: []
+});
 
-        if (event[k] === '' || event === []) {
-          let error = k.charAt(0).toUpperCase() + k.slice(1);
-          switch (error) {
-            case 'Details':
-              error = 'Event Details';
-              break;
-            case 'End':
-              error = 'End Date';
-              break;
-            case 'Type':
-              error = 'Event Type';
-              break;
-            case 'Start':
-              error = 'Start Date';
-              break;
-            default:
-              error = '';
-              break;
-          }
-          if (error === 'Event Details' && event.type !== 'Vacation' && event.type !== 'Birthday') {
-            errors.push(error);
-          } else if (error !== 'Event Details' && error !== '') {
-            errors.push(error);
-          }
-        }
-      });
+function emitNewEvent() {
+  errors.value = validateEvent(newEvent.value);
 
-      return errors;
-    },
-    resetNewEvent() {
-      this.newEvent = {
-        class: '',
-        closed: '',
-        details: '',
-        end: '',
-        start: '',
-        staff: [],
-        type: ''
-      };
-      this.errors = [];
-      this.showErrMsg = false;
-    },
-    toggleForm() {
-      this.showForm = !this.showForm;
+  if (errors.value.length > 0) {
+    showErrMsg.value = true;
+  } else {
+    if (newEvent.value.type !== 'Holiday') {
+      newEvent.value.closed = 'none';
+    } else {
+      newEvent.value.staff = [];
+    }
+
+    switch (newEvent.value.type) {
+      case 'Auto Show':
+        newEvent.value.class = 'auto-show';
+        break;
+      case 'Press Trip':
+        newEvent.value.class = 'press-trip';
+        break;
+      case 'C/D Event':
+        newEvent.value.class = 'cd-event';
+        break;
+      default:
+        newEvent.value.class = newEvent.value.type.toLowerCase();
+        break;
+    }
+
+    emit('update', { ...newEvent.value, staff: [...newEvent.value.staff] });
+    resetNewEvent();
+    showForm.value = false;
+  }
+}
+
+function compareDates(val) {
+  if (newEvent.value.end === '') {
+    newEvent.value.end = newEvent.value.start;
+  } else if (newEvent.value.start === '') {
+    newEvent.value.start = newEvent.value.end;
+  } else if (newEvent.value.type === 'Birthday') {
+    newEvent.value.end = newEvent.value.start;
+  } else {
+    const startDate = parse(newEvent.value.start, 'yyyy-MM-dd', new Date());
+    const endDate = parse(newEvent.value.end, 'yyyy-MM-dd', new Date());
+    const result = compareDesc(startDate, endDate);
+
+    if (result < 0) {
+      if (val === 'end') newEvent.value.end = newEvent.value.start;
+      if (val === 'start') newEvent.value.start = newEvent.value.end;
     }
   }
-};
+}
+
+function validateEvent(event) {
+  const keys = Object.keys(event);
+  const validationErrors = [];
+
+  keys.forEach((k) => {
+    if (
+      k === 'staff' &&
+      event[k].length === 0 &&
+      event.type !== 'Holiday' &&
+      event.type !== 'C/D Event'
+    ) {
+      validationErrors.push('Staff');
+    }
+
+    if (event[k] === '' || event === []) {
+      let error = k.charAt(0).toUpperCase() + k.slice(1);
+
+      switch (error) {
+        case 'Details':
+          error = 'Event Details';
+          break;
+        case 'End':
+          error = 'End Date';
+          break;
+        case 'Type':
+          error = 'Event Type';
+          break;
+        case 'Start':
+          error = 'Start Date';
+          break;
+        default:
+          error = '';
+          break;
+      }
+
+      if (error === 'Event Details' && event.type !== 'Vacation' && event.type !== 'Birthday') {
+        validationErrors.push(error);
+      } else if (error !== 'Event Details' && error !== '') {
+        validationErrors.push(error);
+      }
+    }
+  });
+
+  return validationErrors;
+}
+
+function resetNewEvent() {
+  newEvent.value = {
+    class: '',
+    closed: '',
+    details: '',
+    end: '',
+    start: '',
+    staff: [],
+    type: ''
+  };
+  errors.value = [];
+  showErrMsg.value = false;
+}
+
+function toggleForm() {
+  showForm.value = !showForm.value;
+}
 </script>
 <style lang="scss" scoped>
 .new-event-container {

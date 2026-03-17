@@ -24,7 +24,7 @@
         :key="'day' + idx"
         :date="n"
         :currentDate="activeDate"
-        :events="this.events[n - 1]"
+        :events="events[n - 1]"
       />
       <CalendarDay
         dayClass="day-hidden"
@@ -37,101 +37,66 @@
     </div>
   </section>
 </template>
-<script>
+<script setup>
+import { computed, ref, watch } from 'vue';
 import CalendarDay from './CalendarDay.vue';
 import assignEvents from './utils/assignEvents';
 
-export default {
-  name: 'CalendarBody',
-  data() {
-    return {
-      activeDate: {
-        date: 0,
-        month: 0,
-        year: 0
-      },
-      dataReady: false,
-      events: [],
-      weekdays: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
-    };
+const props = defineProps({
+  currentDate: {
+    type: Object,
+    required: true
   },
-  components: {
-    CalendarDay
-  },
-  props: {
-    currentDate: {
-      type: Object,
-      required: true
-    },
-    prevMonthDays: Number,
-    currentMonthDays: Number,
-    currentMonthEvents: Array
-  },
-  computed: {
-    firstMonthDay() {
-      let firstDay = new Date(this.activeDate.year, this.activeDate.month, 1).getDay();
-      return firstDay + 1;
-    }
-  },
-  methods: {
-    assignEvents: assignEvents,
-    deleteEvent(event) {
-      this.$emit('delete', event);
-    },
-    getDay(date) {
-      const day = new Date(date.year, date.month, date.date).getDay();
-      return { ...date, day: day };
-    },
-    updateDate(date) {
-      this.activeDate.date = date;
-      this.$emit('date', this.activeDate);
-    },
-    updateEvents() {
-      if (!this.currentMonthDays || !this.currentMonthEvents) {
-        // wait until both are available
-        return;
-      }
+  prevMonthDays: Number,
+  currentMonthDays: Number,
+  currentMonthEvents: Array
+});
 
-      this.events = assignEvents(
-        this.currentMonthEvents,
-        this.currentDate.month,
-        this.currentMonthDays
-      );
-      this.dataReady = true;
-    }
+const emit = defineEmits(['date', 'delete']);
+
+const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+
+const activeDate = ref({
+  date: 0,
+  month: 0,
+  year: 0
+});
+
+watch(
+  () => props.currentDate,
+  (val) => {
+    activeDate.value = { ...val };
   },
-  watch: {
-    activeDate: {
-      handler() {
-        this.updateEvents();
-      },
-      deep: true
-    },
-    currentDate: {
-      handler(val) {
-        this.activeDate = { ...val };
-      },
-      deep: true,
-      immediate: true
-    },
-    currentMonthDays: {
-      handler() {
-        this.updateEvents();
-      },
-      immediate: true // Trigger immediately when the component is initialized
-    },
-    currentMonthEvents: {
-      handler() {
-        this.updateEvents();
-      },
-      immediate: true // Trigger immediately when the component is initialized
-    }
-  },
-  created() {
-    this.activeDate = { ...this.currentDate };
-    this.updateEvents();
+  { deep: true, immediate: true }
+);
+
+const firstMonthDay = computed(() => {
+  const firstDay = new Date(activeDate.value.year, activeDate.value.month, 1).getDay();
+  return firstDay + 1;
+});
+
+const events = computed(() => {
+  if (!props.currentMonthDays || !props.currentMonthEvents) {
+    return [];
   }
-};
+
+  return assignEvents(props.currentMonthEvents, props.currentDate.month, props.currentMonthDays);
+});
+
+const dataReady = computed(() => events.value.length > 0 || props.currentMonthDays > 0);
+
+function deleteEvent(event) {
+  emit('delete', event);
+}
+
+function updateDate(date) {
+  activeDate.value.date = date;
+  emit('date', { ...activeDate.value });
+}
+
+function updateEvents() {
+  // keep emit path unchanged for child interactions
+}
 </script>
 <style lang="scss" scoped>
 @mixin calendar-layout($property) {

@@ -15,34 +15,28 @@
     <EditStaff :staff="staff" key="edit-staff" @update="emitStaff($event)" />
   </article>
 </template>
-<script>
+<script setup>
 import EditStaff from './components/EditStaff.vue';
 
-export default {
-  name: 'StaffList',
-  props: {
-    staff: Array
-  },
-  components: {
-    EditStaff
-  },
-  methods: {
-    emitStaff(staffFn) {
-      this.$emit('update', staffFn);
-    },
-    imgUrl(name) {
-      // Use require.context to dynamically load images from the staff folder
-      const images = require.context('@/assets/staff', false, /\.(jpg|png)$/);
-      console.log(images);
-      try {
-        return images(`./${name}.jpg`);
-      } catch (e) {
-        // Return a fallback image if not found
-        return images('./user.png');
-      }
-    }
+defineProps({
+  staff: Array
+});
+
+const emit = defineEmits(['update']);
+
+function emitStaff(staffFn) {
+  emit('update', staffFn);
+}
+
+function imgUrl(name) {
+  const images = require.context('@/assets/staff', false, /\.(jpg|png)$/);
+
+  try {
+    return images(`./${name}.jpg`);
+  } catch (e) {
+    return images('./user.png');
   }
-};
+}
 </script>
 <style lang="scss" scoped>
 #staff-list {

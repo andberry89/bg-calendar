@@ -23,47 +23,43 @@
     </ul>
   </div>
 </template>
-<script>
+<script setup>
 import { month } from '@/components/calendar/utils/selectOptions';
 
-export default {
-  name: 'EventList',
-  data() {
-    return {
-      month: month
-    };
+defineProps({
+  currentDate: {
+    type: Object,
+    required: true
   },
-  props: {
-    currentDate: {
-      type: Object,
-      required: true
-    },
-    events: {
-      type: Array,
-      required: true,
-      default: () => []
-    }
-  },
-  methods: {
-    eventTitle(event) {
-      if (event.type === 'C/D Event' || event.type === 'Holiday') {
-        return event.details;
-      } else {
-        return event.type;
-      }
-    },
-    holidayDetails(event) {
-      if (event.closed === 'none') {
-        return '';
-      } else if (event.closed === 'full') {
-        return 'Office closed';
-      } else if (event.closed === 'half') {
-        return 'Early close';
-      }
-      return '';
-    }
+  events: {
+    type: Array,
+    required: true
   }
-};
+});
+
+function eventTitle(event) {
+  if (event.type === 'C/D Event' || event.type === 'Holiday') {
+    return event.details;
+  }
+
+  return event.type;
+}
+
+function holidayDetails(event) {
+  if (event.closed === 'none') {
+    return '';
+  }
+
+  if (event.closed === 'full') {
+    return 'Office closed';
+  }
+
+  if (event.closed === 'half') {
+    return 'Early close';
+  }
+
+  return '';
+}
 </script>
 <style lang="scss" scoped>
 .events-list {
