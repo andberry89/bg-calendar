@@ -1,3 +1,4 @@
+import { collection } from 'firebase/firestore';
 import { db } from './firebase';
 
 const collections = {
@@ -6,9 +7,9 @@ const collections = {
 };
 
 export const getEventsCollection = () => {
-  return db.collection(collections.events);
+  return collection(db, collections.events);
 };
 
 export const getStaffCollection = () => {
-  return db.collection(collections.staff);
+  return collection(db, collections.staff);
 };

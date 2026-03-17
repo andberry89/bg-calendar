@@ -1,8 +1,9 @@
+import { addDoc, deleteDoc, doc } from 'firebase/firestore';
 import { getEventsCollection } from '@/services';
 
 export const addEvent = async (event) => {
   try {
-    const docRef = await getEventsCollection().add(event);
+    const docRef = await addDoc(getEventsCollection(), event);
 
     console.log('Successfully added event with ID: ', docRef.id);
 
@@ -30,8 +31,8 @@ export const deleteEvent = async (id) => {
       };
     }
 
-    const docRef = getEventsCollection().doc(id);
-    await docRef.delete();
+    const docRef = doc(getEventsCollection(), id);
+    await deleteDoc(docRef);
 
     console.log(`Event with ID ${id} deleted successfully.`);
 

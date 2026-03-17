@@ -1,12 +1,13 @@
+import { getDocs } from 'firebase/firestore';
 import { getEventsCollection, getStaffCollection } from '@/services';
 
 export const fetchEvents = async () => {
-  const snapshot = await getEventsCollection().get();
+  const snapshot = await getDocs(getEventsCollection());
   const events = [];
 
-  snapshot.forEach((doc) => {
-    const appData = doc.data();
-    appData.id = doc.id;
+  snapshot.forEach((docSnapshot) => {
+    const appData = docSnapshot.data();
+    appData.id = docSnapshot.id;
     events.push(appData);
   });
 
@@ -14,12 +15,12 @@ export const fetchEvents = async () => {
 };
 
 export const fetchStaff = async () => {
-  const snapshot = await getStaffCollection().get();
+  const snapshot = await getDocs(getStaffCollection());
   const staff = [];
 
-  snapshot.forEach((doc) => {
-    const appData = doc.data();
-    appData.id = doc.id;
+  snapshot.forEach((docSnapshot) => {
+    const appData = docSnapshot.data();
+    appData.id = docSnapshot.id;
     staff.push(appData);
   });
 
