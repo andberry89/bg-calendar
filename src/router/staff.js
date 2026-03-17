@@ -1,3 +1,4 @@
+import { deleteDoc, doc, getDoc, setDoc } from 'firebase/firestore';
 import { getStaffCollection } from '@/services';
 
 export const addStaff = async (person) => {
@@ -10,10 +11,10 @@ export const addStaff = async (person) => {
     const shortName = firstInitial + '. ' + lastName;
     const id = (firstName + '-' + lastName).toLowerCase();
 
-    const docRef = getStaffCollection().doc(id);
-    const docSnap = await docRef.get();
+    const docRef = doc(getStaffCollection(), id);
+    const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists) {
+    if (docSnap.exists()) {
       console.warn(`Staff member with ID "${id}" already exists.`);
       return {
         success: false,
@@ -21,7 +22,7 @@ export const addStaff = async (person) => {
       };
     }
 
-    await docRef.set({
+    await setDoc(docRef, {
       firstName,
       lastName,
       initials,
@@ -54,8 +55,8 @@ export const deleteStaff = async (id) => {
       };
     }
 
-    const docRef = getStaffCollection().doc(id);
-    await docRef.delete();
+    const docRef = doc(getStaffCollection(), id);
+    await deleteDoc(docRef);
 
     console.log(`Staff with ID "${id}" deleted successfully.`);
 
