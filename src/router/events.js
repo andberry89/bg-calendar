@@ -1,51 +1,51 @@
-import { db } from "@/main";
-import { doc, addDoc, deleteDoc, collection } from "firebase/firestore";
+import { getEventsCollection } from '@/services';
 
 export const addEvent = async (event) => {
   try {
-    // Add new event to database
-    const docRef = await addDoc(collection(db, "calEvent"), event);
+    const docRef = await getEventsCollection().add(event);
 
-    // Success feedback
-    console.log("Successfully added event with ID: ", docRef.id);
+    console.log('Successfully added event with ID: ', docRef.id);
+
     return {
       success: true,
-      message: "Event added successfully.",
+      message: 'Event added successfully.'
     };
   } catch (err) {
-    console.error("Error adding event.");
+    console.error('Error adding event.', err);
+
     return {
       success: false,
-      message: "An error occurred while adding the event.",
-      error: err,
+      message: 'An error occurred while adding the event.',
+      error: err
     };
   }
 };
 
 export const deleteEvent = async (id) => {
   try {
-    const docRef = doc(db, "calEvent", id);
-    await deleteDoc(docRef);
-
-    // Validate id
-    if (!id || typeof id !== "string") {
+    if (!id || typeof id !== 'string') {
       return {
         success: false,
-        message: "Invalid ID provided.",
+        message: 'Invalid ID provided.'
       };
     }
 
+    const docRef = getEventsCollection().doc(id);
+    await docRef.delete();
+
     console.log(`Event with ID ${id} deleted successfully.`);
+
     return {
       success: true,
-      message: `Event with ID ${id} deleted successfully.`,
+      message: `Event with ID ${id} deleted successfully.`
     };
   } catch (err) {
-    console.error(`Error deleting event with ID ${id}`);
+    console.error(`Error deleting event with ID ${id}`, err);
+
     return {
       success: false,
       message: `Failed to delete event with ID ${id}`,
-      error: err,
+      error: err
     };
   }
 };

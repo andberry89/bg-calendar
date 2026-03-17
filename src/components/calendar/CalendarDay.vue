@@ -1,5 +1,7 @@
 <template>
-  <div :class="[dayClass, { weekend: isWeekend }, { fullClose: hasFullClosureHoliday }, 'container']">
+  <div
+    :class="[dayClass, { weekend: isWeekend }, { fullClose: hasFullClosureHoliday }, 'container']"
+  >
     <EventModal
       v-if="showEventDetails"
       :event="modalEvent"
@@ -9,11 +11,7 @@
     />
     <div class="date-text">
       {{ date }}
-      <CalendarEvent
-        v-for="(event, idx) in holidays"
-        :key="'holiday-' + idx"
-        :event="event"
-      />
+      <CalendarEvent v-for="(event, idx) in holidays" :key="'holiday-' + idx" :event="event" />
     </div>
     <CalendarEvent
       v-for="(event, idx) in filteredEvents"
@@ -25,38 +23,38 @@
   </div>
 </template>
 <script>
-import CalendarEvent from "./CalendarEvent.vue";
-import EventModal from "./EventModal.vue";
+import CalendarEvent from './CalendarEvent.vue';
+import EventModal from './EventModal.vue';
 
 export default {
-  name: "CalendarDay",
+  name: 'CalendarDay',
   data() {
     return {
       holidays: [],
       filteredEvents: [],
       showEventDetails: false,
-      modalEvent: {},
+      modalEvent: {}
     };
   },
   components: {
     CalendarEvent,
-    EventModal,
+    EventModal
   },
   props: {
     date: Number,
     dayClass: String,
     currentDate: {
-      type: Object,
+      type: Object
     },
     month: {
       type: String,
-      required: false,
+      required: false
     },
     events: {
       type: Array,
       default: () => [],
-      required: false,
-    },
+      required: false
+    }
   },
   computed: {
     getDay() {
@@ -65,14 +63,14 @@ export default {
     },
     hasFullClosureHoliday() {
       if (this.holidays.length > 0) {
-        const e = this.holidays.find((x) => x.closed === "full");
+        const e = this.holidays.find((x) => x.closed === 'full');
         if (e) return true;
       }
       return false;
     },
     isWeekend() {
       let date = { ...this.currentDate };
-      if (this.month === "prev") {
+      if (this.month === 'prev') {
         if (date.month === 0) {
           date.month = 11;
           date.year--;
@@ -80,7 +78,7 @@ export default {
           date.month--;
         }
       }
-      if (this.month === "next") {
+      if (this.month === 'next') {
         if (date.month === 11) {
           date.month = 0;
           date.year++;
@@ -91,7 +89,7 @@ export default {
 
       const day = new Date(date.year, date.month, this.date).getDay();
       return day === 0 || day === 6;
-    },
+    }
   },
   methods: {
     closeModal() {
@@ -99,7 +97,7 @@ export default {
       this.showEventDetails = false;
     },
     deleteEvent(event) {
-      this.$emit("delete", event);
+      this.$emit('delete', event);
       this.closeModal();
     },
     openEventModal(event) {
@@ -107,12 +105,12 @@ export default {
       this.showEventDetails = true;
     },
     sortEvents() {
-      this.holidays = this.events.filter((e) => e.type === "Holiday");
-      this.filteredEvents = this.events.filter((e) => e.type !== "Holiday");
+      this.holidays = this.events.filter((e) => e.type === 'Holiday');
+      this.filteredEvents = this.events.filter((e) => e.type !== 'Holiday');
     },
     updateEvents() {
-      this.$emit("update");
-    },
+      this.$emit('update');
+    }
   },
   created() {
     this.sortEvents();
@@ -123,9 +121,9 @@ export default {
         this.sortEvents();
       },
       immediate: true, // Trigger the watcher immediately
-      deep: true, // Watch deeply to account for nested changes in the array
-    },
-  },
+      deep: true // Watch deeply to account for nested changes in the array
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>

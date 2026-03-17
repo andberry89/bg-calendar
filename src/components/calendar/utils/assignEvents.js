@@ -1,8 +1,8 @@
 const assignEvents = (arr, currentMonth, currentMonthDays) => {
   let updatedEvents = Array.from({ length: currentMonthDays }, () => []);
   arr.forEach((e) => {
-    const start = e.start.split("-");
-    const end = e.end.split("-");
+    const start = e.start.split('-');
+    const end = e.end.split('-');
     const startMonth = parseInt(start[1]);
     const endMonth = parseInt(end[1]);
     let startIdx = parseInt(start[2]) - 1;

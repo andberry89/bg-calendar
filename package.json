@@ -1,11 +1,13 @@
 {
   "name": "bg-calendar",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "type-check": "vue-tsc --noEmit",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "core-js": "^3.8.3",
@@ -17,13 +19,20 @@
   "devDependencies": {
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
+    "@types/node": "^24.0.0",
+    "@typescript-eslint/parser": "^5.62.0",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
     "eslint": "^7.32.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-vue": "^8.0.3",
-    "node-sass": "^9.0.0",
-    "sass-loader": "^16.0.4"
+    "pinia": "^3.0.4",
+    "prettier": "^3.8.1",
+    "sass": "^1.77.0",
+    "sass-loader": "^16.0.4",
+    "typescript": "^5.8.2",
+    "vue-tsc": "^2.2.8"
   },
   "eslintConfig": {
     "root": true,
@@ -32,10 +41,11 @@
     },
     "extends": [
       "plugin:vue/vue3-essential",
-      "eslint:recommended"
+      "eslint:recommended",
+      "prettier"
     ],
     "parserOptions": {
-      "parser": "@babel/eslint-parser"
+      "parser": "@typescript-eslint/parser"
     },
     "rules": {
       "vue/multi-word-component-names": "off"

@@ -2,62 +2,24 @@
   <div class="new-event-container">
     <Button @click="toggleForm">New Event</Button>
     <Transition name="drop-form">
-      <div
-        v-if="showForm"
-        class="new-event-form-container"
-      >
+      <div v-if="showForm" class="new-event-form-container">
         <div class="new-event-form">
           <label for="eventType">Event Type</label>
-          <select
-            name="eventType"
-            id="eventType"
-            v-model="newEvent.type"
-          >
-            <option
-              disabled
-              value="Event Type"
-            >
-              --Event Type--
-            </option>
-            <option
-              v-for="(event, idx) in eventType"
-              :key="'event-' + idx"
-              :value="event"
-            >
+          <select name="eventType" id="eventType" v-model="newEvent.type">
+            <option disabled value="Event Type">--Event Type--</option>
+            <option v-for="(event, idx) in eventType" :key="'event-' + idx" :value="event">
               {{ event }}
             </option>
           </select>
-          <div
-            class="holiday-options"
-            v-if="this.newEvent.type === 'Holiday'"
-          >
+          <div class="holiday-options" v-if="this.newEvent.type === 'Holiday'">
             <span class="office-closure-label">Office Closed?</span>
+            <label> <input type="radio" value="full" v-model="newEvent.closed" />Full Day </label>
+            <label> <input type="radio" value="half" v-model="newEvent.closed" />Half Day </label>
             <label>
-              <input
-                type="radio"
-                value="full"
-                v-model="newEvent.closed"
-              />Full Day
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="half"
-                v-model="newEvent.closed"
-              />Half Day
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="none"
-                v-model="newEvent.closed"
-              />Office Open
+              <input type="radio" value="none" v-model="newEvent.closed" />Office Open
             </label>
           </div>
-          <div
-            class="details-div"
-            v-if="this.newEvent.type !== 'Birthday'"
-          >
+          <div class="details-div" v-if="this.newEvent.type !== 'Birthday'">
             <label for="details">Event Details</label>
             <input
               type="text"
@@ -67,7 +29,7 @@
               id="details"
             />
           </div>
-          <label for="startDate">{{ this.newEvent.type === "Birthday" ? "" : "Start" }} Date</label>
+          <label for="startDate">{{ this.newEvent.type === 'Birthday' ? '' : 'Start' }} Date</label>
           <input
             type="date"
             v-model="newEvent.start"
@@ -75,10 +37,7 @@
             id="startDate"
             @input="compareDates('end')"
           />
-          <div
-            class="end-date-div"
-            v-if="this.newEvent.type !== 'Birthday'"
-          >
+          <div class="end-date-div" v-if="this.newEvent.type !== 'Birthday'">
             <label for="endDate">End Date</label>
             <input
               type="date"
@@ -89,10 +48,7 @@
             />
           </div>
           <ul v-if="this.newEvent.type !== 'Holiday'">
-            <li
-              v-for="(s, idx) in staff"
-              :key="'staff-' + idx"
-            >
+            <li v-for="(s, idx) in staff" :key="'staff-' + idx">
               <input
                 type="checkbox"
                 :id="'staff-' + idx"
@@ -102,23 +58,12 @@
               /><label :for="'staff' + idx">{{ s.shortName }}</label>
             </li>
           </ul>
-          <button
-            class="submit-event-button"
-            @click="emitNewEvent"
-          >
-            Add Event
-          </button>
-          <div
-            class="err-msg"
-            v-if="showErrMsg"
-          >
+          <button class="submit-event-button" @click="emitNewEvent">Add Event</button>
+          <div class="err-msg" v-if="showErrMsg">
             This is not a valid event!<br />
             Make sure to check the following:
             <ul>
-              <li
-                v-for="error in errors"
-                :key="error"
-              >
+              <li v-for="error in errors" :key="error">
                 {{ error }}
               </li>
             </ul>
@@ -129,35 +74,35 @@
   </div>
 </template>
 <script>
-import Button from "@/components/common/Button.vue";
-import { eventType } from "../utils/selectOptions";
-import { compareDesc, parse } from "date-fns";
+import Button from '@/components/common/Button.vue';
+import { eventType } from '../utils/selectOptions';
+import { compareDesc, parse } from 'date-fns';
 
 export default {
-  name: "NewEvent",
+  name: 'NewEvent',
   data() {
     return {
       eventType: eventType,
       isValidEvent: false,
       newEvent: {
-        class: "",
-        closed: "",
-        details: "",
-        end: "",
-        type: "",
-        start: "",
-        staff: [],
+        class: '',
+        closed: '',
+        details: '',
+        end: '',
+        type: '',
+        start: '',
+        staff: []
       },
       errors: [],
       showErrMsg: false,
-      showForm: false,
+      showForm: false
     };
   },
   props: {
-    staff: Array,
+    staff: Array
   },
   components: {
-    Button,
+    Button
   },
   methods: {
     compareDesc: compareDesc,
@@ -168,45 +113,45 @@ export default {
       if (this.errors.length > 0) {
         this.showErrMsg = true;
       } else {
-        if (this.newEvent.type !== "Holiday") {
-          this.newEvent.closed = "none";
+        if (this.newEvent.type !== 'Holiday') {
+          this.newEvent.closed = 'none';
         } else {
           this.newEvent.staff = [];
         }
 
         switch (this.newEvent.type) {
-          case "Auto Show":
-            this.newEvent.class = "auto-show";
+          case 'Auto Show':
+            this.newEvent.class = 'auto-show';
             break;
-          case "Press Trip":
-            this.newEvent.class = "press-trip";
+          case 'Press Trip':
+            this.newEvent.class = 'press-trip';
             break;
-          case "C/D Event":
-            this.newEvent.class = "cd-event";
+          case 'C/D Event':
+            this.newEvent.class = 'cd-event';
             break;
           default:
             this.newEvent.class = this.newEvent.type.toLowerCase();
             break;
         }
-        this.$emit("update", this.newEvent);
+        this.$emit('update', this.newEvent);
         this.resetNewEvent();
         this.showForm = false;
       }
     },
     compareDates(val) {
-      if (this.newEvent.end === "") {
+      if (this.newEvent.end === '') {
         this.newEvent.end = this.newEvent.start;
-      } else if (this.newEvent.start === "") {
+      } else if (this.newEvent.start === '') {
         this.newEvent.start = this.newEvent.end;
-      } else if (this.newEvent.type === "Birthday") {
+      } else if (this.newEvent.type === 'Birthday') {
         this.newEvent.end = this.newEvent.start;
       } else {
-        const startDate = parse(this.newEvent.start, "yyyy-MM-dd", new Date());
-        const endDate = parse(this.newEvent.end, "yyyy-MM-dd", new Date());
+        const startDate = parse(this.newEvent.start, 'yyyy-MM-dd', new Date());
+        const endDate = parse(this.newEvent.end, 'yyyy-MM-dd', new Date());
         const result = compareDesc(startDate, endDate);
         if (result < 0) {
-          if (val === "end") this.newEvent.end = this.newEvent.start;
-          if (val === "start") this.newEvent.start = this.newEvent.end;
+          if (val === 'end') this.newEvent.end = this.newEvent.start;
+          if (val === 'start') this.newEvent.start = this.newEvent.end;
         }
       }
     },
@@ -215,33 +160,38 @@ export default {
       let errors = [];
 
       keys.forEach((k) => {
-        if (k === "staff" && event[k].length === 0 && event.type !== "Holiday" && event.type !== "C/D Event") {
-          console.log("Staff is required for this event type.");
-          errors.push("Staff");
+        if (
+          k === 'staff' &&
+          event[k].length === 0 &&
+          event.type !== 'Holiday' &&
+          event.type !== 'C/D Event'
+        ) {
+          console.log('Staff is required for this event type.');
+          errors.push('Staff');
         }
 
-        if (event[k] === "" || event === []) {
+        if (event[k] === '' || event === []) {
           let error = k.charAt(0).toUpperCase() + k.slice(1);
           switch (error) {
-            case "Details":
-              error = "Event Details";
+            case 'Details':
+              error = 'Event Details';
               break;
-            case "End":
-              error = "End Date";
+            case 'End':
+              error = 'End Date';
               break;
-            case "Type":
-              error = "Event Type";
+            case 'Type':
+              error = 'Event Type';
               break;
-            case "Start":
-              error = "Start Date";
+            case 'Start':
+              error = 'Start Date';
               break;
             default:
-              error = "";
+              error = '';
               break;
           }
-          if (error === "Event Details" && event.type !== "Vacation" && event.type !== "Birthday") {
+          if (error === 'Event Details' && event.type !== 'Vacation' && event.type !== 'Birthday') {
             errors.push(error);
-          } else if (error !== "Event Details" && error !== "") {
+          } else if (error !== 'Event Details' && error !== '') {
             errors.push(error);
           }
         }
@@ -251,28 +201,30 @@ export default {
     },
     resetNewEvent() {
       this.newEvent = {
-        class: "",
-        closed: "",
-        details: "",
-        end: "",
-        start: "",
+        class: '',
+        closed: '',
+        details: '',
+        end: '',
+        start: '',
         staff: [],
-        type: "",
+        type: ''
       };
       this.errors = [];
       this.showErrMsg = false;
     },
     toggleForm() {
       this.showForm = !this.showForm;
-    },
-  },
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>
 .new-event-container {
   position: relative;
   width: 25%;
-  font: 400 1rem/1 "Arial", sans-serif;
+  font:
+    400 1rem/1 'Arial',
+    sans-serif;
   text-shadow: none;
   color: var(--black);
 
@@ -341,7 +293,9 @@ export default {
       }
 
       .err-msg {
-        font: 700 12px/1.1 "Arial", sans-serif;
+        font:
+          700 12px/1.1 'Arial',
+          sans-serif;
         color: var(--red);
         margin-top: 10px;
 
