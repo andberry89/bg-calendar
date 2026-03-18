@@ -58,3 +58,5 @@ export interface CalendarEvent {
 export type EventsByYear = Record<string, CalendarEvent[]>;
 
 export type StaffDocument = Omit<Staff, 'id'>;
+
+export type StaffUpdatePayload = ['add', NewStaffInput] | ['remove', Staff];
