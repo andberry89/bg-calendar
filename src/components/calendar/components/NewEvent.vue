@@ -98,7 +98,7 @@ interface DraftCalendarEvent {
   staff: Staff[];
 }
 
-const props = defineProps<{
+defineProps<{
   staff: Staff[];
 }>();
 
