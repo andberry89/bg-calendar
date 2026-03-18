@@ -1,5 +1,10 @@
-export const getCurrentMonthEvents = (sortedEvents, currentDate) => {
-  const currentYearEvents = sortedEvents[currentDate.year];
+import type { CalendarEvent, CurrentDate, EventsByYear } from '@/types/calendar';
+
+export const getCurrentMonthEvents = (
+  sortedEvents: EventsByYear,
+  currentDate: CurrentDate
+): CalendarEvent[] => {
+  const currentYearEvents = sortedEvents[String(currentDate.year)];
 
   if (!currentYearEvents) {
     return [];
@@ -13,6 +18,6 @@ export const getCurrentMonthEvents = (sortedEvents, currentDate) => {
       return currentDate.month === startMonth || currentDate.month === endMonth;
     })
     .sort((a, b) => {
-      return new Date(a.start) - new Date(b.start);
+      return new Date(a.start).getTime() - new Date(b.start).getTime();
     });
 };

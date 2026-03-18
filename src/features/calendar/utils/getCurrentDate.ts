@@ -1,4 +1,6 @@
-export const getCurrentDate = () => {
+import type { CurrentDate } from '@/types/calendar';
+
+export const getCurrentDate = (): CurrentDate => {
   const today = new Date();
 
   return {
