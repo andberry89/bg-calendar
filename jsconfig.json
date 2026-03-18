@@ -9,5 +9,16 @@
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
-  "include": ["src/**/*.js", "src/**/*.vue"]
+  "include": [
+    "src/**/*.js",
+    "src/**/*.vue",
+    "src/services/index.ts",
+    "src/router/events.ts",
+    "src/router/staff.ts",
+    "src/services/calendar-data.ts",
+    "src/services/firebase.ts",
+    "src/directives/click-outside.ts",
+    "src/services/firestore.ts",
+    "src/main.ts"
+  ]
 }

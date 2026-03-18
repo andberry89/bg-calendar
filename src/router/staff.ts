@@ -1,7 +1,8 @@
 import { deleteDoc, doc, getDoc, setDoc } from 'firebase/firestore';
 import { getStaffCollection } from '@/services';
+import type { MutationResult, NewStaffInput, StaffDocument } from '@/types/calendar';
 
-export const addStaff = async (person) => {
+export const addStaff = async (person: NewStaffInput): Promise<MutationResult> => {
   try {
     const firstName = person.firstName.trim();
     const lastName = person.lastName.trim();
@@ -15,29 +16,26 @@ export const addStaff = async (person) => {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      console.warn(`Staff member with ID "${id}" already exists.`);
       return {
         success: false,
         message: 'Staff member already exists.'
       };
     }
 
-    await setDoc(docRef, {
+    const staffDocument: StaffDocument = {
       firstName,
       lastName,
       initials,
       shortName
-    });
+    };
 
-    console.log(`Successfully added staff member: ${shortName}`);
+    await setDoc(docRef, staffDocument);
 
     return {
       success: true,
       message: 'Staff member added succesfully.'
     };
   } catch (err) {
-    console.error('Error adding staff:', err);
-
     return {
       success: false,
       message: 'An error occurred while adding the staff member.',
@@ -46,9 +44,9 @@ export const addStaff = async (person) => {
   }
 };
 
-export const deleteStaff = async (id) => {
+export const deleteStaff = async (id: string): Promise<MutationResult> => {
   try {
-    if (!id || typeof id !== 'string') {
+    if (!id) {
       return {
         success: false,
         message: 'Invalid ID provided.'
@@ -58,15 +56,11 @@ export const deleteStaff = async (id) => {
     const docRef = doc(getStaffCollection(), id);
     await deleteDoc(docRef);
 
-    console.log(`Staff with ID "${id}" deleted successfully.`);
-
     return {
       success: true,
       message: `Staff with ID "${id}" deleted successfully.`
     };
   } catch (err) {
-    console.error(`Error deleting staff with ID "${id}"`, err);
-
     return {
       success: false,
       message: `Failed to delete staff with ID "${id}".`,
