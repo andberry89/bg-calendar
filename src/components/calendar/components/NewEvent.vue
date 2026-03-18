@@ -73,23 +73,44 @@
     </Transition>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue';
 import { compareDesc, parse } from 'date-fns';
 import Button from '@/components/common/Button.vue';
 import { eventType } from '../utils/selectOptions';
+import type {
+  EventClass,
+  EventType,
+  HolidayClosure,
+  NewCalendarEvent,
+  Staff
+} from '@/types/calendar';
 
-defineProps({
-  staff: Array
-});
+type CompareTarget = 'start' | 'end';
 
-const emit = defineEmits(['update']);
+interface DraftCalendarEvent {
+  class: EventClass | '';
+  closed: HolidayClosure;
+  details: string;
+  end: string;
+  type: EventType | '';
+  start: string;
+  staff: Staff[];
+}
 
-const errors = ref([]);
+const props = defineProps<{
+  staff: Staff[];
+}>();
+
+const emit = defineEmits<{
+  (e: 'update', value: NewCalendarEvent): void;
+}>();
+
+const errors = ref<string[]>([]);
 const showErrMsg = ref(false);
 const showForm = ref(false);
 
-const newEvent = ref({
+const createEmptyEvent = (): DraftCalendarEvent => ({
   class: '',
   closed: '',
   details: '',
@@ -99,40 +120,51 @@ const newEvent = ref({
   staff: []
 });
 
-function emitNewEvent() {
+const newEvent = ref<DraftCalendarEvent>(createEmptyEvent());
+
+function getEventClass(type: EventType): EventClass {
+  switch (type) {
+    case 'Auto Show':
+      return 'auto-show';
+    case 'Press Trip':
+      return 'press-trip';
+    case 'C/D Event':
+      return 'cd-event';
+    case 'Vacation':
+      return 'vacation';
+    case 'Holiday':
+      return 'holiday';
+    case 'Birthday':
+      return 'birthday';
+  }
+}
+
+function emitNewEvent(): void {
   errors.value = validateEvent(newEvent.value);
 
   if (errors.value.length > 0) {
     showErrMsg.value = true;
-  } else {
-    if (newEvent.value.type !== 'Holiday') {
-      newEvent.value.closed = 'none';
-    } else {
-      newEvent.value.staff = [];
-    }
-
-    switch (newEvent.value.type) {
-      case 'Auto Show':
-        newEvent.value.class = 'auto-show';
-        break;
-      case 'Press Trip':
-        newEvent.value.class = 'press-trip';
-        break;
-      case 'C/D Event':
-        newEvent.value.class = 'cd-event';
-        break;
-      default:
-        newEvent.value.class = newEvent.value.type.toLowerCase();
-        break;
-    }
-
-    emit('update', { ...newEvent.value, staff: [...newEvent.value.staff] });
-    resetNewEvent();
-    showForm.value = false;
+    return;
   }
+
+  if (!newEvent.value.type) {
+    return;
+  }
+
+  const normalizedEvent: NewCalendarEvent = {
+    ...newEvent.value,
+    closed: newEvent.value.type !== 'Holiday' ? 'none' : newEvent.value.closed || 'none',
+    staff: newEvent.value.type === 'Holiday' ? [] : [...newEvent.value.staff],
+    class: getEventClass(newEvent.value.type),
+    type: newEvent.value.type
+  };
+
+  emit('update', normalizedEvent);
+  resetNewEvent();
+  showForm.value = false;
 }
 
-function compareDates(val) {
+function compareDates(target: CompareTarget): void {
   if (newEvent.value.end === '') {
     newEvent.value.end = newEvent.value.start;
   } else if (newEvent.value.start === '') {
@@ -145,73 +177,55 @@ function compareDates(val) {
     const result = compareDesc(startDate, endDate);
 
     if (result < 0) {
-      if (val === 'end') newEvent.value.end = newEvent.value.start;
-      if (val === 'start') newEvent.value.start = newEvent.value.end;
+      if (target === 'end') newEvent.value.end = newEvent.value.start;
+      if (target === 'start') newEvent.value.start = newEvent.value.end;
     }
   }
 }
 
-function validateEvent(event) {
-  const keys = Object.keys(event);
-  const validationErrors = [];
+function validateEvent(event: DraftCalendarEvent): string[] {
+  const validationErrors: string[] = [];
 
-  keys.forEach((k) => {
-    if (
-      k === 'staff' &&
-      event[k].length === 0 &&
-      event.type !== 'Holiday' &&
-      event.type !== 'C/D Event'
-    ) {
-      validationErrors.push('Staff');
-    }
+  if (!event.type) {
+    validationErrors.push('Event Type');
+  }
 
-    if (event[k] === '' || (k === 'staff' && event[k].length === 0)) {
-      let error = k.charAt(0).toUpperCase() + k.slice(1);
+  if (!event.start) {
+    validationErrors.push('Start Date');
+  }
 
-      switch (error) {
-        case 'Details':
-          error = 'Event Details';
-          break;
-        case 'End':
-          error = 'End Date';
-          break;
-        case 'Type':
-          error = 'Event Type';
-          break;
-        case 'Start':
-          error = 'Start Date';
-          break;
-        default:
-          error = '';
-          break;
-      }
+  if (!event.end) {
+    validationErrors.push('End Date');
+  }
 
-      if (error === 'Event Details' && event.type !== 'Vacation' && event.type !== 'Birthday') {
-        validationErrors.push(error);
-      } else if (error !== 'Event Details' && error !== '') {
-        validationErrors.push(error);
-      }
-    }
-  });
+  if (
+    !event.details &&
+    event.type !== 'Vacation' &&
+    event.type !== 'Birthday' &&
+    event.type !== ''
+  ) {
+    validationErrors.push('Event Details');
+  }
+
+  if (
+    event.staff.length === 0 &&
+    event.type !== 'Holiday' &&
+    event.type !== 'C/D Event' &&
+    event.type !== ''
+  ) {
+    validationErrors.push('Staff');
+  }
 
   return validationErrors;
 }
 
-function resetNewEvent() {
-  newEvent.value = {
-    class: '',
-    closed: '',
-    details: '',
-    end: '',
-    start: '',
-    staff: [],
-    type: ''
-  };
+function resetNewEvent(): void {
+  newEvent.value = createEmptyEvent();
   errors.value = [];
   showErrMsg.value = false;
 }
 
-function toggleForm() {
+function toggleForm(): void {
   showForm.value = !showForm.value;
 }
 </script>
