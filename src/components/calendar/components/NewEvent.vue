@@ -165,7 +165,7 @@ function validateEvent(event) {
       validationErrors.push('Staff');
     }
 
-    if (event[k] === '' || event === []) {
+    if (event[k] === '' || (k === 'staff' && event[k].length === 0)) {
       let error = k.charAt(0).toUpperCase() + k.slice(1);
 
       switch (error) {
