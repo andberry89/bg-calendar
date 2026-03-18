@@ -1,7 +1,8 @@
 import { addDoc, deleteDoc, doc } from 'firebase/firestore';
 import { getEventsCollection } from '@/services';
+import type { MutationResult, NewCalendarEvent } from '@/types/calendar';
 
-export const addEvent = async (event) => {
+export const addEvent = async (event: NewCalendarEvent): Promise<MutationResult> => {
   try {
     const docRef = await addDoc(getEventsCollection(), event);
 
@@ -22,9 +23,9 @@ export const addEvent = async (event) => {
   }
 };
 
-export const deleteEvent = async (id) => {
+export const deleteEvent = async (id: string): Promise<MutationResult> => {
   try {
-    if (!id || typeof id !== 'string') {
+    if (!id) {
       return {
         success: false,
         message: 'Invalid ID provided.'
