@@ -15,25 +15,28 @@
     <EditStaff :staff="staff" key="edit-staff" @update="emitStaff($event)" />
   </article>
 </template>
-<script setup>
+<script setup lang="ts">
 import EditStaff from './components/EditStaff.vue';
+import type { Staff, StaffUpdatePayload } from '@/types/calendar';
 
-defineProps({
-  staff: Array
-});
+defineProps<{
+  staff: Staff[];
+}>();
 
-const emit = defineEmits(['update']);
+const emit = defineEmits<{
+  (e: 'update', value: StaffUpdatePayload): void;
+}>();
 
 const images = import.meta.glob('@/assets/staff/*.{jpg,png}', {
   eager: true,
   import: 'default'
-});
+}) as Record<string, string>;
 
-function emitStaff(staffFn) {
-  emit('update', staffFn);
+function emitStaff(staffUpdate: StaffUpdatePayload): void {
+  emit('update', staffUpdate);
 }
 
-function imgUrl(name) {
+function imgUrl(name: string): string {
   return (
     images[`/src/assets/staff/${name}.jpg`] ||
     images[`/src/assets/staff/${name}.png`] ||
