@@ -5,7 +5,7 @@
       <div class="event-name">
         <span class="event-type"
           >{{ event.class === 'cd-event' ? event.details : event.type }}
-          {{ event.class === 'Birthday' ? '🎂' : '' }}</span
+          {{ event.class === 'birthday' ? '🎂' : '' }}</span
         >
       </div>
       <div class="event-dates">
@@ -22,24 +22,22 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue';
 import { format } from 'date-fns';
+import type { CalendarEvent } from '@/types/calendar';
 
-const props = defineProps({
-  day: {
-    type: Number,
-    required: true
-  },
-  event: {
-    type: Object,
-    required: true
-  }
-});
+const props = defineProps<{
+  day: number;
+  event: CalendarEvent;
+}>();
 
-const emit = defineEmits(['update', 'delete']);
+const emit = defineEmits<{
+  (e: 'update'): void;
+  (e: 'delete', value: CalendarEvent): void;
+}>();
 
-const eventDates = computed(() => {
+const eventDates = computed((): string => {
   const startDate = new Date(props.event.start.replace(/-/g, '/'));
   const start = format(startDate, 'MM/dd/yyyy');
 
@@ -53,11 +51,11 @@ const eventDates = computed(() => {
   return start + ' - ' + end;
 });
 
-function closeModal() {
+function closeModal(): void {
   emit('update');
 }
 
-function deleteEvent() {
+function deleteEvent(): void {
   emit('delete', props.event);
 }
 </script>

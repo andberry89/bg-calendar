@@ -24,16 +24,18 @@
     </div>
   </div>
 </template>
-<script setup>
-const props = defineProps({
-  event: {
-    type: Object
-  }
-});
+<script setup lang="ts">
+import type { CalendarEvent } from '@/types/calendar';
 
-const emit = defineEmits(['update']);
+const props = defineProps<{
+  event: CalendarEvent;
+}>();
 
-function emitEvent() {
+const emit = defineEmits<{
+  (e: 'update', value: CalendarEvent): void;
+}>();
+
+function emitEvent(): void {
   emit('update', props.event);
 }
 </script>
