@@ -37,26 +37,27 @@
     </div>
   </section>
 </template>
-<script setup>
+<script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import CalendarDay from './CalendarDay.vue';
 import assignEvents from './utils/assignEvents';
+import type { CalendarEvent, CurrentDate } from '@/types/calendar';
 
-const props = defineProps({
-  currentDate: {
-    type: Object,
-    required: true
-  },
-  prevMonthDays: Number,
-  currentMonthDays: Number,
-  currentMonthEvents: Array
-});
+const props = defineProps<{
+  currentDate: CurrentDate;
+  prevMonthDays: number;
+  currentMonthDays: number;
+  currentMonthEvents: CalendarEvent[];
+}>();
 
-const emit = defineEmits(['date', 'delete']);
+const emit = defineEmits<{
+  (e: 'date', value: CurrentDate): void;
+  (e: 'delete', value: CalendarEvent): void;
+}>();
 
-const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'] as const;
 
-const activeDate = ref({
+const activeDate = ref<CurrentDate>({
   date: 0,
   month: 0,
   year: 0
@@ -64,37 +65,39 @@ const activeDate = ref({
 
 watch(
   () => props.currentDate,
-  (val) => {
-    activeDate.value = { ...val };
+  (value: CurrentDate) => {
+    activeDate.value = { ...value };
   },
   { deep: true, immediate: true }
 );
 
-const firstMonthDay = computed(() => {
+const firstMonthDay = computed((): number => {
   const firstDay = new Date(activeDate.value.year, activeDate.value.month, 1).getDay();
   return firstDay + 1;
 });
 
-const events = computed(() => {
-  if (!props.currentMonthDays || !props.currentMonthEvents) {
+const events = computed((): CalendarEvent[][] => {
+  if (!props.currentMonthDays || !props.currentMonthEvents.length) {
     return [];
   }
 
   return assignEvents(props.currentMonthEvents, props.currentDate.month, props.currentMonthDays);
 });
 
-const dataReady = computed(() => events.value.length > 0 || props.currentMonthDays > 0);
+const dataReady = computed((): boolean => {
+  return events.value.length > 0 || props.currentMonthDays > 0;
+});
 
-function deleteEvent(event) {
+function deleteEvent(event: CalendarEvent): void {
   emit('delete', event);
 }
 
-function updateDate(date) {
+function updateDate(date: number): void {
   activeDate.value.date = date;
   emit('date', { ...activeDate.value });
 }
 
-function updateEvents() {
+function updateEvents(): void {
   // keep emit path unchanged for child interactions
 }
 </script>

@@ -37,35 +37,38 @@
     </div>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { ref, nextTick } from 'vue';
+import type { NewStaffInput, Staff, StaffUpdatePayload } from '@/types/calendar';
 
-defineProps({
-  staff: {
-    type: Array,
-    required: true
-  }
-});
+defineProps<{
+  staff: Staff[];
+}>();
 
-const emit = defineEmits(['update']);
+const emit = defineEmits<{
+  (e: 'update', value: StaffUpdatePayload): void;
+}>();
 
-const firstNameInput = ref(null);
+const firstNameInput = ref<HTMLInputElement | null>(null);
 
-const newStaff = ref({
+const newStaff = ref<NewStaffInput>({
   firstName: '',
   lastName: ''
 });
 
-const showForm = ref({
+const showForm = ref<{
+  add: boolean;
+  remove: boolean;
+}>({
   add: false,
   remove: false
 });
 
-function emitStaff(fn) {
-  if (fn === 'add') {
-    emit('update', [fn, newStaff.value]);
+function emitStaff(payload: 'add' | Staff): void {
+  if (payload === 'add') {
+    emit('update', ['add', newStaff.value]);
   } else {
-    emit('update', ['remove', fn]);
+    emit('update', ['remove', payload]);
   }
 
   newStaff.value.firstName = '';
@@ -74,14 +77,14 @@ function emitStaff(fn) {
   showForm.value.remove = false;
 }
 
-function toggleEditStaffForm(form) {
+function toggleEditStaffForm(form: 'add' | 'remove'): void {
   if (form === 'add') {
     showForm.value.remove = false;
     showForm.value.add = !showForm.value.add;
 
     if (showForm.value.add) {
       nextTick(() => {
-        firstNameInput.value.focus();
+        firstNameInput.value?.focus();
       });
     }
   } else {

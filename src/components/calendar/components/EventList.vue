@@ -23,21 +23,16 @@
     </ul>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { month } from '@/components/calendar/utils/selectOptions';
+import type { CalendarEvent, CurrentDate } from '@/types/calendar';
 
-defineProps({
-  currentDate: {
-    type: Object,
-    required: true
-  },
-  events: {
-    type: Array,
-    required: true
-  }
-});
+defineProps<{
+  currentDate: CurrentDate;
+  events: CalendarEvent[];
+}>();
 
-function eventTitle(event) {
+function eventTitle(event: CalendarEvent): string {
   if (event.type === 'C/D Event' || event.type === 'Holiday') {
     return event.details;
   }
@@ -45,7 +40,7 @@ function eventTitle(event) {
   return event.type;
 }
 
-function holidayDetails(event) {
+function holidayDetails(event: CalendarEvent): string {
   if (event.closed === 'none') {
     return '';
   }

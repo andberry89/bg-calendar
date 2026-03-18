@@ -4,7 +4,7 @@
   >
     <EventModal
       v-if="showEventDetails"
-      :event="modalEvent"
+      :event="modalEvent!"
       :day="getDay"
       @update="closeModal"
       @delete="deleteEvent($event)"
@@ -22,63 +22,71 @@
     />
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from 'vue';
 import CalendarEvent from './CalendarEvent.vue';
 import EventModal from './EventModal.vue';
+import type { CalendarEvent as CalendarEventType, CurrentDate } from '@/types/calendar';
 
-const props = defineProps({
-  date: Number,
-  dayClass: String,
-  currentDate: {
-    type: Object
-  },
-  month: {
-    type: String,
-    required: false
-  },
-  events: {
-    type: Array,
-    default: () => [],
-    required: false
+type CalendarMonthOffset = 'prev' | 'next';
+
+const props = withDefaults(
+  defineProps<{
+    date: number;
+    dayClass: string;
+    currentDate: CurrentDate;
+    month?: CalendarMonthOffset;
+    events?: CalendarEventType[];
+  }>(),
+  {
+    month: undefined,
+    events: () => []
   }
-});
+);
 
-const emit = defineEmits(['delete', 'update']);
+const emit = defineEmits<{
+  (e: 'delete', value: CalendarEventType): void;
+  (e: 'update'): void;
+}>();
 
 const showEventDetails = ref(false);
-const modalEvent = ref({});
+const modalEvent = ref<CalendarEventType | null>(null);
 
-const holidays = computed(() => props.events.filter((e) => e.type === 'Holiday'));
-const filteredEvents = computed(() => props.events.filter((e) => e.type !== 'Holiday'));
+const holidays = computed((): CalendarEventType[] =>
+  props.events.filter((event) => event.type === 'Holiday')
+);
 
-const getDay = computed(() => {
+const filteredEvents = computed((): CalendarEventType[] =>
+  props.events.filter((event) => event.type !== 'Holiday')
+);
+
+const getDay = computed((): number => {
   const date = { ...props.currentDate };
   return new Date(date.year, date.month, props.date).getDay();
 });
 
-const hasFullClosureHoliday = computed(() => {
+const hasFullClosureHoliday = computed((): boolean => {
   return holidays.value.some((event) => event.closed === 'full');
 });
 
-const isWeekend = computed(() => {
+const isWeekend = computed((): boolean => {
   const date = { ...props.currentDate };
 
   if (props.month === 'prev') {
     if (date.month === 0) {
       date.month = 11;
-      date.year--;
+      date.year -= 1;
     } else {
-      date.month--;
+      date.month -= 1;
     }
   }
 
   if (props.month === 'next') {
     if (date.month === 11) {
       date.month = 0;
-      date.year++;
+      date.year += 1;
     } else {
-      date.month++;
+      date.month += 1;
     }
   }
 
@@ -86,22 +94,22 @@ const isWeekend = computed(() => {
   return day === 0 || day === 6;
 });
 
-function closeModal() {
-  modalEvent.value = {};
+function closeModal(): void {
+  modalEvent.value = null;
   showEventDetails.value = false;
 }
 
-function deleteEvent(event) {
+function deleteEvent(event: CalendarEventType): void {
   emit('delete', event);
   closeModal();
 }
 
-function openEventModal(event) {
+function openEventModal(event: CalendarEventType): void {
   modalEvent.value = event;
   showEventDetails.value = true;
 }
 
-function updateEvents() {
+function updateEvents(): void {
   emit('update');
 }
 </script>

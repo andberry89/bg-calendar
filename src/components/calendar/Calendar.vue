@@ -30,7 +30,7 @@
     <em>Version {{ appVersion }}</em>
   </footer>
 </template>
-<script setup>
+<script setup lang="ts">
 /* global __APP_VERSION__ */
 import { computed, onMounted, ref } from 'vue';
 import CalendarHeader from './CalendarHeader.vue';
@@ -44,46 +44,57 @@ import { sortEvents } from '@/features/calendar/utils/sortEvents';
 import { getCurrentMonthEvents } from '@/features/calendar/utils/getCurrentMonthEvents';
 import { getPrevMonthDays, getCurrentMonthDays } from '@/features/calendar/utils/getMonthDayCounts';
 import { getCurrentDate as getInitialCurrentDate } from '@/features/calendar/utils/getCurrentDate';
+import type {
+  CalendarEvent,
+  CurrentDate,
+  EventsByYear,
+  NewCalendarEvent,
+  Staff,
+  StaffUpdatePayload
+} from '@/types/calendar';
 
-const currentDate = ref({
+const currentDate = ref<CurrentDate>({
   date: 0,
   month: 0,
   year: 0
 });
 
-const staff = ref([]);
-const sortedEvents = ref({});
+const staff = ref<Staff[]>([]);
+const sortedEvents = ref<EventsByYear>({});
 const showEvents = ref(false);
 const isLoading = ref(true);
-const loadError = ref(null);
+const loadError = ref<string | null>(null);
 
-const appVersion = computed(() => __APP_VERSION__);
+const appVersion = computed((): string => __APP_VERSION__);
 const prevMonthDays = computed(() => getPrevMonthDays(currentDate.value));
 const currentMonthDays = computed(() => getCurrentMonthDays(currentDate.value));
-const currentMonthEvents = computed(() =>
+const currentMonthEvents = computed((): CalendarEvent[] =>
   getCurrentMonthEvents(sortedEvents.value, currentDate.value)
 );
 
-function getCurrentDate() {
+function getCurrentDate(): void {
   currentDate.value = getInitialCurrentDate();
 }
 
-function updateDate(newDate) {
+function updateDate(newDate: CurrentDate): void {
   currentDate.value = newDate;
 }
 
-async function refreshCalendarData() {
+async function refreshCalendarData(): Promise<void> {
   const { events, staff: staffData } = await fetchCalendarPageData();
   sortedEvents.value = sortEvents(events);
   staff.value = staffData;
 }
 
-async function updateEvents(fn, event) {
+async function updateEvents(
+  fn: 'add' | 'delete',
+  event: NewCalendarEvent | CalendarEvent
+): Promise<void> {
   try {
     if (fn === 'add') {
-      await addEvent(event);
+      await addEvent(event as NewCalendarEvent);
     } else {
-      await deleteEvent(event.id);
+      await deleteEvent((event as CalendarEvent).id);
     }
 
     await refreshCalendarData();
@@ -92,12 +103,12 @@ async function updateEvents(fn, event) {
   }
 }
 
-async function updateStaff([fn, person]) {
+async function updateStaff([fn, person]: StaffUpdatePayload): Promise<void> {
   try {
     if (fn === 'add') {
-      await addStaff(person);
+      await addStaff(person as { firstName: string; lastName: string });
     } else {
-      await deleteStaff(person.id);
+      await deleteStaff((person as Staff).id);
     }
 
     await refreshCalendarData();
@@ -106,7 +117,7 @@ async function updateStaff([fn, person]) {
   }
 }
 
-onMounted(async () => {
+onMounted(async (): Promise<void> => {
   getCurrentDate();
 
   try {

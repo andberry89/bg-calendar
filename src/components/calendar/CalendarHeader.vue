@@ -7,7 +7,7 @@
         <div>{{ currentDate.year }}</div>
         <div class="date-picker-btn" @click="toggleDatePicker">&#10552;</div>
         <div v-if="showDatePicker" class="date-picker">
-          <input type="date" @input="updateDate($event.target.value)" />
+          <input type="date" @input="updateDate(($event.target as HTMLInputElement).value)" />
         </div>
       </div>
       <div class="date-nav">
@@ -23,24 +23,25 @@
     <NewEvent :staff="staff" key="new-event" @update="addEvent($event)" />
   </header>
 </template>
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from 'vue';
 import NewEvent from './components/NewEvent.vue';
 import { month } from './utils/selectOptions';
+import type { CurrentDate, NewCalendarEvent, Staff } from '@/types/calendar';
 
-const props = defineProps({
-  currentDate: {
-    type: Object,
-    required: true
-  },
-  staff: Array
-});
+const props = defineProps<{
+  currentDate: CurrentDate;
+  staff: Staff[];
+}>();
 
-const emit = defineEmits(['date', 'update']);
+const emit = defineEmits<{
+  (e: 'date', value: CurrentDate): void;
+  (e: 'update', value: NewCalendarEvent): void;
+}>();
 
 const showDatePicker = ref(false);
 
-const lastMonth = computed(() => {
+const lastMonth = computed((): string => {
   let previousMonth = month[props.currentDate.month - 1];
 
   if (props.currentDate.month === 0) {
@@ -50,7 +51,7 @@ const lastMonth = computed(() => {
   return previousMonth.substring(0, 3);
 });
 
-const nextMonth = computed(() => {
+const nextMonth = computed((): string => {
   let upcomingMonth = month[props.currentDate.month + 1];
 
   if (props.currentDate.month === 11) {
@@ -60,11 +61,11 @@ const nextMonth = computed(() => {
   return upcomingMonth.substring(0, 3);
 });
 
-function addEvent(event) {
+function addEvent(event: NewCalendarEvent): void {
   emit('update', event);
 }
 
-function goToToday() {
+function goToToday(): void {
   const today = new Date();
 
   emit('date', {
@@ -74,39 +75,39 @@ function goToToday() {
   });
 }
 
-function goToNextMonth() {
-  const nextDate = { ...props.currentDate };
+function goToNextMonth(): void {
+  const nextDate: CurrentDate = { ...props.currentDate };
 
   if (nextDate.month === 11) {
     nextDate.month = 0;
-    nextDate.year++;
+    nextDate.year += 1;
   } else {
-    nextDate.month++;
+    nextDate.month += 1;
   }
 
   nextDate.date = 1;
   emit('date', nextDate);
 }
 
-function goToPreviousMonth() {
-  const previousDate = { ...props.currentDate };
+function goToPreviousMonth(): void {
+  const previousDate: CurrentDate = { ...props.currentDate };
 
   if (previousDate.month === 0) {
     previousDate.month = 11;
-    previousDate.year--;
+    previousDate.year -= 1;
   } else {
-    previousDate.month--;
+    previousDate.month -= 1;
   }
 
   previousDate.date = 1;
   emit('date', previousDate);
 }
 
-function toggleDatePicker() {
+function toggleDatePicker(): void {
   showDatePicker.value = !showDatePicker.value;
 }
 
-function updateDate(date) {
+function updateDate(date: string): void {
   const split = date.split('-');
 
   emit('date', {
