@@ -6,8 +6,10 @@
     <div class="background-overlay" @click.self="emit('update')"></div>
   </div>
 </template>
-<script setup>
-const emit = defineEmits(['update']);
+<script setup lang="ts">
+const emit = defineEmits<{
+  (e: 'update'): void;
+}>();
 </script>
 <style lang="scss" scoped>
 .edit-modal {
