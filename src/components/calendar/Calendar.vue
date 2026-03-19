@@ -94,18 +94,41 @@ async function loadCalendarData(): Promise<void> {
   staff.value = staffData;
 }
 
+async function addCalendarEvent(event: NewCalendarEvent): Promise<void> {
+  const result = await addEvent(event);
+  assertMutationSucceeded(result);
+  await loadCalendarData();
+}
+
+async function removeCalendarEvent(eventId: string): Promise<void> {
+  const result = await deleteEvent(eventId);
+  assertMutationSucceeded(result);
+  await loadCalendarData();
+}
+
+async function addCalendarStaff(firstName: string, lastName: string): Promise<void> {
+  const result = await addStaff({ firstName, lastName });
+  assertMutationSucceeded(result);
+  await loadCalendarData();
+}
+
+async function removeCalendarStaff(staffId: string): Promise<void> {
+  const result = await deleteStaff(staffId);
+  assertMutationSucceeded(result);
+  await loadCalendarData();
+}
+
 async function updateEvents(
   fn: 'add' | 'delete',
   event: NewCalendarEvent | CalendarEvent
 ): Promise<void> {
   try {
-    const result =
-      fn === 'add'
-        ? await addEvent(event as NewCalendarEvent)
-        : await deleteEvent((event as CalendarEvent).id);
+    if (fn === 'add') {
+      await addCalendarEvent(event as NewCalendarEvent);
+      return;
+    }
 
-    assertMutationSucceeded(result);
-    await loadCalendarData();
+    await removeCalendarEvent((event as CalendarEvent).id);
   } catch (err) {
     console.warn(err);
   }
@@ -113,13 +136,12 @@ async function updateEvents(
 
 async function updateStaff([fn, person]: StaffUpdatePayload): Promise<void> {
   try {
-    const result =
-      fn === 'add'
-        ? await addStaff(person as { firstName: string; lastName: string })
-        : await deleteStaff((person as Staff).id);
+    if (fn === 'add') {
+      await addCalendarStaff(person.firstName, person.lastName);
+      return;
+    }
 
-    assertMutationSucceeded(result);
-    await loadCalendarData();
+    await removeCalendarStaff(person.id);
   } catch (err) {
     console.warn(err);
   }
