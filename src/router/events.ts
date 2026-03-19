@@ -1,10 +1,23 @@
 import { addDoc, deleteDoc, doc } from 'firebase/firestore';
 import { getEventsCollection } from '@/services';
-import type { MutationResult, NewCalendarEvent } from '@/types/calendar';
+import type { CalendarEventDocument, MutationResult, NewCalendarEvent } from '@/types/calendar';
+
+const mapNewEventToDocument = (event: NewCalendarEvent): CalendarEventDocument => {
+  return {
+    class: event.class,
+    closed: event.closed,
+    details: event.details,
+    end: event.end,
+    start: event.start,
+    staff: event.staff,
+    type: event.type
+  };
+};
 
 export const addEvent = async (event: NewCalendarEvent): Promise<MutationResult> => {
   try {
-    const docRef = await addDoc(getEventsCollection(), event);
+    const eventDocument = mapNewEventToDocument(event);
+    const docRef = await addDoc(getEventsCollection(), eventDocument);
 
     console.log('Successfully added event with ID: ', docRef.id);
 
