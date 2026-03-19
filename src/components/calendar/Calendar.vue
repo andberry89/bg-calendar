@@ -147,11 +147,14 @@ async function updateStaff([fn, person]: StaffUpdatePayload): Promise<void> {
   }
 }
 
-onMounted(async (): Promise<void> => {
+async function initializeCalendarPage(): Promise<void> {
   initializeCurrentDate();
+  await loadCalendarData();
+}
 
+onMounted(async (): Promise<void> => {
   try {
-    await loadCalendarData();
+    await initializeCalendarPage();
   } catch (err) {
     console.warn(err);
     loadError.value = 'Failed to load calendar data.';
