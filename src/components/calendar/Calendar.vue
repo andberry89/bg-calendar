@@ -53,11 +53,7 @@ import type {
   StaffUpdatePayload
 } from '@/types/calendar';
 
-const currentDate = ref<CurrentDate>({
-  date: 0,
-  month: 0,
-  year: 0
-});
+const currentDate = ref<CurrentDate>(getInitialCurrentDate());
 
 const staff = ref<Staff[]>([]);
 const sortedEvents = ref<EventsByYear>({});
@@ -71,10 +67,6 @@ const currentMonthDays = computed(() => getCurrentMonthDays(currentDate.value));
 const currentMonthEvents = computed((): CalendarEvent[] =>
   getCurrentMonthEvents(sortedEvents.value, currentDate.value)
 );
-
-function getCurrentDate(): void {
-  currentDate.value = getInitialCurrentDate();
-}
 
 function updateDate(newDate: CurrentDate): void {
   currentDate.value = newDate;
@@ -118,8 +110,6 @@ async function updateStaff([fn, person]: StaffUpdatePayload): Promise<void> {
 }
 
 onMounted(async (): Promise<void> => {
-  getCurrentDate();
-
   try {
     await refreshCalendarData();
   } catch (err) {
