@@ -37,9 +37,8 @@ import CalendarHeader from './CalendarHeader.vue';
 import CalendarBody from './CalendarBody.vue';
 import StaffList from './StaffList.vue';
 import EventList from './components/EventList.vue';
-import { fetchCalendarPageData } from '@/services';
+import { addStaff, deleteStaff, fetchCalendarPageData } from '@/services';
 import { addEvent, deleteEvent } from '@/router/events';
-import { addStaff, deleteStaff } from '@/router/staff';
 import { sortEvents } from '@/features/calendar/utils/sortEvents';
 import { getCurrentMonthEvents } from '@/features/calendar/utils/getCurrentMonthEvents';
 import { getPrevMonthDays, getCurrentMonthDays } from '@/features/calendar/utils/getMonthDayCounts';
@@ -48,16 +47,13 @@ import type {
   CalendarEvent,
   CurrentDate,
   EventsByYear,
+  MutationResult,
   NewCalendarEvent,
   Staff,
   StaffUpdatePayload
 } from '@/types/calendar';
 
-const currentDate = ref<CurrentDate>({
-  date: 0,
-  month: 0,
-  year: 0
-});
+const currentDate = ref<CurrentDate>(getInitialCurrentDate());
 
 const staff = ref<Staff[]>([]);
 const sortedEvents = ref<EventsByYear>({});
@@ -71,10 +67,6 @@ const currentMonthDays = computed(() => getCurrentMonthDays(currentDate.value));
 const currentMonthEvents = computed((): CalendarEvent[] =>
   getCurrentMonthEvents(sortedEvents.value, currentDate.value)
 );
-
-function getCurrentDate(): void {
-  currentDate.value = getInitialCurrentDate();
-}
 
 function updateDate(newDate: CurrentDate): void {
   currentDate.value = newDate;
@@ -91,10 +83,14 @@ async function updateEvents(
   event: NewCalendarEvent | CalendarEvent
 ): Promise<void> {
   try {
-    if (fn === 'add') {
-      await addEvent(event as NewCalendarEvent);
-    } else {
-      await deleteEvent((event as CalendarEvent).id);
+    const result: MutationResult =
+      fn === 'add'
+        ? await addEvent(event as NewCalendarEvent)
+        : await deleteEvent((event as CalendarEvent).id);
+
+    if (!result.success) {
+      console.warn(result.message, result.error);
+      return;
     }
 
     await refreshCalendarData();
@@ -105,10 +101,12 @@ async function updateEvents(
 
 async function updateStaff([fn, person]: StaffUpdatePayload): Promise<void> {
   try {
-    if (fn === 'add') {
-      await addStaff(person as { firstName: string; lastName: string });
-    } else {
-      await deleteStaff((person as Staff).id);
+    const result: MutationResult =
+      fn === 'add' ? await addStaff(person) : await deleteStaff(person.id);
+
+    if (!result.success) {
+      console.warn(result.message, result.error);
+      return;
     }
 
     await refreshCalendarData();
@@ -118,8 +116,6 @@ async function updateStaff([fn, person]: StaffUpdatePayload): Promise<void> {
 }
 
 onMounted(async (): Promise<void> => {
-  getCurrentDate();
-
   try {
     await refreshCalendarData();
   } catch (err) {
