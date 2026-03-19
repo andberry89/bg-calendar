@@ -40,6 +40,7 @@ import EventList from './components/EventList.vue';
 import { fetchCalendarPageData } from '@/services';
 import { addEvent, deleteEvent } from '@/router/events';
 import { addStaff, deleteStaff } from '@/router/staff';
+import type { MutationResult } from '@/types/calendar';
 import { sortEvents } from '@/features/calendar/utils/sortEvents';
 import { getCurrentMonthEvents } from '@/features/calendar/utils/getCurrentMonthEvents';
 import { getPrevMonthDays, getCurrentMonthDays } from '@/features/calendar/utils/getMonthDayCounts';
@@ -72,7 +73,7 @@ const currentMonthEvents = computed((): CalendarEvent[] =>
   getCurrentMonthEvents(sortedEvents.value, currentDate.value)
 );
 
-function getCurrentDate(): void {
+function initializeCurrentDate(): void {
   currentDate.value = getInitialCurrentDate();
 }
 
@@ -80,8 +81,15 @@ function updateDate(newDate: CurrentDate): void {
   currentDate.value = newDate;
 }
 
-async function refreshCalendarData(): Promise<void> {
+function assertMutationSucceeded(result: MutationResult): void {
+  if (!result.success) {
+    throw new Error(result.message);
+  }
+}
+
+async function loadCalendarData(): Promise<void> {
   const { events, staff: staffData } = await fetchCalendarPageData();
+
   sortedEvents.value = sortEvents(events);
   staff.value = staffData;
 }
@@ -91,13 +99,13 @@ async function updateEvents(
   event: NewCalendarEvent | CalendarEvent
 ): Promise<void> {
   try {
-    if (fn === 'add') {
-      await addEvent(event as NewCalendarEvent);
-    } else {
-      await deleteEvent((event as CalendarEvent).id);
-    }
+    const result =
+      fn === 'add'
+        ? await addEvent(event as NewCalendarEvent)
+        : await deleteEvent((event as CalendarEvent).id);
 
-    await refreshCalendarData();
+    assertMutationSucceeded(result);
+    await loadCalendarData();
   } catch (err) {
     console.warn(err);
   }
@@ -105,23 +113,23 @@ async function updateEvents(
 
 async function updateStaff([fn, person]: StaffUpdatePayload): Promise<void> {
   try {
-    if (fn === 'add') {
-      await addStaff(person as { firstName: string; lastName: string });
-    } else {
-      await deleteStaff((person as Staff).id);
-    }
+    const result =
+      fn === 'add'
+        ? await addStaff(person as { firstName: string; lastName: string })
+        : await deleteStaff((person as Staff).id);
 
-    await refreshCalendarData();
+    assertMutationSucceeded(result);
+    await loadCalendarData();
   } catch (err) {
     console.warn(err);
   }
 }
 
 onMounted(async (): Promise<void> => {
-  getCurrentDate();
+  initializeCurrentDate();
 
   try {
-    await refreshCalendarData();
+    await loadCalendarData();
   } catch (err) {
     console.warn(err);
     loadError.value = 'Failed to load calendar data.';
