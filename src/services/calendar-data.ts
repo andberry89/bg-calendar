@@ -1,35 +1,31 @@
 import { getDocs } from 'firebase/firestore';
 import { getEventsCollection, getStaffCollection } from '@/services';
-import type { CalendarEvent, Staff } from '@/types/calendar';
+import type { CalendarEvent, CalendarEventDocument, Staff, StaffDocument } from '@/types/calendar';
+
+const mapEvent = (id: string, data: CalendarEventDocument): CalendarEvent => {
+  return {
+    id,
+    ...data
+  };
+};
+
+const mapStaff = (id: string, data: StaffDocument): Staff => {
+  return {
+    id,
+    ...data
+  };
+};
 
 export const fetchEvents = async (): Promise<CalendarEvent[]> => {
   const snapshot = await getDocs(getEventsCollection());
-  const events: CalendarEvent[] = [];
 
-  snapshot.forEach((docSnapshot) => {
-    const appData = docSnapshot.data() as Omit<CalendarEvent, 'id'>;
-
-    events.push({
-      ...appData,
-      id: docSnapshot.id
-    });
-  });
-
-  return events;
+  return snapshot.docs.map((doc) => mapEvent(doc.id, doc.data()));
 };
 
 export const fetchStaff = async (): Promise<Staff[]> => {
   const snapshot = await getDocs(getStaffCollection());
-  const staff: Staff[] = [];
 
-  snapshot.forEach((docSnapshot) => {
-    const appData = docSnapshot.data() as Omit<Staff, 'id'>;
-
-    staff.push({
-      ...appData,
-      id: docSnapshot.id
-    });
-  });
+  const staff = snapshot.docs.map((doc) => mapStaff(doc.id, doc.data()));
 
   return staff.sort((a, b) => a.lastName.localeCompare(b.lastName));
 };
