@@ -33,12 +33,13 @@
 <script setup lang="ts">
 /* global __APP_VERSION__ */
 import { computed, onMounted, ref } from 'vue';
+import { storeToRefs } from 'pinia';
 import CalendarHeader from './CalendarHeader.vue';
 import CalendarBody from './CalendarBody.vue';
 import StaffList from './StaffList.vue';
 import EventList from './components/EventList.vue';
-import { addStaff, deleteStaff, fetchCalendarPageData } from '@/services';
-import { addEvent, deleteEvent } from '@/router/events';
+import { useEventsStore } from '@/stores/events';
+import { useStaffStore } from '@/stores/staff';
 import { sortEvents } from '@/features/calendar/utils/sortEvents';
 import { getCurrentMonthEvents } from '@/features/calendar/utils/getCurrentMonthEvents';
 import { getPrevMonthDays, getCurrentMonthDays } from '@/features/calendar/utils/getMonthDayCounts';
@@ -47,19 +48,23 @@ import type {
   CalendarEvent,
   CurrentDate,
   EventsByYear,
-  MutationResult,
   NewCalendarEvent,
-  Staff,
   StaffUpdatePayload
 } from '@/types/calendar';
 
 const currentDate = ref<CurrentDate>(getInitialCurrentDate());
 
-const staff = ref<Staff[]>([]);
-const sortedEvents = ref<EventsByYear>({});
+const eventsStore = useEventsStore();
+const staffStore = useStaffStore();
+
+const { events } = storeToRefs(eventsStore);
+const { staff } = storeToRefs(staffStore);
+
 const showEvents = ref(false);
 const isLoading = ref(true);
 const loadError = ref<string | null>(null);
+
+const sortedEvents = computed<EventsByYear>(() => sortEvents(events.value));
 
 const appVersion = computed((): string => __APP_VERSION__);
 const prevMonthDays = computed(() => getPrevMonthDays(currentDate.value));
@@ -73,9 +78,7 @@ function updateDate(newDate: CurrentDate): void {
 }
 
 async function refreshCalendarData(): Promise<void> {
-  const { events, staff: staffData } = await fetchCalendarPageData();
-  sortedEvents.value = sortEvents(events);
-  staff.value = staffData;
+  await Promise.all([eventsStore.fetchEvents(), staffStore.fetchStaff()]);
 }
 
 async function updateEvents(
@@ -83,17 +86,14 @@ async function updateEvents(
   event: NewCalendarEvent | CalendarEvent
 ): Promise<void> {
   try {
-    const result: MutationResult =
+    const result =
       fn === 'add'
-        ? await addEvent(event as NewCalendarEvent)
-        : await deleteEvent((event as CalendarEvent).id);
+        ? await eventsStore.addEvent(event as NewCalendarEvent)
+        : await eventsStore.deleteEvent((event as CalendarEvent).id);
 
     if (!result.success) {
       console.warn(result.message, result.error);
-      return;
     }
-
-    await refreshCalendarData();
   } catch (err) {
     console.warn(err);
   }
@@ -101,15 +101,12 @@ async function updateEvents(
 
 async function updateStaff([fn, person]: StaffUpdatePayload): Promise<void> {
   try {
-    const result: MutationResult =
-      fn === 'add' ? await addStaff(person) : await deleteStaff(person.id);
+    const result =
+      fn === 'add' ? await staffStore.addStaff(person) : await staffStore.deleteStaff(person.id);
 
     if (!result.success) {
       console.warn(result.message, result.error);
-      return;
     }
-
-    await refreshCalendarData();
   } catch (err) {
     console.warn(err);
   }
