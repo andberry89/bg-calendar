@@ -127,11 +127,11 @@ function updateEvents(): void {
 </script>
 
 <style lang="scss" scoped>
-@mixin calendar-layout($property) {
+@mixin calendar-layout($padding) {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  grid-gap: 10px 2px;
-  padding: $property;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 10px 2px;
+  padding: $padding;
 
   div {
     display: flex;
@@ -139,6 +139,7 @@ function updateEvents(): void {
     justify-content: flex-start;
     align-items: center;
     border-radius: 5px;
+    min-width: 0;
   }
 }
 
@@ -146,6 +147,7 @@ function updateEvents(): void {
   display: flex;
   flex-flow: column nowrap;
   justify-content: flex-start;
+  min-width: 0;
   height: 100%;
 }
 
@@ -153,7 +155,7 @@ function updateEvents(): void {
   @include calendar-layout(10px 20px 10px);
   background-color: var(--md-tran-black);
   border-bottom: 1px solid var(--white);
-  font-size: 1.5em;
+  font-size: clamp(1rem, 1.5vw, 1.5rem);
   color: var(--ocean-gray);
 
   div:first-child,
@@ -164,11 +166,32 @@ function updateEvents(): void {
 
 .date {
   @include calendar-layout(10px 20px 20px);
-  background-color: var(--lt-tran-black);
+  background-color: var(--layout-panel-overlay);
   flex-grow: 4;
 
   .active {
     background-color: var(--ocean-lt-blue);
+  }
+}
+
+@media (max-width: 900px) {
+  .weekdays {
+    padding: 10px 12px;
+  }
+
+  .date {
+    padding: 10px 12px 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .weekdays,
+  .date {
+    gap: 6px 2px;
+  }
+
+  .weekdays {
+    font-size: 0.95rem;
   }
 }
 </style>
