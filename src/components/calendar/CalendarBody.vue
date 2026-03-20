@@ -8,35 +8,36 @@
     <div class="date" v-if="dataReady">
       <CalendarDay
         dayClass="day-hidden"
-        v-for="(n, idx) in firstMonthDay - 1"
+        v-for="(date, idx) in previousMonthVisibleDays"
         :key="'prev' + idx"
-        :date="prevMonthDays + 1 - firstMonthDay + n"
+        :date="date"
         :currentDate="currentDate"
         month="prev"
       />
       <CalendarDay
         dayClass="day"
-        v-for="(n, idx) in currentMonthDays"
-        :class="{ active: n === currentDate.date }"
-        @click="updateDate(n)"
+        v-for="(date, idx) in currentMonthVisibleDays"
+        :class="{ active: date === currentDate.date }"
+        @click="updateDate(date)"
         @update="updateEvents"
         @delete="deleteEvent($event)"
         :key="'day' + idx"
-        :date="n"
+        :date="date"
         :currentDate="currentDate"
-        :events="events[n - 1]"
+        :events="events[date - 1]"
       />
       <CalendarDay
         dayClass="day-hidden"
-        v-for="(n, idx) in 43 - (currentMonthDays + firstMonthDay)"
+        v-for="(date, idx) in nextMonthVisibleDays"
         :key="'next' + idx"
-        :date="n"
+        :date="date"
         :currentDate="currentDate"
         month="next"
       />
     </div>
   </section>
 </template>
+
 <script setup lang="ts">
 import { computed } from 'vue';
 import CalendarDay from './CalendarDay.vue';
@@ -62,6 +63,21 @@ const firstMonthDay = computed((): number => {
   return firstDay + 1;
 });
 
+const previousMonthVisibleDays = computed((): number[] => {
+  return Array.from(
+    { length: firstMonthDay.value - 1 },
+    (_, idx) => prevMonthDays + idx + 2 - firstMonthDay.value
+  );
+});
+
+const currentMonthVisibleDays = computed((): number[] => {
+  return Array.from({ length: currentMonthDays }, (_, idx) => idx + 1);
+});
+
+const nextMonthVisibleDays = computed((): number[] => {
+  return Array.from({ length: 43 - (currentMonthDays + firstMonthDay.value) }, (_, idx) => idx + 1);
+});
+
 const events = computed((): CalendarEvent[][] => {
   if (!currentMonthDays || !currentMonthEvents.length) {
     return [];
@@ -71,7 +87,7 @@ const events = computed((): CalendarEvent[][] => {
 });
 
 const dataReady = computed((): boolean => {
-  return events.value.length > 0 || currentMonthDays > 0;
+  return currentMonthDays > 0;
 });
 
 function deleteEvent(event: CalendarEvent): void {
@@ -86,6 +102,7 @@ function updateEvents(): void {
   // keep emit path unchanged for child interactions
 }
 </script>
+
 <style lang="scss" scoped>
 @mixin calendar-layout($property) {
   display: grid;
