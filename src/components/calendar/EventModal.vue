@@ -27,7 +27,7 @@ import { computed } from 'vue';
 import { format } from 'date-fns';
 import type { CalendarEvent } from '@/types/calendar';
 
-const props = defineProps<{
+const { day, event } = defineProps<{
   day: number;
   event: CalendarEvent;
 }>();
@@ -38,14 +38,14 @@ const emit = defineEmits<{
 }>();
 
 const eventDates = computed((): string => {
-  const startDate = new Date(props.event.start.replace(/-/g, '/'));
+  const startDate = new Date(event.start.replace(/-/g, '/'));
   const start = format(startDate, 'MM/dd/yyyy');
 
-  if (props.event.start === props.event.end) {
+  if (event.start === event.end) {
     return start;
   }
 
-  const endDate = new Date(props.event.end.replace(/-/g, '/'));
+  const endDate = new Date(event.end.replace(/-/g, '/'));
   const end = format(endDate, 'MM/dd/yyyy');
 
   return start + ' - ' + end;
@@ -56,7 +56,7 @@ function closeModal(): void {
 }
 
 function deleteEvent(): void {
-  emit('delete', props.event);
+  emit('delete', event);
 }
 </script>
 <style lang="scss" scoped>
