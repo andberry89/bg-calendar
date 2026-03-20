@@ -52,13 +52,29 @@ const emit = defineEmits<{
 const showEventDetails = ref(false);
 const modalEvent = ref<CalendarEventType | null>(null);
 
-const holidays = computed((): CalendarEventType[] =>
-  props.events.filter((event) => event.type === 'Holiday')
+const eventGroups = computed(
+  (): { holidays: CalendarEventType[]; regularEvents: CalendarEventType[] } => {
+    return props.events.reduce(
+      (groups, event) => {
+        if (event.type === 'Holiday') {
+          groups.holidays.push(event);
+        } else {
+          groups.regularEvents.push(event);
+        }
+
+        return groups;
+      },
+      {
+        holidays: [] as CalendarEventType[],
+        regularEvents: [] as CalendarEventType[]
+      }
+    );
+  }
 );
 
-const filteredEvents = computed((): CalendarEventType[] =>
-  props.events.filter((event) => event.type !== 'Holiday')
-);
+const holidays = computed((): CalendarEventType[] => eventGroups.value.holidays);
+
+const filteredEvents = computed((): CalendarEventType[] => eventGroups.value.regularEvents);
 
 const getDay = computed((): number => {
   const date = { ...props.currentDate };
