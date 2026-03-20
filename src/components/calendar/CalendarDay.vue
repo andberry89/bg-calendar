@@ -28,10 +28,20 @@
     <CalendarEvent
       v-for="(event, idx) in filteredEvents"
       :key="'event-' + idx"
+      :class="['regular-event', { 'regular-event--overflow': idx >= 3 }]"
       :event="event"
       @click="openEventModal(event)"
       @update="updateEvents"
     />
+
+    <button
+      v-if="hiddenEventCount > 0"
+      class="more-events"
+      type="button"
+      @click.stop="openDayModal"
+    >
+      +{{ hiddenEventCount }} more
+    </button>
   </div>
 </template>
 <script setup lang="ts">
@@ -92,6 +102,10 @@ const filteredEvents = computed((): CalendarEventType[] => eventGroups.value.reg
 
 const allEvents = computed((): CalendarEventType[] => {
   return [...holidays.value, ...filteredEvents.value];
+});
+
+const hiddenEventCount = computed((): number => {
+  return Math.max(filteredEvents.value.length - 3, 0);
 });
 
 const displayDate = computed((): CurrentDate => {
@@ -196,5 +210,37 @@ function closeDayModal(): void {
   width: 100%;
   text-align: center;
   margin-bottom: 5px;
+}
+
+.more-events {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  .container {
+    height: 140px;
+    overflow: hidden;
+  }
+
+  .date-text {
+    font-size: 0.85rem;
+    margin-bottom: 3px;
+  }
+
+  .regular-event--overflow {
+    display: none;
+  }
+
+  .more-events {
+    display: block;
+    width: 100%;
+    margin-top: 2px;
+    border: 0;
+    background: transparent;
+    color: var(--white);
+    font-size: 0.7rem;
+    text-align: center;
+    cursor: pointer;
+  }
 }
 </style>
