@@ -27,7 +27,7 @@
 <script setup lang="ts">
 import type { CalendarEvent } from '@/types/calendar';
 
-const props = defineProps<{
+const { event } = defineProps<{
   event: CalendarEvent;
 }>();
 
@@ -36,7 +36,7 @@ const emit = defineEmits<{
 }>();
 
 function emitEvent(): void {
-  emit('update', props.event);
+  emit('update', event);
 }
 </script>
 <style lang="scss" scoped>
