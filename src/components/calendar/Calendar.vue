@@ -164,8 +164,9 @@ footer {
   main {
     grid-template-columns: 1fr;
   }
-
-  #staff-list,
+  #staff-list {
+    display: none;
+  }
   #calendar {
     width: 100%;
   }
