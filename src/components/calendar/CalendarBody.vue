@@ -78,12 +78,35 @@ const nextMonthVisibleDays = computed((): number[] => {
   return Array.from({ length: 43 - (currentMonthDays + firstMonthDay.value) }, (_, idx) => idx + 1);
 });
 
+let cachedEvents: CalendarEvent[][] = [];
+let cachedMonth = -1;
+let cachedMonthDays = -1;
+let cachedSourceEvents: CalendarEvent[] | null = null;
+
 const events = computed((): CalendarEvent[][] => {
   if (!currentMonthDays || !currentMonthEvents.length) {
-    return [];
+    cachedEvents = [];
+    cachedMonth = currentDate.month;
+    cachedMonthDays = currentMonthDays;
+    cachedSourceEvents = currentMonthEvents;
+
+    return cachedEvents;
   }
 
-  return assignEvents(currentMonthEvents, currentDate.month, currentMonthDays);
+  if (
+    cachedSourceEvents === currentMonthEvents &&
+    cachedMonth === currentDate.month &&
+    cachedMonthDays === currentMonthDays
+  ) {
+    return cachedEvents;
+  }
+
+  cachedEvents = assignEvents(currentMonthEvents, currentDate.month, currentMonthDays);
+  cachedMonth = currentDate.month;
+  cachedMonthDays = currentMonthDays;
+  cachedSourceEvents = currentMonthEvents;
+
+  return cachedEvents;
 });
 
 const dataReady = computed((): boolean => {
