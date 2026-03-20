@@ -228,11 +228,13 @@ function closeDayModal(): void {
 
 .more-events {
   display: none;
+  border: 0;
+  background: transparent;
 }
 
 @media (max-width: 640px) {
   .container {
-    height: 120px;
+    height: 130px;
     overflow: hidden;
   }
 
@@ -247,12 +249,14 @@ function closeDayModal(): void {
 
   .more-events {
     display: block;
-    width: 100%;
-    margin-top: 2px;
-    border: 0;
-    background: transparent;
+    width: calc(100% - 8px);
+    margin: 4px auto 0;
+    padding: 3px 6px;
+    border-radius: 999px;
+    background-color: var(--md-tran-black);
     color: var(--white);
     font-size: 0.6rem;
+    line-height: 1.1;
     text-align: center;
     cursor: pointer;
   }
