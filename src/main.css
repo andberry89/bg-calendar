@@ -25,3 +25,25 @@
   --md-tran-black: rgba(0, 0, 0, 0.5);
   --lt-tran-black: rgba(0, 0, 0, 0.7);
 }
+
+body {
+  margin: 0;
+  background-color: var(--ocean-gray);
+  color: var(--dark-gray);
+}
+
+#app {
+  min-height: 100vh;
+}
+
+:root {
+  --layout-gap-sm: 10px;
+  --layout-gap-md: 15px;
+  --layout-gap-lg: 20px;
+  --layout-radius-md: 15px;
+  --layout-radius-sm: 10px;
+  --layout-shell-max-width: 1600px;
+  --layout-shell-padding: 16px;
+  --layout-panel-bg: var(--ocean-dark-blue);
+  --layout-panel-overlay: var(--lt-tran-black);
+}
