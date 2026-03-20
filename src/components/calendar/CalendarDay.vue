@@ -20,7 +20,10 @@
       @delete="deleteEvent($event)"
       @click.stop
     />
-    <div class="date-text" @click.stop="openDayModal">
+    <div
+      :class="['date-text', { 'date-text--interactive': canOpenDayModal }]"
+      @click.stop="openDayModal"
+    >
       {{ date }}
       <CalendarEvent v-for="(event, idx) in holidays" :key="'holiday-' + idx" :event="event" />
     </div>
@@ -103,6 +106,10 @@ const allEvents = computed((): CalendarEventType[] => {
   return [...holidays.value, ...filteredEvents.value];
 });
 
+const canOpenDayModal = computed((): boolean => {
+  return props.dayClass === 'day' && allEvents.value.length > 0;
+});
+
 const hiddenEventCount = computed((): number => {
   return Math.max(filteredEvents.value.length - 2, 0);
 });
@@ -158,6 +165,10 @@ function updateEvents(): void {
 }
 
 function openDayModal(): void {
+  if (!canOpenDayModal.value) {
+    return;
+  }
+
   showDayModal.value = true;
 }
 
@@ -209,6 +220,10 @@ function closeDayModal(): void {
   width: 100%;
   text-align: center;
   margin-bottom: 5px;
+}
+
+.date-text--interactive {
+  cursor: pointer;
 }
 
 .more-events {
