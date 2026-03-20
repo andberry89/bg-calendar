@@ -52,17 +52,50 @@ const emit = defineEmits<{
 const showEventDetails = ref(false);
 const modalEvent = ref<CalendarEventType | null>(null);
 
-const holidays = computed((): CalendarEventType[] =>
-  props.events.filter((event) => event.type === 'Holiday')
+const eventGroups = computed(
+  (): { holidays: CalendarEventType[]; regularEvents: CalendarEventType[] } => {
+    return props.events.reduce(
+      (groups, event) => {
+        if (event.type === 'Holiday') {
+          groups.holidays.push(event);
+        } else {
+          groups.regularEvents.push(event);
+        }
+
+        return groups;
+      },
+      {
+        holidays: [] as CalendarEventType[],
+        regularEvents: [] as CalendarEventType[]
+      }
+    );
+  }
 );
 
-const filteredEvents = computed((): CalendarEventType[] =>
-  props.events.filter((event) => event.type !== 'Holiday')
-);
+const holidays = computed((): CalendarEventType[] => eventGroups.value.holidays);
+
+const filteredEvents = computed((): CalendarEventType[] => eventGroups.value.regularEvents);
+
+const displayDate = computed((): CurrentDate => {
+  const { year, month } = props.currentDate;
+
+  if (props.month === 'prev') {
+    return month === 0
+      ? { ...props.currentDate, year: year - 1, month: 11 }
+      : { ...props.currentDate, month: month - 1 };
+  }
+
+  if (props.month === 'next') {
+    return month === 11
+      ? { ...props.currentDate, year: year + 1, month: 0 }
+      : { ...props.currentDate, month: month + 1 };
+  }
+
+  return props.currentDate;
+});
 
 const getDay = computed((): number => {
-  const date = { ...props.currentDate };
-  return new Date(date.year, date.month, props.date).getDay();
+  return new Date(displayDate.value.year, displayDate.value.month, props.date).getDay();
 });
 
 const hasFullClosureHoliday = computed((): boolean => {
@@ -70,27 +103,7 @@ const hasFullClosureHoliday = computed((): boolean => {
 });
 
 const isWeekend = computed((): boolean => {
-  const date = { ...props.currentDate };
-
-  if (props.month === 'prev') {
-    if (date.month === 0) {
-      date.month = 11;
-      date.year -= 1;
-    } else {
-      date.month -= 1;
-    }
-  }
-
-  if (props.month === 'next') {
-    if (date.month === 11) {
-      date.month = 0;
-      date.year += 1;
-    } else {
-      date.month += 1;
-    }
-  }
-
-  const day = new Date(date.year, date.month, props.date).getDay();
+  const day = new Date(displayDate.value.year, displayDate.value.month, props.date).getDay();
   return day === 0 || day === 6;
 });
 

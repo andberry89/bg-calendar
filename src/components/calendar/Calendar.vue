@@ -19,7 +19,6 @@
         :prevMonthDays="prevMonthDays"
         :currentMonthDays="currentMonthDays"
         :currentMonthEvents="currentMonthEvents"
-        :key="currentDate.month + '-' + currentDate.year"
         @date="updateDate"
         @delete="updateEvents('delete', $event)"
       />
