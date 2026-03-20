@@ -51,6 +51,9 @@
             </button>
           </div>
         </div>
+        <div v-else class="day-modal__details day-modal__details--empty">
+          <p>Click an event to view full details</p>
+        </div>
       </div>
 
       <p v-else class="day-modal__empty">No events for this day.</p>
@@ -225,6 +228,18 @@ function getEventLabel(event: CalendarEvent): string {
   border-radius: 8px;
   background-color: var(--white);
   padding: 12px;
+}
+
+.day-modal__details--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--dark-gray);
+  opacity: 0.7;
+  font-size: 0.9rem;
+  min-height: 120px;
+  border-style: dashed;
 }
 
 .day-modal__details-header {
