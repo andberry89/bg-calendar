@@ -49,21 +49,30 @@ function imgUrl(name: string): string {
   font:
     400 12px/1.2 'Arial',
     sans-serif;
+  min-width: 0;
+
+  h2 {
+    margin-bottom: var(--layout-gap-sm);
+  }
 
   .staff-card {
     display: flex;
     flex-flow: row nowrap;
     align-items: center;
-    gap: 10px;
+    gap: var(--layout-gap-sm);
     height: 70px;
-    background-color: #bafca2;
-    border: 2px solid var(--black);
+    background-color: var(--white);
+    color: var(--dark-gray);
+    border-radius: var(--layout-radius-sm);
+    border: 1px solid var(--ocean-slate-blue);
     overflow: hidden;
-    margin: 10px 0;
-    padding: 5px;
+    margin: var(--layout-gap-sm) 0;
+    padding: 6px 8px;
+    transition: background-color 0.2s ease;
 
     &:hover {
-      background-color: #90ee90;
+      background-color: var(--ocean-gray);
+      cursor: pointer;
     }
 
     .profile-picture {
@@ -71,7 +80,8 @@ function imgUrl(name: string): string {
       position: relative;
       height: 60px;
       width: 60px;
-      border: 2px solid var(--black);
+      border-radius: var(--layout-radius-sm);
+      border: 1px solid var(--ocean-slate-blue);
 
       img {
         height: auto;

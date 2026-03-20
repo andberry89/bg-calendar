@@ -126,7 +126,7 @@ onMounted(async (): Promise<void> => {
 @import url('https://fonts.googleapis.com/css?family=Anton');
 main {
   display: grid;
-  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  grid-template-columns: minmax(150px, 200px) minmax(0, 1fr);
   align-items: start;
   gap: var(--layout-gap-md);
   max-width: var(--layout-shell-max-width);
