@@ -152,7 +152,8 @@ function getEventLabel(event: CalendarEvent): string {
 <style lang="scss" scoped>
 .day-modal {
   position: relative;
-  width: min(560px, 100%);
+  width: min(560px, calc(100vw - 24px));
+  max-width: 560px;
   background-color: var(--light-gray);
   color: var(--black);
   border-radius: 12px;
@@ -188,9 +189,10 @@ function getEventLabel(event: CalendarEvent): string {
 
 .day-modal__content {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 260px);
+  grid-template-columns: minmax(0, 1fr) 240px;
   gap: 12px;
   align-items: start;
+  width: 100%;
 }
 
 .day-modal__events {
