@@ -2,30 +2,55 @@
   <div
     :class="[dayClass, { weekend: isWeekend }, { fullClose: hasFullClosureHoliday }, 'container']"
   >
+    <DayModal
+      v-if="showDayModal"
+      :currentDate="currentDate"
+      :date="date"
+      :day="getDay"
+      :events="allEvents"
+      @update="closeDayModal"
+      @delete="deleteEvent"
+      @click.stop
+    />
     <EventModal
       v-if="showEventDetails"
       :event="modalEvent!"
       :day="getDay"
       @update="closeModal"
       @delete="deleteEvent($event)"
+      @click.stop
     />
-    <div class="date-text">
+    <div
+      :class="['date-text', { 'date-text--interactive': canOpenDayModal }]"
+      @click.stop="openDayModal"
+    >
       {{ date }}
       <CalendarEvent v-for="(event, idx) in holidays" :key="'holiday-' + idx" :event="event" />
     </div>
     <CalendarEvent
       v-for="(event, idx) in filteredEvents"
       :key="'event-' + idx"
+      :class="['regular-event', { 'regular-event--overflow': idx >= 2 }]"
       :event="event"
       @click="openEventModal(event)"
       @update="updateEvents"
     />
+
+    <button
+      v-if="hiddenEventCount > 0"
+      class="more-events"
+      type="button"
+      @click.stop="openDayModal"
+    >
+      +{{ hiddenEventCount }} more
+    </button>
   </div>
 </template>
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import CalendarEvent from './CalendarEvent.vue';
 import EventModal from './EventModal.vue';
+import DayModal from './DayModal.vue';
 import type { CalendarEvent as CalendarEventType, CurrentDate } from '@/types/calendar';
 
 type CalendarMonthOffset = 'prev' | 'next';
@@ -51,6 +76,7 @@ const emit = defineEmits<{
 
 const showEventDetails = ref(false);
 const modalEvent = ref<CalendarEventType | null>(null);
+const showDayModal = ref(false);
 
 const eventGroups = computed(
   (): { holidays: CalendarEventType[]; regularEvents: CalendarEventType[] } => {
@@ -75,6 +101,18 @@ const eventGroups = computed(
 const holidays = computed((): CalendarEventType[] => eventGroups.value.holidays);
 
 const filteredEvents = computed((): CalendarEventType[] => eventGroups.value.regularEvents);
+
+const allEvents = computed((): CalendarEventType[] => {
+  return [...holidays.value, ...filteredEvents.value];
+});
+
+const canOpenDayModal = computed((): boolean => {
+  return props.dayClass === 'day' && allEvents.value.length > 0;
+});
+
+const hiddenEventCount = computed((): number => {
+  return Math.max(filteredEvents.value.length - 2, 0);
+});
 
 const displayDate = computed((): CurrentDate => {
   const { year, month } = props.currentDate;
@@ -125,6 +163,18 @@ function openEventModal(event: CalendarEventType): void {
 function updateEvents(): void {
   emit('update');
 }
+
+function openDayModal(): void {
+  if (!canOpenDayModal.value) {
+    return;
+  }
+
+  showDayModal.value = true;
+}
+
+function closeDayModal(): void {
+  showDayModal.value = false;
+}
 </script>
 <style lang="scss" scoped>
 .container {
@@ -170,5 +220,45 @@ function updateEvents(): void {
   width: 100%;
   text-align: center;
   margin-bottom: 5px;
+}
+
+.date-text--interactive {
+  cursor: pointer;
+}
+
+.more-events {
+  display: none;
+  border: 0;
+  background: transparent;
+}
+
+@media (max-width: 640px) {
+  .container {
+    height: 130px;
+    overflow: hidden;
+  }
+
+  .date-text {
+    font-size: 0.85rem;
+    margin-bottom: 3px;
+  }
+
+  .regular-event--overflow {
+    display: none;
+  }
+
+  .more-events {
+    display: block;
+    width: calc(100% - 8px);
+    margin: 4px auto 0;
+    padding: 3px 6px;
+    border-radius: 999px;
+    background-color: var(--md-tran-black);
+    color: var(--white);
+    font-size: 0.6rem;
+    line-height: 1.1;
+    text-align: center;
+    cursor: pointer;
+  }
 }
 </style>
