@@ -146,10 +146,6 @@ header {
     justify-self: end;
   }
 
-  .calendar-title {
-    min-width: 0;
-  }
-
   .date-container {
     display: flex;
     flex-flow: column nowrap;
@@ -232,47 +228,17 @@ header {
     min-width: 0;
   }
 
-  /* Tablet / Mobile Layout */
   @media (max-width: 1100px) {
     grid-template-columns: 1fr;
     justify-items: center;
     padding: 20px 16px;
 
     > :last-child {
-      justify-self: center;
+      justify-self: end;
     }
 
     .date-container {
       width: 100%;
-      gap: 16px;
-
-      /* Row 1: Title */
-      .calendar-title {
-        order: 1;
-      }
-
-      /* Row 2: Date + Nav */
-      .date-container {
-        order: 2;
-        width: 100%;
-
-        .today {
-          font-size: 1.5rem;
-          grid-template-columns: auto auto auto auto;
-        }
-
-        .date-nav {
-          font-size: 1.2rem;
-        }
-      }
-
-      /* Row 3: Action */
-      > :last-child {
-        order: 3;
-        justify-self: center;
-        width: 100%;
-        max-width: 320px;
-      }
     }
   }
 }
