@@ -43,7 +43,7 @@ import CalendarDay from './CalendarDay.vue';
 import assignEvents from './utils/assignEvents';
 import type { CalendarEvent, CurrentDate } from '@/types/calendar';
 
-const props = defineProps<{
+const { currentDate, prevMonthDays, currentMonthDays, currentMonthEvents } = defineProps<{
   currentDate: CurrentDate;
   prevMonthDays: number;
   currentMonthDays: number;
@@ -64,7 +64,7 @@ const activeDate = ref<CurrentDate>({
 });
 
 watch(
-  () => props.currentDate,
+  () => currentDate,
   (value: CurrentDate) => {
     activeDate.value = { ...value };
   },
@@ -77,15 +77,15 @@ const firstMonthDay = computed((): number => {
 });
 
 const events = computed((): CalendarEvent[][] => {
-  if (!props.currentMonthDays || !props.currentMonthEvents.length) {
+  if (!currentMonthDays || !currentMonthEvents.length) {
     return [];
   }
 
-  return assignEvents(props.currentMonthEvents, props.currentDate.month, props.currentMonthDays);
+  return assignEvents(currentMonthEvents, currentDate.month, currentMonthDays);
 });
 
 const dataReady = computed((): boolean => {
-  return events.value.length > 0 || props.currentMonthDays > 0;
+  return events.value.length > 0 || currentMonthDays > 0;
 });
 
 function deleteEvent(event: CalendarEvent): void {
