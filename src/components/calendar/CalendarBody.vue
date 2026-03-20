@@ -11,19 +11,19 @@
         v-for="(n, idx) in firstMonthDay - 1"
         :key="'prev' + idx"
         :date="prevMonthDays + 1 - firstMonthDay + n"
-        :currentDate="activeDate"
+        :currentDate="currentDate"
         month="prev"
       />
       <CalendarDay
         dayClass="day"
         v-for="(n, idx) in currentMonthDays"
-        :class="{ active: n === activeDate.date }"
+        :class="{ active: n === currentDate.date }"
         @click="updateDate(n)"
         @update="updateEvents"
         @delete="deleteEvent($event)"
         :key="'day' + idx"
         :date="n"
-        :currentDate="activeDate"
+        :currentDate="currentDate"
         :events="events[n - 1]"
       />
       <CalendarDay
@@ -31,14 +31,14 @@
         v-for="(n, idx) in 43 - (currentMonthDays + firstMonthDay)"
         :key="'next' + idx"
         :date="n"
-        :currentDate="activeDate"
+        :currentDate="currentDate"
         month="next"
       />
     </div>
   </section>
 </template>
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed } from 'vue';
 import CalendarDay from './CalendarDay.vue';
 import assignEvents from './utils/assignEvents';
 import type { CalendarEvent, CurrentDate } from '@/types/calendar';
@@ -57,22 +57,8 @@ const emit = defineEmits<{
 
 const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'] as const;
 
-const activeDate = ref<CurrentDate>({
-  date: 0,
-  month: 0,
-  year: 0
-});
-
-watch(
-  () => currentDate,
-  (value: CurrentDate) => {
-    activeDate.value = { ...value };
-  },
-  { deep: true, immediate: true }
-);
-
 const firstMonthDay = computed((): number => {
-  const firstDay = new Date(activeDate.value.year, activeDate.value.month, 1).getDay();
+  const firstDay = new Date(currentDate.year, currentDate.month, 1).getDay();
   return firstDay + 1;
 });
 
@@ -93,8 +79,7 @@ function deleteEvent(event: CalendarEvent): void {
 }
 
 function updateDate(date: number): void {
-  activeDate.value.date = date;
-  emit('date', { ...activeDate.value });
+  emit('date', { ...currentDate, date });
 }
 
 function updateEvents(): void {
