@@ -125,30 +125,49 @@ onMounted(async (): Promise<void> => {
 <style lang="scss" scoped>
 @import url('https://fonts.googleapis.com/css?family=Anton');
 main {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 15px;
-  padding: 0 10px;
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  align-items: start;
+  gap: var(--layout-gap-md);
+  max-width: var(--layout-shell-max-width);
+  margin: 0 auto;
+  padding: 0 var(--layout-shell-padding);
+
+  #staff-list {
+    min-width: 0;
+  }
 
   #calendar {
-    width: 1032px;
+    min-width: 0;
+    width: 100%;
     display: flex;
-    flex-basis: 1050px;
     flex-flow: column nowrap;
     justify-content: flex-start;
-    gap: 10px;
-    background-color: var(--ocean-dark-blue);
+    gap: var(--layout-gap-sm);
+    background-color: var(--layout-panel-bg);
+    color: var(--white);
     font-family: 'Anton';
-    border-radius: 15px;
+    border-radius: var(--layout-radius-md);
     overflow: hidden;
     background-size: cover;
     user-select: none;
     position: relative;
   }
 }
+
 footer {
   text-align: center;
+  padding: var(--layout-gap-md) var(--layout-shell-padding);
+}
+
+@media (max-width: 1100px) {
+  main {
+    grid-template-columns: 1fr;
+  }
+
+  #staff-list,
+  #calendar {
+    width: 100%;
+  }
 }
 </style>
