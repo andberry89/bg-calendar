@@ -6,32 +6,54 @@
         <button class="day-modal__close" type="button" @click="closeDayModal">×</button>
       </div>
 
-      <div v-if="events.length > 0" class="day-modal__events">
-        <button
-          v-for="(calendarEvent, idx) in events"
-          :key="`${calendarEvent.id}-${idx}`"
-          class="day-modal__event"
-          type="button"
-          @click="openEventModal(calendarEvent)"
-        >
-          <span class="day-modal__event-type">
-            {{ getEventLabel(calendarEvent) }}
-          </span>
-          <span class="day-modal__event-dates">
-            {{ getEventDates(calendarEvent) }}
-          </span>
-        </button>
+      <div v-if="events.length > 0" class="day-modal__content">
+        <div class="day-modal__events">
+          <button
+            v-for="(calendarEvent, idx) in events"
+            :key="`${calendarEvent.id}-${idx}`"
+            class="day-modal__event"
+            type="button"
+            @click="selectEvent(calendarEvent)"
+          >
+            <span class="day-modal__event-type">
+              {{ getEventLabel(calendarEvent) }}
+            </span>
+            <span class="day-modal__event-dates">
+              {{ getEventDates(calendarEvent) }}
+            </span>
+          </button>
+        </div>
+
+        <div v-if="selectedEvent" class="day-modal__details">
+          <div class="day-modal__details-header">
+            <h4 class="day-modal__details-title">
+              {{ selectedEvent.class === 'cd-event' ? selectedEvent.details : selectedEvent.type }}
+              {{ selectedEvent.class === 'birthday' ? '🎂' : '' }}
+            </h4>
+            <button class="day-modal__details-close" type="button" @click="clearSelectedEvent">
+              ×
+            </button>
+          </div>
+
+          <div class="day-modal__details-dates">
+            {{ getEventDates(selectedEvent) }}
+          </div>
+
+          <div v-if="selectedEvent.staff.length > 0" class="day-modal__details-staff">
+            <p v-for="person in selectedEvent.staff" :key="person.lastName">
+              {{ person.shortName }}
+            </p>
+          </div>
+
+          <div class="day-modal__details-actions">
+            <button class="day-modal__delete" type="button" @click="deleteEvent(selectedEvent)">
+              Delete Event ✘
+            </button>
+          </div>
+        </div>
       </div>
 
       <p v-else class="day-modal__empty">No events for this day.</p>
-
-      <EventModal
-        v-if="showEventDetails"
-        :event="modalEvent!"
-        :day="day"
-        @update="closeEventModal"
-        @delete="deleteEvent"
-      />
     </div>
   </ModalOverlay>
 </template>
@@ -40,7 +62,6 @@
 import { computed, ref } from 'vue';
 import { format } from 'date-fns';
 import ModalOverlay from '@/components/common/ModalOverlay.vue';
-import EventModal from './EventModal.vue';
 import type { CalendarEvent, CurrentDate } from '@/types/calendar';
 
 const props = defineProps<{
@@ -55,8 +76,7 @@ const emit = defineEmits<{
   (e: 'delete', value: CalendarEvent): void;
 }>();
 
-const showEventDetails = ref(false);
-const modalEvent = ref<CalendarEvent | null>(null);
+const selectedEvent = ref<CalendarEvent | null>(null);
 
 const title = computed((): string => {
   return format(
@@ -66,19 +86,16 @@ const title = computed((): string => {
 });
 
 function closeDayModal(): void {
-  modalEvent.value = null;
-  showEventDetails.value = false;
+  selectedEvent.value = null;
   emit('update');
 }
 
-function closeEventModal(): void {
-  modalEvent.value = null;
-  showEventDetails.value = false;
+function selectEvent(event: CalendarEvent): void {
+  selectedEvent.value = event;
 }
 
-function openEventModal(event: CalendarEvent): void {
-  modalEvent.value = event;
-  showEventDetails.value = true;
+function clearSelectedEvent(): void {
+  selectedEvent.value = null;
 }
 
 function deleteEvent(event: CalendarEvent): void {
@@ -166,6 +183,13 @@ function getEventLabel(event: CalendarEvent): string {
   cursor: pointer;
 }
 
+.day-modal__content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 260px);
+  gap: 12px;
+  align-items: start;
+}
+
 .day-modal__events {
   display: flex;
   flex-direction: column;
@@ -196,6 +220,61 @@ function getEventLabel(event: CalendarEvent): string {
   color: var(--dark-gray);
 }
 
+.day-modal__details {
+  border: 1px solid var(--ocean-slate-blue);
+  border-radius: 8px;
+  background-color: var(--white);
+  padding: 12px;
+}
+
+.day-modal__details-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.day-modal__details-title {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.day-modal__details-close {
+  border: 1px solid var(--black);
+  background-color: var(--white);
+  color: var(--black);
+  border-radius: 6px;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.day-modal__details-dates {
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  color: var(--dark-gray);
+}
+
+.day-modal__details-staff {
+  p {
+    margin: 0 0 4px;
+  }
+}
+
+.day-modal__details-actions {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.day-modal__delete {
+  border: 0;
+  background: transparent;
+  color: var(--ocean-event-detail);
+  cursor: pointer;
+  padding: 0;
+}
+
 .day-modal__empty {
   margin: 0;
 }
@@ -203,6 +282,10 @@ function getEventLabel(event: CalendarEvent): string {
 @media (max-width: 640px) {
   .day-modal {
     padding: 12px;
+  }
+
+  .day-modal__content {
+    grid-template-columns: 1fr;
   }
 
   .day-modal__event {
