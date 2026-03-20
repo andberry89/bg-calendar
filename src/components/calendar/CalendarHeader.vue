@@ -29,7 +29,7 @@ import NewEvent from './components/NewEvent.vue';
 import { month } from './utils/selectOptions';
 import type { CurrentDate, NewCalendarEvent, Staff } from '@/types/calendar';
 
-const props = defineProps<{
+const { currentDate, staff } = defineProps<{
   currentDate: CurrentDate;
   staff: Staff[];
 }>();
@@ -42,9 +42,9 @@ const emit = defineEmits<{
 const showDatePicker = ref(false);
 
 const lastMonth = computed((): string => {
-  let previousMonth = month[props.currentDate.month - 1];
+  let previousMonth = month[currentDate.month - 1];
 
-  if (props.currentDate.month === 0) {
+  if (currentDate.month === 0) {
     previousMonth = month[11];
   }
 
@@ -52,9 +52,9 @@ const lastMonth = computed((): string => {
 });
 
 const nextMonth = computed((): string => {
-  let upcomingMonth = month[props.currentDate.month + 1];
+  let upcomingMonth = month[currentDate.month + 1];
 
-  if (props.currentDate.month === 11) {
+  if (currentDate.month === 11) {
     upcomingMonth = month[0];
   }
 
@@ -76,7 +76,7 @@ function goToToday(): void {
 }
 
 function goToNextMonth(): void {
-  const nextDate: CurrentDate = { ...props.currentDate };
+  const nextDate: CurrentDate = { ...currentDate };
 
   if (nextDate.month === 11) {
     nextDate.month = 0;
@@ -90,7 +90,7 @@ function goToNextMonth(): void {
 }
 
 function goToPreviousMonth(): void {
-  const previousDate: CurrentDate = { ...props.currentDate };
+  const previousDate: CurrentDate = { ...currentDate };
 
   if (previousDate.month === 0) {
     previousDate.month = 11;
