@@ -129,10 +129,11 @@ function updateDate(date: string): void {
 }
 
 header {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr);
   align-items: center;
-  padding: 0 50px;
+  gap: var(--layout-gap-md);
+  padding: 20px 24px;
   text-align: center;
   color: var(--light-gray);
   text-shadow:
@@ -140,14 +141,17 @@ header {
     1px -1px 1px var(--dark-gray),
     -1px 1px 1px var(--dark-gray),
     -1px -1px 1px var(--dark-gray);
-  height: 15vh;
+
+  > :last-child {
+    justify-self: end;
+  }
 
   .date-container {
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
-    gap: 25px;
-    width: 30%;
+    gap: 20px;
+    min-width: 0;
 
     .arrow-left {
       @include arrow-style();
@@ -157,6 +161,7 @@ header {
         border-right: 10px solid var(--md-tran-black);
       }
     }
+
     .arrow-right {
       @include arrow-style();
       border-left: 10px solid var(--white);
@@ -169,7 +174,7 @@ header {
     .today {
       display: grid;
       grid-template-columns: 40px auto 70px auto;
-      grid-gap: 10px;
+      gap: 10px;
       font-size: 2rem;
       position: relative;
 
@@ -215,6 +220,24 @@ header {
       .small-month {
         font-size: 1rem;
       }
+    }
+  }
+
+  .calendar-title {
+    min-width: 0;
+  }
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    padding: 20px 16px;
+
+    > :last-child {
+      justify-self: center;
+    }
+
+    .date-container {
+      width: 100%;
     }
   }
 }
