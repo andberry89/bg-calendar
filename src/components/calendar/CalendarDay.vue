@@ -1,7 +1,6 @@
 <template>
   <div
     :class="[dayClass, { weekend: isWeekend }, { fullClose: hasFullClosureHoliday }, 'container']"
-    @click="openDayModal"
   >
     <DayModal
       v-if="showDayModal"
@@ -21,14 +20,14 @@
       @delete="deleteEvent($event)"
       @click.stop
     />
-    <div class="date-text">
+    <div class="date-text" @click.stop="openDayModal">
       {{ date }}
       <CalendarEvent v-for="(event, idx) in holidays" :key="'holiday-' + idx" :event="event" />
     </div>
     <CalendarEvent
       v-for="(event, idx) in filteredEvents"
       :key="'event-' + idx"
-      :class="['regular-event', { 'regular-event--overflow': idx >= 3 }]"
+      :class="['regular-event', { 'regular-event--overflow': idx >= 2 }]"
       :event="event"
       @click="openEventModal(event)"
       @update="updateEvents"
@@ -105,7 +104,7 @@ const allEvents = computed((): CalendarEventType[] => {
 });
 
 const hiddenEventCount = computed((): number => {
-  return Math.max(filteredEvents.value.length - 3, 0);
+  return Math.max(filteredEvents.value.length - 2, 0);
 });
 
 const displayDate = computed((): CurrentDate => {
@@ -218,7 +217,7 @@ function closeDayModal(): void {
 
 @media (max-width: 640px) {
   .container {
-    height: 140px;
+    height: 120px;
     overflow: hidden;
   }
 
@@ -238,7 +237,7 @@ function closeDayModal(): void {
     border: 0;
     background: transparent;
     color: var(--white);
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     text-align: center;
     cursor: pointer;
   }
