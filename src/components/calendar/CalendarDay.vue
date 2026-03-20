@@ -1,13 +1,25 @@
 <template>
   <div
     :class="[dayClass, { weekend: isWeekend }, { fullClose: hasFullClosureHoliday }, 'container']"
+    @click="openDayModal"
   >
+    <DayModal
+      v-if="showDayModal"
+      :currentDate="currentDate"
+      :date="date"
+      :day="getDay"
+      :events="allEvents"
+      @update="closeDayModal"
+      @delete="deleteEvent"
+      @click.stop
+    />
     <EventModal
       v-if="showEventDetails"
       :event="modalEvent!"
       :day="getDay"
       @update="closeModal"
       @delete="deleteEvent($event)"
+      @click.stop
     />
     <div class="date-text">
       {{ date }}
@@ -26,6 +38,7 @@
 import { computed, ref } from 'vue';
 import CalendarEvent from './CalendarEvent.vue';
 import EventModal from './EventModal.vue';
+import DayModal from './DayModal.vue';
 import type { CalendarEvent as CalendarEventType, CurrentDate } from '@/types/calendar';
 
 type CalendarMonthOffset = 'prev' | 'next';
@@ -51,6 +64,7 @@ const emit = defineEmits<{
 
 const showEventDetails = ref(false);
 const modalEvent = ref<CalendarEventType | null>(null);
+const showDayModal = ref(false);
 
 const eventGroups = computed(
   (): { holidays: CalendarEventType[]; regularEvents: CalendarEventType[] } => {
@@ -75,6 +89,10 @@ const eventGroups = computed(
 const holidays = computed((): CalendarEventType[] => eventGroups.value.holidays);
 
 const filteredEvents = computed((): CalendarEventType[] => eventGroups.value.regularEvents);
+
+const allEvents = computed((): CalendarEventType[] => {
+  return [...holidays.value, ...filteredEvents.value];
+});
 
 const displayDate = computed((): CurrentDate => {
   const { year, month } = props.currentDate;
@@ -124,6 +142,14 @@ function openEventModal(event: CalendarEventType): void {
 
 function updateEvents(): void {
   emit('update');
+}
+
+function openDayModal(): void {
+  showDayModal.value = true;
+}
+
+function closeDayModal(): void {
+  showDayModal.value = false;
 }
 </script>
 <style lang="scss" scoped>
