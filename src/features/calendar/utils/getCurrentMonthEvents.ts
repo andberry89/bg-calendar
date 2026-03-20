@@ -10,14 +10,22 @@ export const getCurrentMonthEvents = (
     return [];
   }
 
-  return currentYearEvents
-    .filter((eventItem) => {
-      const startMonth = Number(eventItem.start.split('-')[1]) - 1;
-      const endMonth = Number(eventItem.end.split('-')[1]) - 1;
+  const targetMonth = currentDate.month;
+  const monthEvents: { event: CalendarEvent; startTime: number }[] = [];
 
-      return currentDate.month === startMonth || currentDate.month === endMonth;
-    })
-    .sort((a, b) => {
-      return new Date(a.start).getTime() - new Date(b.start).getTime();
-    });
+  for (const eventItem of currentYearEvents) {
+    const startMonth = Number(eventItem.start.slice(5, 7)) - 1;
+    const endMonth = Number(eventItem.end.slice(5, 7)) - 1;
+
+    if (targetMonth === startMonth || targetMonth === endMonth) {
+      monthEvents.push({
+        event: eventItem,
+        startTime: Date.parse(eventItem.start)
+      });
+    }
+  }
+
+  monthEvents.sort((a, b) => a.startTime - b.startTime);
+
+  return monthEvents.map(({ event }) => event);
 };
