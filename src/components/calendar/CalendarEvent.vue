@@ -1,5 +1,5 @@
 <template>
-  <div class="event-container" @click="emitEvent">
+  <div class="event-container" @click.stop="emitEvent">
     <div v-if="event.class === 'birthday'" :class="event.class">
       {{ event.staff[0].shortName }}'s Birthday! 🎂
     </div>
