@@ -245,10 +245,10 @@ function updateDate(date: string): void {
   }
 
   .date-picker-btn {
-    padding: 4px 8px;
-    min-width: 36px;
-    opacity: 0.8;
-    transition: opacity 0.2s ease;
+    padding: 2px 6px;
+    min-width: auto;
+    font-size: 0.85em;
+    opacity: 0.7;
 
     &:hover {
       opacity: 1;
