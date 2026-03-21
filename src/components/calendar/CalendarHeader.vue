@@ -164,7 +164,12 @@ function updateDate(date: string): void {
 
   .header-action {
     grid-area: action;
-    justify-self: end;
+    justify-self: center;
+    width: max-content;
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .date-container {
@@ -300,7 +305,7 @@ function updateDate(date: string): void {
   }
 
   @media (max-width: 640px) {
-    grid-template-columns: minmax(0, 2.2fr) auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-areas:
       'title title'
       'main action';
@@ -326,6 +331,8 @@ function updateDate(date: string): void {
     }
 
     .header-action {
+      justify-self: center;
+      align-self: center;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -360,7 +367,7 @@ function updateDate(date: string): void {
 
 @media (max-width: 360px) {
   .calendar-header {
-    grid-template-columns: minmax(0, 2.6fr) auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: 8px;
     padding: 14px 8px;
   }
