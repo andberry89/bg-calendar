@@ -15,9 +15,16 @@
             type="button"
             @click="selectEvent(calendarEvent)"
           >
-            <span class="day-modal__event-type">
-              {{ getEventLabel(calendarEvent) }}
-            </span>
+            <div class="day-modal__event-row">
+              <span class="day-modal__event-type">
+                {{ getEventTypeText(calendarEvent) }}
+              </span>
+
+              <span class="day-modal__event-meta">
+                {{ getEventMetaText(calendarEvent) }}
+              </span>
+            </div>
+
             <span class="day-modal__event-dates">
               {{ getEventDates(calendarEvent) }}
             </span>
@@ -116,36 +123,27 @@ function getEventDates(event: CalendarEvent): string {
   const end = format(new Date(event.end.replace(/-/g, '/')), 'MM/dd/yyyy');
   return `${start} - ${end}`;
 }
-
-function getEventLabel(event: CalendarEvent): string {
-  if (event.class === 'birthday') {
-    return `${event.staff[0].shortName}'s Birthday 🎂`;
-  }
-
-  if (event.class === 'press-trip') {
-    return `${event.staff[0].initials} Press Trip`;
-  }
-
-  if (event.class === 'vacation') {
-    return `${event.staff[0].initials} Off (PTO)`;
-  }
-
-  if (event.class === 'auto-show') {
-    return `Auto Show: ${event.details}`;
-  }
-
-  if (event.class === 'cd-event') {
-    return event.details;
-  }
-
-  if (event.class === 'holiday') {
-    const closure =
-      event.closed === 'full' ? 'Office Closed' : event.closed === 'half' ? 'Early Close' : '';
-
-    return closure ? `${event.details} — ${closure}` : event.details;
-  }
+function getEventTypeText(event: CalendarEvent): string {
+  if (event.class === 'birthday') return 'Birthday';
+  if (event.class === 'press-trip') return 'Press Trip';
+  if (event.class === 'vacation') return 'PTO';
+  if (event.class === 'auto-show') return 'Auto Show';
+  if (event.class === 'cd-event') return event.details;
+  if (event.class === 'holiday') return event.details;
 
   return event.type;
+}
+
+function getEventMetaText(event: CalendarEvent): string {
+  if (event.class === 'birthday') {
+    return event.staff[0]?.shortName ?? '';
+  }
+
+  if (event.class === 'press-trip' || event.class === 'vacation') {
+    return event.staff[0]?.shortName ?? '';
+  }
+
+  return '';
 }
 </script>
 
@@ -216,8 +214,22 @@ function getEventLabel(event: CalendarEvent): string {
   cursor: pointer;
 }
 
+.day-modal__event-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
 .day-modal__event-type {
   font-weight: 700;
+}
+
+.day-modal__event-meta {
+  font-size: 0.8rem;
+  color: var(--ocean-slate-blue);
+  white-space: nowrap;
 }
 
 .day-modal__event-dates {
