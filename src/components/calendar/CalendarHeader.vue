@@ -164,8 +164,9 @@ function updateDate(date: string): void {
 
     h1 {
       margin: 0;
-      font-size: clamp(1.5rem, 2vw, 2.2rem);
+      font-size: clamp(1.4rem, 1.8vw, 2rem);
       line-height: 1.1;
+      letter-spacing: 0.02em;
       white-space: nowrap;
     }
   }
@@ -189,7 +190,7 @@ function updateDate(date: string): void {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     min-width: 0;
   }
 
@@ -246,6 +247,12 @@ function updateDate(date: string): void {
   .date-picker-btn {
     padding: 4px 8px;
     min-width: 36px;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+      opacity: 1;
+    }
   }
 
   .date-picker {
@@ -261,7 +268,8 @@ function updateDate(date: string): void {
     align-items: center;
     gap: 8px;
     min-width: 0;
-    font-size: 1.25rem;
+    font-size: 1.1rem;
+    opacity: 0.9;
 
     .small-month {
       font-size: 0.95rem;
@@ -319,7 +327,7 @@ function updateDate(date: string): void {
     }
 
     .date-container {
-      gap: 8px;
+      gap: 6px;
     }
 
     .date-display {
