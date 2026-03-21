@@ -248,11 +248,13 @@ function updateDate(date: string): void {
   }
 
   @media (max-width: 1100px) {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-areas:
       'title title'
       'main action';
-    align-items: start;
+    align-items: center;
+    column-gap: 24px;
+    row-gap: 16px;
     padding: 20px 16px;
 
     .header-title {
@@ -261,19 +263,25 @@ function updateDate(date: string): void {
 
     .header-main {
       width: 100%;
+      display: flex;
+      justify-content: center;
     }
 
     .header-action {
-      align-self: start;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .date-container {
-      align-items: flex-start;
+      align-items: center;
+      justify-content: center;
     }
 
     .date-display,
     .date-nav {
-      justify-content: flex-start;
+      justify-content: center;
     }
 
     .date-display {
@@ -286,17 +294,22 @@ function updateDate(date: string): void {
   }
 
   @media (max-width: 900px) {
+    column-gap: 18px;
+    row-gap: 14px;
+
     .header-title h1 {
-      font-size: 1.4rem;
+      font-size: 1.3rem;
+      white-space: normal;
     }
 
     .date-display {
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       gap: 8px;
     }
 
     .date-nav {
       gap: 6px;
+      font-size: 1rem;
 
       div {
         padding: 4px 12px;
@@ -305,45 +318,52 @@ function updateDate(date: string): void {
   }
 
   @media (max-width: 640px) {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-areas:
-      'title main'
-      'action action';
+      'title title'
+      'main action';
+    align-items: center;
     column-gap: 12px;
-    row-gap: 14px;
-    align-items: start;
+    row-gap: 12px;
     padding: 16px 12px;
 
     .header-title {
-      text-align: left;
-      align-self: center;
+      text-align: center;
 
       h1 {
-        font-size: 1.1rem;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        font-size: 1.05rem;
+        line-height: 1.2;
+        white-space: normal;
       }
     }
 
     .header-main {
+      width: 100%;
       display: flex;
-      justify-content: flex-end;
+      justify-content: center;
+    }
+
+    .header-action {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .date-container {
-      align-items: flex-end;
-      gap: 10px;
+      align-items: center;
+      gap: 8px;
     }
 
     .date-display {
-      justify-content: flex-end;
-      font-size: 1.1rem;
+      justify-content: center;
+      font-size: 1rem;
       gap: 6px;
     }
 
     .date-nav {
-      justify-content: flex-end;
-      font-size: 0.95rem;
+      justify-content: center;
+      font-size: 0.9rem;
       gap: 6px;
 
       div {
@@ -351,12 +371,8 @@ function updateDate(date: string): void {
       }
 
       .small-month {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
       }
-    }
-
-    .header-action {
-      justify-self: stretch;
     }
   }
 }
