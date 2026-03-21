@@ -1,26 +1,49 @@
 <template>
-  <header>
-    <div class="date-container">
-      <div class="today">
-        <div>{{ currentDate.date }}</div>
-        <div>{{ month[currentDate.month] }}</div>
-        <div>{{ currentDate.year }}</div>
-        <div class="date-picker-btn" @click="toggleDatePicker">&#10552;</div>
-        <div v-if="showDatePicker" class="date-picker">
-          <input type="date" @input="updateDate(($event.target as HTMLInputElement).value)" />
+  <header class="calendar-header">
+    <div class="header-title">
+      <h1>C/D Buyers Guide Team Calendar</h1>
+    </div>
+
+    <div class="header-main">
+      <div class="date-container">
+        <div class="date-display">
+          <div class="date-value">{{ currentDate.date }}</div>
+          <div class="month-value">{{ month[currentDate.month] }}</div>
+          <div class="year-value">{{ currentDate.year }}</div>
+          <div class="date-picker-control">
+            <button
+              class="date-picker-btn header-control-button"
+              type="button"
+              aria-label="Open date picker"
+              @click="toggleDatePicker"
+            >
+              &#10552;
+            </button>
+            <div v-if="showDatePicker" class="date-picker">
+              <input type="date" @input="updateDate(($event.target as HTMLInputElement).value)" />
+            </div>
+          </div>
+        </div>
+
+        <div class="date-nav">
+          <button
+            type="button"
+            class="header-control-button small-month"
+            @click="goToPreviousMonth"
+          >
+            &lt; {{ lastMonth }}
+          </button>
+          <button type="button" class="header-control-button" @click="goToToday">Today</button>
+          <button type="button" class="header-control-button small-month" @click="goToNextMonth">
+            {{ nextMonth }} &gt;
+          </button>
         </div>
       </div>
-      <div class="date-nav">
-        <div @click="goToPreviousMonth" class="small-month">&lt; {{ lastMonth }}</div>
-        <div @click="goToToday">Today</div>
-        <div @click="goToNextMonth" class="small-month">{{ nextMonth }} &gt;</div>
-      </div>
     </div>
-    <div class="calendar-title">
-      <h1>C/D Buyers Guide</h1>
-      <h2>Team Calendar</h2>
+
+    <div class="header-action">
+      <NewEvent :staff="staff" key="new-event" @update="addEvent($event)" />
     </div>
-    <NewEvent :staff="staff" key="new-event" @update="addEvent($event)" />
   </header>
 </template>
 <script setup lang="ts">
@@ -120,21 +143,13 @@ function updateDate(date: string): void {
 }
 </script>
 <style lang="scss" scoped>
-@mixin arrow-style() {
-  width: 0;
-  height: 0;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  cursor: pointer;
-}
-
-header {
+.calendar-header {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr);
+  grid-template-columns: minmax(280px, 1fr) minmax(280px, auto) minmax(220px, 1fr);
+  grid-template-areas: 'main title action';
   align-items: center;
   gap: var(--layout-gap-md);
   padding: 20px 24px;
-  text-align: center;
   color: var(--light-gray);
   text-shadow:
     1px 1px 1px var(--dark-gray),
@@ -142,103 +157,222 @@ header {
     -1px 1px 1px var(--dark-gray),
     -1px -1px 1px var(--dark-gray);
 
-  > :last-child {
-    justify-self: end;
+  .header-title {
+    grid-area: title;
+    min-width: 0;
+    text-align: center;
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.4rem, 1.8vw, 2rem);
+      line-height: 1.1;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+  }
+
+  .header-main {
+    grid-area: main;
+    min-width: 0;
+  }
+
+  .header-action {
+    grid-area: action;
+    justify-self: center;
+    width: max-content;
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .date-container {
     display: flex;
-    flex-flow: column nowrap;
+    flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .date-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 1.75rem;
+    position: relative;
     min-width: 0;
 
-    .arrow-left {
-      @include arrow-style();
-      border-right: 10px solid var(--white);
-
-      &:hover {
-        border-right: 10px solid var(--md-tran-black);
-      }
+    > div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .arrow-right {
-      @include arrow-style();
-      border-left: 10px solid var(--white);
+    .month-value,
+    .year-value {
+      white-space: nowrap;
+    }
+  }
 
-      &:hover {
-        border-left: 10px solid var(--md-tran-black);
-      }
+  .date-picker-control {
+    position: relative;
+  }
+
+  .header-control-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--white);
+    border-radius: 8px;
+    padding: 4px 14px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-shadow: inherit;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s ease;
+
+    &:hover {
+      background-color: var(--ocean-lt-blue);
+    }
+  }
+
+  .date-picker-btn {
+    padding: 2px 6px;
+    min-width: auto;
+    font-size: 0.85em;
+    opacity: 0.7;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  .date-picker {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+  }
+
+  .date-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+
+    .small-month {
+      font-size: 0.95rem;
+    }
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    grid-template-areas:
+      'title title'
+      'main action';
+    column-gap: 18px;
+    row-gap: 14px;
+    padding: 20px 16px;
+
+    .header-title h1 {
+      font-size: 1.3rem;
+      white-space: normal;
     }
 
-    .today {
-      display: grid;
-      grid-template-columns: 40px auto 70px auto;
-      gap: 10px;
-      font-size: 2rem;
-      position: relative;
+    .header-main {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
 
-      div {
-        display: flex;
-        justify-content: center;
-      }
+    .header-action {
+      align-self: center;
+    }
 
-      .date-picker-btn {
-        padding: 0 4px;
-
-        &:hover {
-          cursor: pointer;
-        }
-      }
-
-      .date-picker {
-        position: absolute;
-        bottom: -20px;
-        right: 0;
-      }
+    .date-display {
+      font-size: 1.2rem;
+      gap: 8px;
     }
 
     .date-nav {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      font-size: 1.5rem;
-      gap: 8px;
+      font-size: 1rem;
+      gap: 6px;
 
-      div {
-        border: 1px solid var(--white);
-        border-radius: 8px;
-        padding: 2px 14px;
-        transition: 0.4s;
-
-        &:hover {
-          background-color: var(--ocean-lt-blue);
-          cursor: pointer;
-        }
-      }
-
-      .small-month {
-        font-size: 1rem;
+      .header-control-button {
+        padding: 4px 12px;
       }
     }
   }
 
-  .calendar-title {
-    min-width: 0;
-  }
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+    column-gap: 12px;
+    row-gap: 12px;
+    padding: 16px 12px;
 
-  @media (max-width: 1100px) {
-    grid-template-columns: 1fr;
-    justify-items: center;
-    padding: 20px 16px;
-
-    > :last-child {
-      justify-self: end;
+    .header-title h1 {
+      font-size: 1.05rem;
+      line-height: 1.2;
     }
 
     .date-container {
-      width: 100%;
+      gap: 6px;
+    }
+
+    .date-display {
+      font-size: 1rem;
+      gap: 6px;
+    }
+
+    .date-nav {
+      font-size: 0.74rem;
+      gap: 3px;
+
+      .header-control-button {
+        padding: 3px 6px;
+      }
+
+      .small-month {
+        font-size: 0.68rem;
+      }
+    }
+  }
+
+  @media (max-width: 360px) {
+    column-gap: 8px;
+    padding: 14px 8px;
+
+    .header-title h1 {
+      font-size: 0.98rem;
+    }
+
+    .date-display {
+      font-size: 0.92rem;
+      gap: 4px;
+    }
+
+    .date-nav {
+      font-size: 0.68rem;
+      gap: 2px;
+
+      .header-control-button {
+        padding: 2px 5px;
+      }
+
+      .small-month {
+        font-size: 0.64rem;
+      }
     }
   }
 }
