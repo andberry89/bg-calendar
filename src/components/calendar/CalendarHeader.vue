@@ -273,7 +273,6 @@ function updateDate(date: string): void {
     }
 
     .header-action {
-      width: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -301,7 +300,7 @@ function updateDate(date: string): void {
   }
 
   @media (max-width: 640px) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 2.2fr) auto;
     grid-template-areas:
       'title title'
       'main action';
@@ -327,7 +326,6 @@ function updateDate(date: string): void {
     }
 
     .header-action {
-      width: 100%;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -346,17 +344,47 @@ function updateDate(date: string): void {
 
     .date-nav {
       justify-content: center;
-      font-size: 0.9rem;
-      gap: 6px;
+      font-size: 0.74rem;
+      gap: 3px;
 
       div {
-        padding: 4px 10px;
+        padding: 3px 6px;
       }
 
       .small-month {
-        font-size: 0.8rem;
+        font-size: 0.68rem;
       }
     }
+  }
+}
+
+@media (max-width: 360px) {
+  .calendar-header {
+    grid-template-columns: minmax(0, 2.6fr) auto;
+    column-gap: 8px;
+    padding: 14px 8px;
+  }
+
+  .date-display {
+    font-size: 0.92rem;
+    gap: 4px;
+  }
+
+  .date-nav {
+    font-size: 0.68rem;
+    gap: 2px;
+
+    div {
+      padding: 2px 5px;
+    }
+
+    .small-month {
+      font-size: 0.64rem;
+    }
+  }
+
+  .header-title h1 {
+    font-size: 0.98rem;
   }
 }
 </style>

@@ -232,7 +232,8 @@ function toggleForm(): void {
 <style lang="scss" scoped>
 .new-event-container {
   position: relative;
-  width: 25%;
+  width: fit-content;
+  max-width: 100%;
   font:
     400 1rem/1 'Arial',
     sans-serif;
