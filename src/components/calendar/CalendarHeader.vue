@@ -247,18 +247,23 @@ function updateDate(date: string): void {
     }
   }
 
-  @media (max-width: 1100px) {
+  @media (max-width: 900px) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-areas:
       'title title'
       'main action';
     align-items: center;
-    column-gap: 24px;
-    row-gap: 16px;
+    column-gap: 18px;
+    row-gap: 14px;
     padding: 20px 16px;
 
     .header-title {
       text-align: center;
+
+      h1 {
+        font-size: 1.3rem;
+        white-space: normal;
+      }
     }
 
     .header-main {
@@ -276,40 +281,18 @@ function updateDate(date: string): void {
 
     .date-container {
       align-items: center;
-      justify-content: center;
-    }
-
-    .date-display,
-    .date-nav {
-      justify-content: center;
-    }
-
-    .date-display {
-      font-size: 1.45rem;
-    }
-
-    .date-nav {
-      font-size: 1.1rem;
-    }
-  }
-
-  @media (max-width: 900px) {
-    column-gap: 18px;
-    row-gap: 14px;
-
-    .header-title h1 {
-      font-size: 1.3rem;
-      white-space: normal;
     }
 
     .date-display {
       font-size: 1.2rem;
       gap: 8px;
+      justify-content: center;
     }
 
     .date-nav {
-      gap: 6px;
       font-size: 1rem;
+      gap: 6px;
+      justify-content: center;
 
       div {
         padding: 4px 12px;
