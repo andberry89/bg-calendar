@@ -199,7 +199,7 @@ function updateDate(date: string): void {
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 8px;
     font-size: 1.75rem;
     position: relative;
     min-width: 0;
@@ -309,7 +309,7 @@ function updateDate(date: string): void {
       font-size: 1rem;
       gap: 6px;
 
-      div {
+      .header-control-button {
         padding: 4px 12px;
       }
     }
@@ -339,7 +339,7 @@ function updateDate(date: string): void {
       font-size: 0.74rem;
       gap: 3px;
 
-      div {
+      .header-control-button {
         padding: 3px 6px;
       }
 
@@ -366,7 +366,7 @@ function updateDate(date: string): void {
       font-size: 0.68rem;
       gap: 2px;
 
-      div {
+      .header-control-button {
         padding: 2px 5px;
       }
 
