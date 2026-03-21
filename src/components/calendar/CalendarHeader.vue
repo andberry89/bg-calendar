@@ -1,26 +1,36 @@
 <template>
-  <header>
-    <div class="date-container">
-      <div class="today">
-        <div>{{ currentDate.date }}</div>
-        <div>{{ month[currentDate.month] }}</div>
-        <div>{{ currentDate.year }}</div>
-        <div class="date-picker-btn" @click="toggleDatePicker">&#10552;</div>
-        <div v-if="showDatePicker" class="date-picker">
-          <input type="date" @input="updateDate(($event.target as HTMLInputElement).value)" />
+  <header class="calendar-header">
+    <div class="header-title">
+      <h1>C/D Buyers Guide Team Calendar</h1>
+    </div>
+
+    <div class="header-main">
+      <div class="date-container">
+        <div class="date-display">
+          <div class="date-value">{{ currentDate.date }}</div>
+          <div class="month-value">{{ month[currentDate.month] }}</div>
+          <div class="year-value">{{ currentDate.year }}</div>
+          <div class="date-picker-control">
+            <button class="date-picker-btn" type="button" @click="toggleDatePicker">
+              &#10552;
+            </button>
+            <div v-if="showDatePicker" class="date-picker">
+              <input type="date" @input="updateDate(($event.target as HTMLInputElement).value)" />
+            </div>
+          </div>
+        </div>
+
+        <div class="date-nav">
+          <div @click="goToPreviousMonth" class="small-month">&lt; {{ lastMonth }}</div>
+          <div @click="goToToday">Today</div>
+          <div @click="goToNextMonth" class="small-month">{{ nextMonth }} &gt;</div>
         </div>
       </div>
-      <div class="date-nav">
-        <div @click="goToPreviousMonth" class="small-month">&lt; {{ lastMonth }}</div>
-        <div @click="goToToday">Today</div>
-        <div @click="goToNextMonth" class="small-month">{{ nextMonth }} &gt;</div>
-      </div>
     </div>
-    <div class="calendar-title">
-      <h1>C/D Buyers Guide</h1>
-      <h2>Team Calendar</h2>
+
+    <div class="header-action">
+      <NewEvent :staff="staff" key="new-event" @update="addEvent($event)" />
     </div>
-    <NewEvent :staff="staff" key="new-event" @update="addEvent($event)" />
   </header>
 </template>
 <script setup lang="ts">
@@ -120,21 +130,13 @@ function updateDate(date: string): void {
 }
 </script>
 <style lang="scss" scoped>
-@mixin arrow-style() {
-  width: 0;
-  height: 0;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  cursor: pointer;
-}
-
-header {
+.calendar-header {
   display: grid;
-  grid-template-columns: minmax(220px, 1fr) auto minmax(220px, 1fr);
+  grid-template-columns: minmax(280px, 1fr) minmax(280px, auto) minmax(220px, 1fr);
+  grid-template-areas: 'main title action';
   align-items: center;
   gap: var(--layout-gap-md);
   padding: 20px 24px;
-  text-align: center;
   color: var(--light-gray);
   text-shadow:
     1px 1px 1px var(--dark-gray),
@@ -142,103 +144,219 @@ header {
     -1px 1px 1px var(--dark-gray),
     -1px -1px 1px var(--dark-gray);
 
-  > :last-child {
+  .header-title {
+    grid-area: title;
+    min-width: 0;
+    text-align: center;
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.5rem, 2vw, 2.2rem);
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+  }
+
+  .header-main {
+    grid-area: main;
+    min-width: 0;
+  }
+
+  .header-action {
+    grid-area: action;
     justify-self: end;
   }
 
   .date-container {
     display: flex;
-    flex-flow: column nowrap;
+    flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .date-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 1.75rem;
+    position: relative;
     min-width: 0;
 
-    .arrow-left {
-      @include arrow-style();
-      border-right: 10px solid var(--white);
-
-      &:hover {
-        border-right: 10px solid var(--md-tran-black);
-      }
-    }
-
-    .arrow-right {
-      @include arrow-style();
-      border-left: 10px solid var(--white);
-
-      &:hover {
-        border-left: 10px solid var(--md-tran-black);
-      }
-    }
-
-    .today {
-      display: grid;
-      grid-template-columns: 40px auto 70px auto;
-      gap: 10px;
-      font-size: 2rem;
-      position: relative;
-
-      div {
-        display: flex;
-        justify-content: center;
-      }
-
-      .date-picker-btn {
-        padding: 0 4px;
-
-        &:hover {
-          cursor: pointer;
-        }
-      }
-
-      .date-picker {
-        position: absolute;
-        bottom: -20px;
-        right: 0;
-      }
-    }
-
-    .date-nav {
+    > div {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
       align-items: center;
-      font-size: 1.5rem;
-      gap: 8px;
+      justify-content: center;
+    }
 
-      div {
-        border: 1px solid var(--white);
-        border-radius: 8px;
-        padding: 2px 14px;
-        transition: 0.4s;
-
-        &:hover {
-          background-color: var(--ocean-lt-blue);
-          cursor: pointer;
-        }
-      }
-
-      .small-month {
-        font-size: 1rem;
-      }
+    .month-value,
+    .year-value {
+      white-space: nowrap;
     }
   }
 
-  .calendar-title {
+  .date-picker-control {
+    position: relative;
+  }
+
+  .date-picker-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-shadow: inherit;
+    cursor: pointer;
+  }
+
+  .date-picker {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+  }
+
+  .date-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
     min-width: 0;
+    font-size: 1.25rem;
+
+    div {
+      border: 1px solid var(--white);
+      border-radius: 8px;
+      padding: 4px 14px;
+      transition: 0.4s;
+      white-space: nowrap;
+
+      &:hover {
+        background-color: var(--ocean-lt-blue);
+        cursor: pointer;
+      }
+    }
+
+    .small-month {
+      font-size: 0.95rem;
+    }
   }
 
   @media (max-width: 1100px) {
-    grid-template-columns: 1fr;
-    justify-items: center;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'title title'
+      'main action';
+    align-items: start;
     padding: 20px 16px;
 
-    > :last-child {
-      justify-self: end;
+    .header-title {
+      text-align: center;
+    }
+
+    .header-main {
+      width: 100%;
+    }
+
+    .header-action {
+      align-self: start;
     }
 
     .date-container {
-      width: 100%;
+      align-items: flex-start;
+    }
+
+    .date-display,
+    .date-nav {
+      justify-content: flex-start;
+    }
+
+    .date-display {
+      font-size: 1.45rem;
+    }
+
+    .date-nav {
+      font-size: 1.1rem;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .header-title h1 {
+      font-size: 1.4rem;
+    }
+
+    .date-display {
+      font-size: 1.3rem;
+      gap: 8px;
+    }
+
+    .date-nav {
+      gap: 6px;
+
+      div {
+        padding: 4px 12px;
+      }
+    }
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'title main'
+      'action action';
+    column-gap: 12px;
+    row-gap: 14px;
+    align-items: start;
+    padding: 16px 12px;
+
+    .header-title {
+      text-align: left;
+      align-self: center;
+
+      h1 {
+        font-size: 1.1rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .header-main {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .date-container {
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .date-display {
+      justify-content: flex-end;
+      font-size: 1.1rem;
+      gap: 6px;
+    }
+
+    .date-nav {
+      justify-content: flex-end;
+      font-size: 0.95rem;
+      gap: 6px;
+
+      div {
+        padding: 4px 10px;
+      }
+
+      .small-month {
+        font-size: 0.85rem;
+      }
+    }
+
+    .header-action {
+      justify-self: stretch;
     }
   }
 }
