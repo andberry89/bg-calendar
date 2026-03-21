@@ -11,7 +11,12 @@
           <div class="month-value">{{ month[currentDate.month] }}</div>
           <div class="year-value">{{ currentDate.year }}</div>
           <div class="date-picker-control">
-            <button class="date-picker-btn" type="button" @click="toggleDatePicker">
+            <button
+              class="date-picker-btn header-control-button"
+              type="button"
+              aria-label="Open date picker"
+              @click="toggleDatePicker"
+            >
               &#10552;
             </button>
             <div v-if="showDatePicker" class="date-picker">
@@ -21,9 +26,17 @@
         </div>
 
         <div class="date-nav">
-          <div @click="goToPreviousMonth" class="small-month">&lt; {{ lastMonth }}</div>
-          <div @click="goToToday">Today</div>
-          <div @click="goToNextMonth" class="small-month">{{ nextMonth }} &gt;</div>
+          <button
+            type="button"
+            class="header-control-button small-month"
+            @click="goToPreviousMonth"
+          >
+            &lt; {{ lastMonth }}
+          </button>
+          <button type="button" class="header-control-button" @click="goToToday">Today</button>
+          <button type="button" class="header-control-button small-month" @click="goToNextMonth">
+            {{ nextMonth }} &gt;
+          </button>
         </div>
       </div>
     </div>
@@ -206,17 +219,33 @@ function updateDate(date: string): void {
     position: relative;
   }
 
-  .date-picker-btn {
+  .header-control-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0 4px;
-    border: 0;
+    border: 1px solid var(--white);
+    border-radius: 8px;
+    padding: 4px 14px;
     background: transparent;
     color: inherit;
     font: inherit;
     text-shadow: inherit;
+    line-height: 1;
+    white-space: nowrap;
     cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s ease;
+
+    &:hover {
+      background-color: var(--ocean-lt-blue);
+    }
+  }
+
+  .date-picker-btn {
+    padding: 4px 8px;
+    min-width: 36px;
   }
 
   .date-picker {
@@ -234,26 +263,13 @@ function updateDate(date: string): void {
     min-width: 0;
     font-size: 1.25rem;
 
-    div {
-      border: 1px solid var(--white);
-      border-radius: 8px;
-      padding: 4px 14px;
-      transition: 0.4s;
-      white-space: nowrap;
-
-      &:hover {
-        background-color: var(--ocean-lt-blue);
-        cursor: pointer;
-      }
-    }
-
     .small-month {
       font-size: 0.95rem;
     }
   }
 
   @media (max-width: 900px) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
     grid-template-areas:
       'title title'
       'main action';
@@ -292,6 +308,7 @@ function updateDate(date: string): void {
   }
 
   @media (max-width: 640px) {
+    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
     column-gap: 12px;
     row-gap: 12px;
     padding: 16px 12px;
