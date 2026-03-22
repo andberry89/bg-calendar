@@ -2,7 +2,7 @@
   <div class="new-event-container">
     <Button @click="openForm">New Event</Button>
 
-    <ModalOverlay v-if="showForm" @update="closeForm">
+    <BaseModal v-if="showForm" @update="closeForm">
       <div class="new-event-modal">
         <div class="new-event-modal__header">
           <h3 class="new-event-modal__title">New Event</h3>
@@ -88,7 +88,7 @@
           </div>
         </div>
       </div>
-    </ModalOverlay>
+    </BaseModal>
   </div>
 </template>
 
@@ -96,7 +96,7 @@
 import { ref } from 'vue';
 import { compareDesc, parse } from 'date-fns';
 import Button from '@/components/common/Button.vue';
-import ModalOverlay from '@/components/common/ModalOverlay.vue';
+import BaseModal from '@/components/common/BaseModal.vue';
 import { eventType } from '../utils/selectOptions';
 import type {
   EventClass,
