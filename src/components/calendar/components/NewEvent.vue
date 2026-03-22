@@ -1,24 +1,30 @@
 <template>
   <div class="new-event-container">
-    <Button @click="toggleForm">New Event</Button>
-    <Transition name="drop-form">
-      <div v-if="showForm" class="new-event-form-container">
+    <Button @click="openForm">New Event</Button>
+
+    <ModalOverlay v-if="showForm" @update="closeForm">
+      <div class="new-event-modal">
+        <div class="new-event-modal__header">
+          <h3 class="new-event-modal__title">New Event</h3>
+          <button class="new-event-modal__close" type="button" @click="closeForm">×</button>
+        </div>
+
         <div class="new-event-form">
           <label for="eventType">Event Type</label>
           <select name="eventType" id="eventType" v-model="newEvent.type">
-            <option disabled value="Event Type">--Event Type--</option>
+            <option disabled value="">--Event Type--</option>
             <option v-for="(event, idx) in eventType" :key="'event-' + idx" :value="event">
               {{ event }}
             </option>
           </select>
+
           <div class="holiday-options" v-if="newEvent.type === 'Holiday'">
             <span class="office-closure-label">Office Closed?</span>
-            <label> <input type="radio" value="full" v-model="newEvent.closed" />Full Day </label>
-            <label> <input type="radio" value="half" v-model="newEvent.closed" />Half Day </label>
-            <label>
-              <input type="radio" value="none" v-model="newEvent.closed" />Office Open
-            </label>
+            <label><input type="radio" value="full" v-model="newEvent.closed" />Full Day</label>
+            <label><input type="radio" value="half" v-model="newEvent.closed" />Half Day</label>
+            <label><input type="radio" value="none" v-model="newEvent.closed" />Office Open</label>
           </div>
+
           <div class="details-div" v-if="newEvent.type !== 'Birthday'">
             <label for="details">Event Details</label>
             <input
@@ -29,24 +35,33 @@
               id="details"
             />
           </div>
-          <label for="startDate">{{ newEvent.type === 'Birthday' ? '' : 'Start' }} Date</label>
-          <input
-            type="date"
-            v-model="newEvent.start"
-            name="startDate"
-            id="startDate"
-            @input="compareDates('end')"
-          />
-          <div class="end-date-div" v-if="newEvent.type !== 'Birthday'">
-            <label for="endDate">End Date</label>
-            <input
-              type="date"
-              v-model="newEvent.end"
-              name="endDate"
-              id="endDate"
-              @input="compareDates('start')"
-            />
+
+          <div class="date-fields" :class="{ 'date-fields--single': newEvent.type === 'Birthday' }">
+            <div class="start-date-div">
+              <label for="startDate">{{
+                newEvent.type === 'Birthday' ? 'Date' : 'Start Date'
+              }}</label>
+              <input
+                type="date"
+                v-model="newEvent.start"
+                name="startDate"
+                id="startDate"
+                @input="compareDates('end')"
+              />
+            </div>
+
+            <div class="end-date-div" v-if="newEvent.type !== 'Birthday'">
+              <label for="endDate">End Date</label>
+              <input
+                type="date"
+                v-model="newEvent.end"
+                name="endDate"
+                id="endDate"
+                @input="compareDates('start')"
+              />
+            </div>
           </div>
+
           <ul v-if="newEvent.type !== 'Holiday'">
             <li v-for="(s, idx) in staff" :key="'staff-' + idx">
               <input
@@ -55,10 +70,13 @@
                 :name="'staff-' + idx"
                 :value="s"
                 v-model="newEvent.staff"
-              /><label :for="'staff' + idx">{{ s.shortName }}</label>
+              />
+              <label :for="'staff-' + idx">{{ s.shortName }}</label>
             </li>
           </ul>
-          <button class="submit-event-button" @click="emitNewEvent">Add Event</button>
+
+          <button class="submit-event-button" type="button" @click="emitNewEvent">Add Event</button>
+
           <div class="err-msg" v-if="showErrMsg">
             This is not a valid event!<br />
             Make sure to check the following:
@@ -70,13 +88,15 @@
           </div>
         </div>
       </div>
-    </Transition>
+    </ModalOverlay>
   </div>
 </template>
+
 <script setup lang="ts">
 import { ref } from 'vue';
 import { compareDesc, parse } from 'date-fns';
 import Button from '@/components/common/Button.vue';
+import ModalOverlay from '@/components/common/ModalOverlay.vue';
 import { eventType } from '../utils/selectOptions';
 import type {
   EventClass,
@@ -98,7 +118,7 @@ interface DraftCalendarEvent {
   staff: Staff[];
 }
 
-defineProps<{
+const { staff } = defineProps<{
   staff: Staff[];
 }>();
 
@@ -142,28 +162,26 @@ function getEventClass(type: EventType): EventClass {
 }
 
 function emitNewEvent(): void {
-  errors.value = validateEvent(newEvent.value);
+  const event = newEvent.value;
 
-  if (errors.value.length > 0) {
+  showErrMsg.value = false;
+  errors.value = validateEvent(event);
+
+  if (errors.value.length > 0 || !event.type) {
     showErrMsg.value = true;
     return;
   }
 
-  if (!newEvent.value.type) {
-    return;
-  }
-
   const normalizedEvent: NewCalendarEvent = {
-    ...newEvent.value,
-    closed: newEvent.value.type !== 'Holiday' ? 'none' : newEvent.value.closed || 'none',
-    staff: newEvent.value.type === 'Holiday' ? [] : [...newEvent.value.staff],
-    class: getEventClass(newEvent.value.type),
-    type: newEvent.value.type
+    ...event,
+    closed: event.type === 'Holiday' ? event.closed || 'none' : 'none',
+    staff: event.type === 'Holiday' ? [] : [...event.staff],
+    class: getEventClass(event.type),
+    type: event.type
   };
 
   emit('update', normalizedEvent);
-  resetNewEvent();
-  showForm.value = false;
+  closeForm();
 }
 
 function compareDates(target: CompareTarget): void {
@@ -200,22 +218,19 @@ function validateEvent(event: DraftCalendarEvent): string[] {
     validationErrors.push('End Date');
   }
 
-  if (
-    !event.details &&
+  const requiresDetails =
+    event.type &&
     event.type !== 'Vacation' &&
     event.type !== 'Sick Time' &&
-    event.type !== 'Birthday' &&
-    event.type !== ''
-  ) {
+    event.type !== 'Birthday';
+
+  if (requiresDetails && !event.details) {
     validationErrors.push('Event Details');
   }
 
-  if (
-    event.staff.length === 0 &&
-    event.type !== 'Holiday' &&
-    event.type !== 'C/D Event' &&
-    event.type !== ''
-  ) {
+  const requiresStaff = event.type && event.type !== 'Holiday' && event.type !== 'C/D Event';
+
+  if (requiresStaff && event.staff.length === 0) {
     validationErrors.push('Staff');
   }
 
@@ -228,13 +243,19 @@ function resetNewEvent(): void {
   showErrMsg.value = false;
 }
 
-function toggleForm(): void {
-  showForm.value = !showForm.value;
+function openForm(): void {
+  resetNewEvent();
+  showForm.value = true;
+}
+
+function closeForm(): void {
+  resetNewEvent();
+  showForm.value = false;
 }
 </script>
+
 <style lang="scss" scoped>
 .new-event-container {
-  position: relative;
   display: inline-flex;
   width: auto;
   max-width: max-content;
@@ -243,84 +264,200 @@ function toggleForm(): void {
     sans-serif;
   text-shadow: none;
   color: var(--black);
+}
 
-  .drop-form-enter-active,
-  .drop-form-leave-active {
-    transition: all 0.5s ease;
+.new-event-modal {
+  position: relative;
+  width: min(560px, calc(100vw - 24px));
+  max-width: 560px;
+  background-color: var(--light-gray);
+  color: var(--black);
+  border-radius: 12px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.new-event-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.new-event-modal__title {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.new-event-modal__close {
+  border: 1px solid var(--black);
+  background-color: var(--white);
+  color: var(--black);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.new-event-form {
+  label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
   }
 
-  .drop-form-enter-from,
-  .drop-form-leave-to {
-    opacity: 0;
-    transform: translateY(-10px);
+  input,
+  select {
+    width: 100%;
+    min-height: 36px;
+    margin: 0;
+    box-sizing: border-box;
+    padding: 6px 8px;
+    border: 1px solid var(--ocean-slate-blue);
+    border-radius: 6px;
+    background-color: var(--white);
+    color: var(--black);
+    font:
+      400 0.95rem/1.2 'Arial',
+      sans-serif;
+  }
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .holiday-options {
+    margin-bottom: 8px;
+    background-color: var(--ocean-md-blue);
+    color: var(--white);
+    padding: 8px;
+    border-radius: 8px;
+
+    .office-closure-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+
+    input {
+      width: auto;
+      margin: 0;
+      cursor: pointer;
+    }
+  }
+  .details-div {
+    display: flex;
+    flex-direction: column;
   }
 
-  .new-event-form-container {
-    position: absolute;
-    top: 70px;
-    right: 18px;
-    border: 1px solid var(--white);
-    background-color: var(--ocean-lt-blue);
-    padding: 15px 30px 15px 10px;
-    text-align: left;
-    z-index: 99;
+  .date-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+  }
 
-    .new-event-form {
-      .holiday-options {
-        margin-bottom: 4px;
-        background-color: var(--ocean-md-blue);
-        padding: 2px;
-        border-radius: 4px;
+  .date-fields--single {
+    grid-template-columns: minmax(0, 1fr);
+  }
 
-        .office-closure-label {
-          font-size: 14px;
-        }
+  .start-date-div,
+  .end-date-div {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
 
-        input {
-          cursor: pointer;
-        }
-      }
+  ul {
+    display: grid;
+    gap: 8px;
+    padding: 0;
+    list-style: none;
+    margin: 0;
+    max-height: 220px;
+    overflow-y: auto;
+  }
 
-      label {
-        font-size: 0.7rem;
-        font-weight: 700;
-        display: block;
-      }
-      input,
-      select {
-        margin-bottom: 5px;
-      }
-      ul {
-        padding: 0;
-        list-style: none;
-        margin: 0;
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--ocean-slate-blue);
+    border-radius: 8px;
+    background-color: var(--white);
 
-        li {
-          display: flex;
-          align-items: center;
+    label {
+      display: inline;
+      margin-bottom: 0;
+      font-size: 0.9rem;
+      font-weight: 400;
+    }
 
-          label {
-            display: inline;
-          }
-        }
-      }
-      button {
-        margin-top: 5px;
-      }
+    input {
+      width: auto;
+      min-height: auto;
+      margin: 0;
+      padding: 0;
+    }
+  }
 
-      .err-msg {
-        font:
-          700 12px/1.1 'Arial',
-          sans-serif;
-        color: var(--red);
-        margin-top: 10px;
+  .submit-event-button {
+    align-self: flex-start;
+    margin-top: 4px;
+  }
 
-        ul {
-          font-weight: 400;
-          list-style: disc;
-          margin-top: 2px;
-        }
-      }
+  .err-msg {
+    padding: 10px 12px;
+    border: 1px solid var(--red);
+    border-radius: 8px;
+    background-color: var(--white);
+    font:
+      700 12px/1.3 'Arial',
+      sans-serif;
+    color: var(--red);
+
+    ul {
+      font-weight: 400;
+      list-style: disc;
+      margin-top: 6px;
+      margin-left: 18px;
+      max-height: none;
+      overflow: visible;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .new-event-modal {
+    padding: 12px;
+  }
+
+  .new-event-form {
+    gap: 10px;
+
+    .date-fields {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    input,
+    select {
+      min-height: 34px;
+      font-size: 0.9rem;
+    }
+
+    li {
+      padding: 7px 9px;
     }
   }
 }

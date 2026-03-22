@@ -6,11 +6,26 @@
     <div class="background-overlay" @click.self="emit('update')"></div>
   </div>
 </template>
+
 <script setup lang="ts">
+import { onBeforeUnmount, onMounted } from 'vue';
+
 const emit = defineEmits<{
   (e: 'update'): void;
 }>();
+
+let originalBodyOverflow = '';
+
+onMounted((): void => {
+  originalBodyOverflow = document.body.style.overflow;
+  document.body.style.overflow = 'hidden';
+});
+
+onBeforeUnmount((): void => {
+  document.body.style.overflow = originalBodyOverflow;
+});
 </script>
+
 <style lang="scss" scoped>
 .edit-modal {
   position: fixed;
