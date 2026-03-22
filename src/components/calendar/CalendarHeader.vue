@@ -6,24 +6,7 @@
 
     <div class="header-main">
       <div class="date-container">
-        <div class="date-display">
-          <div class="date-value">{{ currentDate.date }}</div>
-          <div class="month-value">{{ month[currentDate.month] }}</div>
-          <div class="year-value">{{ currentDate.year }}</div>
-          <div class="date-picker-control">
-            <button
-              class="date-picker-btn header-control-button"
-              type="button"
-              aria-label="Open date picker"
-              @click="toggleDatePicker"
-            >
-              &#10552;
-            </button>
-            <div v-if="showDatePicker" class="date-picker">
-              <input type="date" @input="updateDate(($event.target as HTMLInputElement).value)" />
-            </div>
-          </div>
-        </div>
+        <DatePicker :current-date="currentDate" @update="emit('date', $event)" />
 
         <div class="date-nav">
           <button
@@ -47,7 +30,8 @@
   </header>
 </template>
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
+import DatePicker from './components/DatePicker.vue';
 import NewEvent from './components/NewEvent.vue';
 import { month } from './utils/selectOptions';
 import type { CurrentDate, NewCalendarEvent, Staff } from '@/types/calendar';
@@ -62,26 +46,20 @@ const emit = defineEmits<{
   (e: 'update', value: NewCalendarEvent): void;
 }>();
 
-const showDatePicker = ref(false);
+function getMonthLabel(monthIndex: number): string {
+  return month[monthIndex].substring(0, 3);
+}
 
 const lastMonth = computed((): string => {
-  let previousMonth = month[currentDate.month - 1];
+  const previousMonthIndex = currentDate.month === 0 ? 11 : currentDate.month - 1;
 
-  if (currentDate.month === 0) {
-    previousMonth = month[11];
-  }
-
-  return previousMonth.substring(0, 3);
+  return getMonthLabel(previousMonthIndex);
 });
 
 const nextMonth = computed((): string => {
-  let upcomingMonth = month[currentDate.month + 1];
+  const nextMonthIndex = currentDate.month === 11 ? 0 : currentDate.month + 1;
 
-  if (currentDate.month === 11) {
-    upcomingMonth = month[0];
-  }
-
-  return upcomingMonth.substring(0, 3);
+  return getMonthLabel(nextMonthIndex);
 });
 
 function addEvent(event: NewCalendarEvent): void {
@@ -98,48 +76,28 @@ function goToToday(): void {
   });
 }
 
+function emitMonthChange(monthOffset: -1 | 1): void {
+  const isNextMonth = monthOffset === 1;
+  const isDecemberToJanuary = currentDate.month === 11 && isNextMonth;
+  const isJanuaryToDecember = currentDate.month === 0 && monthOffset === -1;
+
+  emit('date', {
+    date: 1,
+    month: isDecemberToJanuary ? 0 : isJanuaryToDecember ? 11 : currentDate.month + monthOffset,
+    year: isDecemberToJanuary
+      ? currentDate.year + 1
+      : isJanuaryToDecember
+        ? currentDate.year - 1
+        : currentDate.year
+  });
+}
+
 function goToNextMonth(): void {
-  const nextDate: CurrentDate = { ...currentDate };
-
-  if (nextDate.month === 11) {
-    nextDate.month = 0;
-    nextDate.year += 1;
-  } else {
-    nextDate.month += 1;
-  }
-
-  nextDate.date = 1;
-  emit('date', nextDate);
+  emitMonthChange(1);
 }
 
 function goToPreviousMonth(): void {
-  const previousDate: CurrentDate = { ...currentDate };
-
-  if (previousDate.month === 0) {
-    previousDate.month = 11;
-    previousDate.year -= 1;
-  } else {
-    previousDate.month -= 1;
-  }
-
-  previousDate.date = 1;
-  emit('date', previousDate);
-}
-
-function toggleDatePicker(): void {
-  showDatePicker.value = !showDatePicker.value;
-}
-
-function updateDate(date: string): void {
-  const split = date.split('-');
-
-  emit('date', {
-    year: parseInt(split[0], 10),
-    month: parseInt(split[1], 10) - 1,
-    date: parseInt(split[2], 10)
-  });
-
-  toggleDatePicker();
+  emitMonthChange(-1);
 }
 </script>
 <style lang="scss" scoped>
@@ -194,32 +152,6 @@ function updateDate(date: string): void {
     min-width: 0;
   }
 
-  .date-display {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 8px;
-    font-size: 1.75rem;
-    position: relative;
-    min-width: 0;
-
-    > div {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .month-value,
-    .year-value {
-      white-space: nowrap;
-    }
-  }
-
-  .date-picker-control {
-    position: relative;
-  }
-
   .header-control-button {
     display: inline-flex;
     align-items: center;
@@ -242,23 +174,6 @@ function updateDate(date: string): void {
     &:hover {
       background-color: var(--ocean-lt-blue);
     }
-  }
-
-  .date-picker-btn {
-    padding: 2px 6px;
-    min-width: auto;
-    font-size: 0.85em;
-    opacity: 0.7;
-
-    &:hover {
-      opacity: 1;
-    }
-  }
-
-  .date-picker {
-    position: absolute;
-    top: calc(100% + 8px);
-    right: 0;
   }
 
   .date-nav {
@@ -300,11 +215,6 @@ function updateDate(date: string): void {
       align-self: center;
     }
 
-    .date-display {
-      font-size: 1.2rem;
-      gap: 8px;
-    }
-
     .date-nav {
       font-size: 1rem;
       gap: 6px;
@@ -330,11 +240,6 @@ function updateDate(date: string): void {
       gap: 6px;
     }
 
-    .date-display {
-      font-size: 1rem;
-      gap: 6px;
-    }
-
     .date-nav {
       font-size: 0.74rem;
       gap: 3px;
@@ -355,11 +260,6 @@ function updateDate(date: string): void {
 
     .header-title h1 {
       font-size: 0.98rem;
-    }
-
-    .date-display {
-      font-size: 0.92rem;
-      gap: 4px;
     }
 
     .date-nav {
