@@ -15,13 +15,17 @@
     </div>
 
     <div v-if="showDatePicker" class="date-picker">
-      <input type="date" @input="updateDate(($event.target as HTMLInputElement).value)" />
+      <input
+        type="date"
+        :value="inputValue"
+        @change="updateDate(($event.target as HTMLInputElement).value)"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { month } from '../utils/selectOptions';
 import type { CurrentDate } from '@/types/calendar';
 
@@ -35,20 +39,32 @@ const emit = defineEmits<{
 
 const showDatePicker = ref(false);
 
+const inputValue = computed((): string => {
+  const year = currentDate.year.toString();
+  const monthValue = (currentDate.month + 1).toString().padStart(2, '0');
+  const dateValue = currentDate.date.toString().padStart(2, '0');
+
+  return `${year}-${monthValue}-${dateValue}`;
+});
+
 function toggleDatePicker(): void {
   showDatePicker.value = !showDatePicker.value;
 }
 
 function updateDate(date: string): void {
-  const split = date.split('-');
+  if (!date) {
+    return;
+  }
+
+  const [year, monthValue, day] = date.split('-');
 
   emit('update', {
-    year: parseInt(split[0], 10),
-    month: parseInt(split[1], 10) - 1,
-    date: parseInt(split[2], 10)
+    year: parseInt(year, 10),
+    month: parseInt(monthValue, 10) - 1,
+    date: parseInt(day, 10)
   });
 
-  toggleDatePicker();
+  showDatePicker.value = false;
 }
 </script>
 
