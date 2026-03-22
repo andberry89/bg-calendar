@@ -41,7 +41,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import CalendarDay from './CalendarDay.vue';
-import assignEvents from './utils/assignEvents';
+import assignEvents from '@/features/calendar/utils/assignEvents';
 import type { CalendarEvent, CurrentDate } from '@/types/calendar';
 
 const { currentDate, prevMonthDays, currentMonthDays, currentMonthEvents } = defineProps<{
