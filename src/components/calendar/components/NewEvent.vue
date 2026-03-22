@@ -1,24 +1,30 @@
 <template>
   <div class="new-event-container">
-    <Button @click="toggleForm">New Event</Button>
-    <Transition name="drop-form">
-      <div v-if="showForm" class="new-event-form-container">
+    <Button @click="openForm">New Event</Button>
+
+    <ModalOverlay v-if="showForm" @update="closeForm">
+      <div class="new-event-modal">
+        <div class="new-event-modal__header">
+          <h3 class="new-event-modal__title">New Event</h3>
+          <button class="new-event-modal__close" type="button" @click="closeForm">×</button>
+        </div>
+
         <div class="new-event-form">
           <label for="eventType">Event Type</label>
           <select name="eventType" id="eventType" v-model="newEvent.type">
-            <option disabled value="Event Type">--Event Type--</option>
+            <option disabled value="">--Event Type--</option>
             <option v-for="(event, idx) in eventType" :key="'event-' + idx" :value="event">
               {{ event }}
             </option>
           </select>
+
           <div class="holiday-options" v-if="newEvent.type === 'Holiday'">
             <span class="office-closure-label">Office Closed?</span>
-            <label> <input type="radio" value="full" v-model="newEvent.closed" />Full Day </label>
-            <label> <input type="radio" value="half" v-model="newEvent.closed" />Half Day </label>
-            <label>
-              <input type="radio" value="none" v-model="newEvent.closed" />Office Open
-            </label>
+            <label><input type="radio" value="full" v-model="newEvent.closed" />Full Day</label>
+            <label><input type="radio" value="half" v-model="newEvent.closed" />Half Day</label>
+            <label><input type="radio" value="none" v-model="newEvent.closed" />Office Open</label>
           </div>
+
           <div class="details-div" v-if="newEvent.type !== 'Birthday'">
             <label for="details">Event Details</label>
             <input
@@ -29,6 +35,7 @@
               id="details"
             />
           </div>
+
           <label for="startDate">{{ newEvent.type === 'Birthday' ? '' : 'Start' }} Date</label>
           <input
             type="date"
@@ -37,6 +44,7 @@
             id="startDate"
             @input="compareDates('end')"
           />
+
           <div class="end-date-div" v-if="newEvent.type !== 'Birthday'">
             <label for="endDate">End Date</label>
             <input
@@ -47,6 +55,7 @@
               @input="compareDates('start')"
             />
           </div>
+
           <ul v-if="newEvent.type !== 'Holiday'">
             <li v-for="(s, idx) in staff" :key="'staff-' + idx">
               <input
@@ -55,10 +64,13 @@
                 :name="'staff-' + idx"
                 :value="s"
                 v-model="newEvent.staff"
-              /><label :for="'staff' + idx">{{ s.shortName }}</label>
+              />
+              <label :for="'staff-' + idx">{{ s.shortName }}</label>
             </li>
           </ul>
-          <button class="submit-event-button" @click="emitNewEvent">Add Event</button>
+
+          <button class="submit-event-button" type="button" @click="emitNewEvent">Add Event</button>
+
           <div class="err-msg" v-if="showErrMsg">
             This is not a valid event!<br />
             Make sure to check the following:
@@ -70,13 +82,15 @@
           </div>
         </div>
       </div>
-    </Transition>
+    </ModalOverlay>
   </div>
 </template>
+
 <script setup lang="ts">
 import { ref } from 'vue';
 import { compareDesc, parse } from 'date-fns';
 import Button from '@/components/common/Button.vue';
+import ModalOverlay from '@/components/common/ModalOverlay.vue';
 import { eventType } from '../utils/selectOptions';
 import type {
   EventClass,
@@ -98,7 +112,7 @@ interface DraftCalendarEvent {
   staff: Staff[];
 }
 
-defineProps<{
+const { staff } = defineProps<{
   staff: Staff[];
 }>();
 
@@ -162,8 +176,7 @@ function emitNewEvent(): void {
   };
 
   emit('update', normalizedEvent);
-  resetNewEvent();
-  showForm.value = false;
+  closeForm();
 }
 
 function compareDates(target: CompareTarget): void {
@@ -228,13 +241,19 @@ function resetNewEvent(): void {
   showErrMsg.value = false;
 }
 
-function toggleForm(): void {
-  showForm.value = !showForm.value;
+function openForm(): void {
+  resetNewEvent();
+  showForm.value = true;
+}
+
+function closeForm(): void {
+  resetNewEvent();
+  showForm.value = false;
 }
 </script>
+
 <style lang="scss" scoped>
 .new-event-container {
-  position: relative;
   display: inline-flex;
   width: auto;
   max-width: max-content;
@@ -243,85 +262,136 @@ function toggleForm(): void {
     sans-serif;
   text-shadow: none;
   color: var(--black);
+}
 
-  .drop-form-enter-active,
-  .drop-form-leave-active {
-    transition: all 0.5s ease;
+.new-event-modal {
+  position: relative;
+  width: min(560px, calc(100vw - 24px));
+  max-width: 560px;
+  background-color: var(--light-gray);
+  color: var(--black);
+  border-radius: 12px;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.new-event-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.new-event-modal__title {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.new-event-modal__close {
+  border: 1px solid var(--black);
+  background-color: var(--white);
+  color: var(--black);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.new-event-form {
+  label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: block;
   }
 
-  .drop-form-enter-from,
-  .drop-form-leave-to {
-    opacity: 0;
-    transform: translateY(-10px);
+  input,
+  select {
+    width: 100%;
+    margin-bottom: 8px;
+    box-sizing: border-box;
   }
 
-  .new-event-form-container {
-    position: absolute;
-    top: 70px;
-    right: 18px;
-    border: 1px solid var(--white);
-    background-color: var(--ocean-lt-blue);
-    padding: 15px 30px 15px 10px;
-    text-align: left;
-    z-index: 99;
+  .holiday-options {
+    margin-bottom: 8px;
+    background-color: var(--ocean-md-blue);
+    color: var(--white);
+    padding: 8px;
+    border-radius: 8px;
 
-    .new-event-form {
-      .holiday-options {
-        margin-bottom: 4px;
-        background-color: var(--ocean-md-blue);
-        padding: 2px;
-        border-radius: 4px;
-
-        .office-closure-label {
-          font-size: 14px;
-        }
-
-        input {
-          cursor: pointer;
-        }
-      }
-
-      label {
-        font-size: 0.7rem;
-        font-weight: 700;
-        display: block;
-      }
-      input,
-      select {
-        margin-bottom: 5px;
-      }
-      ul {
-        padding: 0;
-        list-style: none;
-        margin: 0;
-
-        li {
-          display: flex;
-          align-items: center;
-
-          label {
-            display: inline;
-          }
-        }
-      }
-      button {
-        margin-top: 5px;
-      }
-
-      .err-msg {
-        font:
-          700 12px/1.1 'Arial',
-          sans-serif;
-        color: var(--red);
-        margin-top: 10px;
-
-        ul {
-          font-weight: 400;
-          list-style: disc;
-          margin-top: 2px;
-        }
-      }
+    .office-closure-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 700;
     }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+
+    input {
+      width: auto;
+      margin: 0;
+      cursor: pointer;
+    }
+  }
+
+  ul {
+    padding: 0;
+    list-style: none;
+    margin: 12px 0 0;
+    max-height: 220px;
+    overflow-y: auto;
+  }
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    label {
+      display: inline;
+      font-size: 0.85rem;
+      font-weight: 400;
+    }
+
+    input {
+      width: auto;
+      margin: 0;
+    }
+  }
+
+  .submit-event-button {
+    margin-top: 12px;
+  }
+
+  .err-msg {
+    font:
+      700 12px/1.1 'Arial',
+      sans-serif;
+    color: var(--red);
+    margin-top: 10px;
+
+    ul {
+      font-weight: 400;
+      list-style: disc;
+      margin-top: 4px;
+      margin-left: 18px;
+      max-height: none;
+      overflow: visible;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .new-event-modal {
+    padding: 12px;
   }
 }
 </style>
