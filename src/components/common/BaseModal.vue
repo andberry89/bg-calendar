@@ -1,9 +1,9 @@
 <template>
-  <div class="edit-modal">
-    <div class="slot-container">
+  <div class="base-modal">
+    <div class="base-modal__content">
       <slot></slot>
     </div>
-    <div class="background-overlay" @click.self="emit('update')"></div>
+    <div class="base-modal__overlay" @click.self="emit('update')"></div>
   </div>
 </template>
 
@@ -27,7 +27,7 @@ onBeforeUnmount((): void => {
 </script>
 
 <style lang="scss" scoped>
-.edit-modal {
+.base-modal {
   position: fixed;
   top: 0;
   left: 0;
@@ -38,14 +38,15 @@ onBeforeUnmount((): void => {
   justify-content: space-around;
   z-index: 4;
 
-  .background-overlay {
+  .base-modal__overlay {
     position: absolute;
     background-color: var(--black);
     opacity: 0.75;
     width: 100%;
     height: 100%;
   }
-  .slot-container {
+
+  .base-modal__content {
     display: inline-block;
     z-index: 5;
     max-height: 90%;

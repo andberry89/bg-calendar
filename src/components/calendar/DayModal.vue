@@ -1,5 +1,5 @@
 <template>
-  <ModalOverlay @update="closeDayModal">
+  <BaseModal @update="closeDayModal">
     <div class="day-modal">
       <div class="day-modal__header">
         <h3 class="day-modal__title">{{ title }}</h3>
@@ -58,13 +58,13 @@
 
       <p v-else class="day-modal__empty">No events for this day.</p>
     </div>
-  </ModalOverlay>
+  </BaseModal>
 </template>
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { format } from 'date-fns';
-import ModalOverlay from '@/components/common/ModalOverlay.vue';
+import BaseModal from '@/components/common/BaseModal.vue';
 import type { CalendarEvent, CurrentDate } from '@/types/calendar';
 
 const props = defineProps<{
