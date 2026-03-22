@@ -16,7 +16,7 @@
   </article>
 </template>
 <script setup lang="ts">
-import EditStaff from './components/EditStaff.vue';
+import EditStaff from './EditStaff.vue';
 import type { Staff, StaffUpdatePayload } from '@/types/calendar';
 
 defineProps<{

@@ -36,7 +36,7 @@ import { storeToRefs } from 'pinia';
 import CalendarHeader from './CalendarHeader.vue';
 import CalendarBody from './CalendarBody.vue';
 import StaffList from './StaffList.vue';
-import EventList from './components/EventList.vue';
+import EventList from './EventList.vue';
 import { useEventsStore } from '@/stores/events';
 import { useStaffStore } from '@/stores/staff';
 import { sortEvents } from '@/features/calendar/utils/sortEvents';

@@ -31,9 +31,9 @@
 </template>
 <script setup lang="ts">
 import { computed } from 'vue';
-import DatePicker from './components/DatePicker.vue';
-import NewEventModal from './components/NewEventModal.vue';
-import { month } from './utils/selectOptions';
+import DatePicker from './DatePicker.vue';
+import NewEventModal from './NewEventModal.vue';
+import { month } from '@/features/calendar/utils/selectOptions';
 import type { CurrentDate, NewCalendarEvent, Staff } from '@/types/calendar';
 
 const { currentDate, staff } = defineProps<{

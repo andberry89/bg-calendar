@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import { fetchEvents as fetchEventsData } from '@/services/calendar-data';
-import { addEvent as addEventMutation, deleteEvent as deleteEventMutation } from '@/router/events';
+import { fetchEvents as fetchEventsData } from '@/services/calendar/calendar-data';
+import { addEvent as addEventMutation, deleteEvent as deleteEventMutation } from '@/services';
 import type { CalendarEvent, MutationResult, NewCalendarEvent } from '@/types/calendar';
 
 interface EventsState {

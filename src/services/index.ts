@@ -1,4 +1,5 @@
 export * from './firebase';
 export * from './firestore';
-export * from './calendar-data';
-export * from './staff';
+export * from './calendar/calendar-data';
+export * from './calendar/staff';
+export * from './calendar/events';
