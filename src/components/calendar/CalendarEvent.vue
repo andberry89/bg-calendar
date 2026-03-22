@@ -9,6 +9,9 @@
     <div v-if="event.class === 'vacation'" :class="event.class">
       {{ event.staff[0].initials }} Off (PTO)
     </div>
+    <div v-if="event.class === 'sick-time'" :class="event.class">
+      {{ event.staff[0].initials }} Sick Time
+    </div>
     <div v-if="event.class === 'auto-show'" :class="event.class">
       <strong>Auto Show</strong><br />
       {{ event.details }}
@@ -94,6 +97,10 @@ function emitEvent(): void {
 .vacation {
   background-color: var(--ocean-off);
   opacity: 0.7;
+}
+
+.sick-time {
+  background-color: var(--ocean-yellow);
 }
 
 .press-trip {

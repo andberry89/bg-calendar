@@ -25,6 +25,7 @@ export const weekdayNames = [
 
 export const eventType = [
   'Vacation',
+  'Sick Time',
   'Holiday',
   'Press Trip',
   'Auto Show',
