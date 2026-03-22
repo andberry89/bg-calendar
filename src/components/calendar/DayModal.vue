@@ -130,6 +130,10 @@ function getEventLabel(event: CalendarEvent): string {
     return `${event.staff[0].initials} Off (PTO)`;
   }
 
+  if (event.class === 'sick-time') {
+    return `${event.staff[0].initials} Sick Time`;
+  }
+
   if (event.class === 'auto-show') {
     return `Auto Show: ${event.details}`;
   }
