@@ -36,24 +36,30 @@
             />
           </div>
 
-          <label for="startDate">{{ newEvent.type === 'Birthday' ? '' : 'Start' }} Date</label>
-          <input
-            type="date"
-            v-model="newEvent.start"
-            name="startDate"
-            id="startDate"
-            @input="compareDates('end')"
-          />
+          <div class="date-fields" :class="{ 'date-fields--single': newEvent.type === 'Birthday' }">
+            <div class="start-date-div">
+              <label for="startDate">{{
+                newEvent.type === 'Birthday' ? 'Date' : 'Start Date'
+              }}</label>
+              <input
+                type="date"
+                v-model="newEvent.start"
+                name="startDate"
+                id="startDate"
+                @input="compareDates('end')"
+              />
+            </div>
 
-          <div class="end-date-div" v-if="newEvent.type !== 'Birthday'">
-            <label for="endDate">End Date</label>
-            <input
-              type="date"
-              v-model="newEvent.end"
-              name="endDate"
-              id="endDate"
-              @input="compareDates('start')"
-            />
+            <div class="end-date-div" v-if="newEvent.type !== 'Birthday'">
+              <label for="endDate">End Date</label>
+              <input
+                type="date"
+                v-model="newEvent.end"
+                name="endDate"
+                id="endDate"
+                @input="compareDates('start')"
+              />
+            </div>
           </div>
 
           <ul v-if="newEvent.type !== 'Holiday'">
@@ -350,10 +356,26 @@ function closeForm(): void {
       cursor: pointer;
     }
   }
-  .details-div,
+  .details-div {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .date-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .date-fields--single {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .start-date-div,
   .end-date-div {
     display: flex;
     flex-direction: column;
+    min-width: 0;
   }
 
   ul {
@@ -424,6 +446,10 @@ function closeForm(): void {
   .new-event-form {
     gap: 10px;
 
+    .date-fields {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
     input,
     select {
       min-height: 34px;
