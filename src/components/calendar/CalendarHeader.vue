@@ -46,24 +46,20 @@ const emit = defineEmits<{
   (e: 'update', value: NewCalendarEvent): void;
 }>();
 
+function getMonthLabel(monthIndex: number): string {
+  return month[monthIndex].substring(0, 3);
+}
+
 const lastMonth = computed((): string => {
-  let previousMonth = month[currentDate.month - 1];
+  const previousMonthIndex = currentDate.month === 0 ? 11 : currentDate.month - 1;
 
-  if (currentDate.month === 0) {
-    previousMonth = month[11];
-  }
-
-  return previousMonth.substring(0, 3);
+  return getMonthLabel(previousMonthIndex);
 });
 
 const nextMonth = computed((): string => {
-  let upcomingMonth = month[currentDate.month + 1];
+  const nextMonthIndex = currentDate.month === 11 ? 0 : currentDate.month + 1;
 
-  if (currentDate.month === 11) {
-    upcomingMonth = month[0];
-  }
-
-  return upcomingMonth.substring(0, 3);
+  return getMonthLabel(nextMonthIndex);
 });
 
 function addEvent(event: NewCalendarEvent): void {
@@ -80,32 +76,28 @@ function goToToday(): void {
   });
 }
 
+function emitMonthChange(monthOffset: -1 | 1): void {
+  const isNextMonth = monthOffset === 1;
+  const isDecemberToJanuary = currentDate.month === 11 && isNextMonth;
+  const isJanuaryToDecember = currentDate.month === 0 && monthOffset === -1;
+
+  emit('date', {
+    date: 1,
+    month: isDecemberToJanuary ? 0 : isJanuaryToDecember ? 11 : currentDate.month + monthOffset,
+    year: isDecemberToJanuary
+      ? currentDate.year + 1
+      : isJanuaryToDecember
+        ? currentDate.year - 1
+        : currentDate.year
+  });
+}
+
 function goToNextMonth(): void {
-  const nextDate: CurrentDate = { ...currentDate };
-
-  if (nextDate.month === 11) {
-    nextDate.month = 0;
-    nextDate.year += 1;
-  } else {
-    nextDate.month += 1;
-  }
-
-  nextDate.date = 1;
-  emit('date', nextDate);
+  emitMonthChange(1);
 }
 
 function goToPreviousMonth(): void {
-  const previousDate: CurrentDate = { ...currentDate };
-
-  if (previousDate.month === 0) {
-    previousDate.month = 11;
-    previousDate.year -= 1;
-  } else {
-    previousDate.month -= 1;
-  }
-
-  previousDate.date = 1;
-  emit('date', previousDate);
+  emitMonthChange(-1);
 }
 </script>
 <style lang="scss" scoped>
