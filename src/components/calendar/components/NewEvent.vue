@@ -156,23 +156,22 @@ function getEventClass(type: EventType): EventClass {
 }
 
 function emitNewEvent(): void {
-  errors.value = validateEvent(newEvent.value);
+  const event = newEvent.value;
 
-  if (errors.value.length > 0) {
+  showErrMsg.value = false;
+  errors.value = validateEvent(event);
+
+  if (errors.value.length > 0 || !event.type) {
     showErrMsg.value = true;
     return;
   }
 
-  if (!newEvent.value.type) {
-    return;
-  }
-
   const normalizedEvent: NewCalendarEvent = {
-    ...newEvent.value,
-    closed: newEvent.value.type !== 'Holiday' ? 'none' : newEvent.value.closed || 'none',
-    staff: newEvent.value.type === 'Holiday' ? [] : [...newEvent.value.staff],
-    class: getEventClass(newEvent.value.type),
-    type: newEvent.value.type
+    ...event,
+    closed: event.type === 'Holiday' ? event.closed || 'none' : 'none',
+    staff: event.type === 'Holiday' ? [] : [...event.staff],
+    class: getEventClass(event.type),
+    type: event.type
   };
 
   emit('update', normalizedEvent);
@@ -213,22 +212,19 @@ function validateEvent(event: DraftCalendarEvent): string[] {
     validationErrors.push('End Date');
   }
 
-  if (
-    !event.details &&
+  const requiresDetails =
+    event.type &&
     event.type !== 'Vacation' &&
     event.type !== 'Sick Time' &&
-    event.type !== 'Birthday' &&
-    event.type !== ''
-  ) {
+    event.type !== 'Birthday';
+
+  if (requiresDetails && !event.details) {
     validationErrors.push('Event Details');
   }
 
-  if (
-    event.staff.length === 0 &&
-    event.type !== 'Holiday' &&
-    event.type !== 'C/D Event' &&
-    event.type !== ''
-  ) {
+  const requiresStaff = event.type && event.type !== 'Holiday' && event.type !== 'C/D Event';
+
+  if (requiresStaff && event.staff.length === 0) {
     validationErrors.push('Staff');
   }
 
@@ -300,17 +296,30 @@ function closeForm(): void {
 
 .new-event-form {
   label {
-    font-size: 0.7rem;
-    font-weight: 700;
     display: block;
+    margin-bottom: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
   }
 
   input,
   select {
     width: 100%;
-    margin-bottom: 8px;
+    min-height: 36px;
+    margin: 0;
     box-sizing: border-box;
+    padding: 6px 8px;
+    border: 1px solid var(--ocean-slate-blue);
+    border-radius: 6px;
+    background-color: var(--white);
+    color: var(--black);
+    font:
+      400 0.95rem/1.2 'Arial',
+      sans-serif;
   }
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 
   .holiday-options {
     margin-bottom: 8px;
@@ -341,11 +350,18 @@ function closeForm(): void {
       cursor: pointer;
     }
   }
+  .details-div,
+  .end-date-div {
+    display: flex;
+    flex-direction: column;
+  }
 
   ul {
+    display: grid;
+    gap: 8px;
     padding: 0;
     list-style: none;
-    margin: 12px 0 0;
+    margin: 0;
     max-height: 220px;
     overflow-y: auto;
   }
@@ -354,34 +370,45 @@ function closeForm(): void {
     display: flex;
     align-items: center;
     gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid var(--ocean-slate-blue);
+    border-radius: 8px;
+    background-color: var(--white);
 
     label {
       display: inline;
-      font-size: 0.85rem;
+      margin-bottom: 0;
+      font-size: 0.9rem;
       font-weight: 400;
     }
 
     input {
       width: auto;
+      min-height: auto;
       margin: 0;
+      padding: 0;
     }
   }
 
   .submit-event-button {
-    margin-top: 12px;
+    align-self: flex-start;
+    margin-top: 4px;
   }
 
   .err-msg {
+    padding: 10px 12px;
+    border: 1px solid var(--red);
+    border-radius: 8px;
+    background-color: var(--white);
     font:
-      700 12px/1.1 'Arial',
+      700 12px/1.3 'Arial',
       sans-serif;
     color: var(--red);
-    margin-top: 10px;
 
     ul {
       font-weight: 400;
       list-style: disc;
-      margin-top: 4px;
+      margin-top: 6px;
       margin-left: 18px;
       max-height: none;
       overflow: visible;
@@ -392,6 +419,20 @@ function closeForm(): void {
 @media (max-width: 640px) {
   .new-event-modal {
     padding: 12px;
+  }
+
+  .new-event-form {
+    gap: 10px;
+
+    input,
+    select {
+      min-height: 34px;
+      font-size: 0.9rem;
+    }
+
+    li {
+      padding: 7px 9px;
+    }
   }
 }
 </style>
