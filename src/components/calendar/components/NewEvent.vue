@@ -132,6 +132,8 @@ function getEventClass(type: EventType): EventClass {
       return 'cd-event';
     case 'Vacation':
       return 'vacation';
+    case 'Sick Time':
+      return 'sick-time';
     case 'Holiday':
       return 'holiday';
     case 'Birthday':
@@ -201,6 +203,7 @@ function validateEvent(event: DraftCalendarEvent): string[] {
   if (
     !event.details &&
     event.type !== 'Vacation' &&
+    event.type !== 'Sick Time' &&
     event.type !== 'Birthday' &&
     event.type !== ''
   ) {

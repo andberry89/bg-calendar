@@ -14,6 +14,7 @@ export interface Staff {
 
 export type EventType =
   | 'Vacation'
+  | 'Sick Time'
   | 'Holiday'
   | 'Press Trip'
   | 'Auto Show'
@@ -23,6 +24,7 @@ export type EventType =
 export type EventClass =
   | ''
   | 'vacation'
+  | 'sick-time'
   | 'holiday'
   | 'press-trip'
   | 'auto-show'
