@@ -25,14 +25,14 @@
     </div>
 
     <div class="header-action">
-      <NewEvent :staff="staff" key="new-event" @update="addEvent($event)" />
+      <NewEventModal :staff="staff" key="new-event" @update="addEvent($event)" />
     </div>
   </header>
 </template>
 <script setup lang="ts">
 import { computed } from 'vue';
 import DatePicker from './components/DatePicker.vue';
-import NewEvent from './components/NewEvent.vue';
+import NewEventModal from './components/NewEventModal.vue';
 import { month } from './utils/selectOptions';
 import type { CurrentDate, NewCalendarEvent, Staff } from '@/types/calendar';
 
