@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
-import { fetchStaff as fetchStaffData } from '@/services/calendar-data';
-import { addStaff as addStaffMutation, deleteStaff as deleteStaffMutation } from '@/services/staff';
+import { fetchStaff as fetchStaffData } from '@/services/calendar/calendar-data';
+import { addStaff as addStaffMutation, deleteStaff as deleteStaffMutation } from '@/services';
 import type { MutationResult, NewStaffInput, Staff } from '@/types/calendar';
 
 interface StaffState {
