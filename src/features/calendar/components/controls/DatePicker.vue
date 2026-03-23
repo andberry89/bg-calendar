@@ -1,31 +1,35 @@
 <template>
   <div class="date-picker-control">
-    <div class="date-display">
-      <div class="date-value">{{ currentDate.date }}</div>
-      <div class="month-value">{{ month[currentDate.month] }}</div>
-      <div class="year-value">{{ currentDate.year }}</div>
-      <button
-        class="date-picker-btn header-control-button"
-        type="button"
-        aria-label="Open date picker"
-        @click="toggleDatePicker"
+    <div class="date-picker">
+      <label class="sr-only" for="calendar-month-select">Select month</label>
+      <select
+        id="calendar-month-select"
+        class="picker-select"
+        :value="currentDate.month"
+        @change="updateMonth"
       >
-        &#10552;
-      </button>
-    </div>
+        <option v-for="(monthLabel, monthIndex) in month" :key="monthLabel" :value="monthIndex">
+          {{ monthLabel }}
+        </option>
+      </select>
 
-    <div v-if="showDatePicker" class="date-picker">
-      <input
-        type="date"
-        :value="inputValue"
-        @change="updateDate(($event.target as HTMLInputElement).value)"
-      />
+      <label class="sr-only" for="calendar-year-select">Select year</label>
+      <select
+        id="calendar-year-select"
+        class="picker-select"
+        :value="currentDate.year"
+        @change="updateYear"
+      >
+        <option v-for="year in yearOptions" :key="year" :value="year">
+          {{ year }}
+        </option>
+      </select>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { month } from '@/features/calendar/utils/selectOptions';
 import type { CurrentDate } from '@/types/calendar';
 
@@ -37,125 +41,107 @@ const emit = defineEmits<{
   (e: 'update', value: CurrentDate): void;
 }>();
 
-const showDatePicker = ref(false);
+const yearOptions = computed((): number[] => {
+  const startYear = currentDate.year - 5;
+  const endYear = currentDate.year + 5;
 
-const inputValue = computed((): string => {
-  const year = currentDate.year.toString();
-  const monthValue = (currentDate.month + 1).toString().padStart(2, '0');
-  const dateValue = currentDate.date.toString().padStart(2, '0');
-
-  return `${year}-${monthValue}-${dateValue}`;
+  return Array.from({ length: endYear - startYear + 1 }, (_, index) => startYear + index);
 });
 
-function toggleDatePicker(): void {
-  showDatePicker.value = !showDatePicker.value;
+function emitDateUpdate(monthValue: number, yearValue: number): void {
+  emit('update', {
+    date: 1,
+    month: monthValue,
+    year: yearValue
+  });
 }
 
-function updateDate(date: string): void {
-  if (!date) {
-    return;
-  }
+function updateMonth(event: Event): void {
+  const target = event.target as HTMLSelectElement;
 
-  const [year, monthValue, day] = date.split('-');
+  emitDateUpdate(parseInt(target.value, 10), currentDate.year);
+}
 
-  emit('update', {
-    year: parseInt(year, 10),
-    month: parseInt(monthValue, 10) - 1,
-    date: parseInt(day, 10)
-  });
+function updateYear(event: Event): void {
+  const target = event.target as HTMLSelectElement;
 
-  showDatePicker.value = false;
+  emitDateUpdate(currentDate.month, parseInt(target.value, 10));
 }
 </script>
 
 <style lang="scss" scoped>
 .date-picker-control {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
   z-index: 2;
 }
 
-.date-display {
+.date-picker {
   display: flex;
-  align-items: center;
-  justify-content: center;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 8px;
-  font-size: 1.75rem;
-  position: relative;
-  min-width: 0;
-
-  > div {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .month-value,
-  .year-value {
-    white-space: nowrap;
-  }
 }
 
-.header-control-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.picker-select {
+  min-width: 0;
   border: 1px solid var(--white);
   border-radius: 8px;
-  padding: 4px 14px;
+  padding: 4px 10px;
   background: transparent;
-  color: inherit;
+  color: var(--white);
   font: inherit;
   text-shadow: inherit;
-  line-height: 1;
-  white-space: nowrap;
+  line-height: 1.2;
   cursor: pointer;
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease;
-
-  &:hover {
-    background-color: var(--ocean-lt-blue);
-  }
+  appearance: auto;
 }
 
-.date-picker-btn {
-  padding: 2px 6px;
-  min-width: auto;
-  font-size: 0.85em;
-  opacity: 0.7;
-
-  &:hover {
-    opacity: 1;
-  }
+.picker-select option {
+  color: var(--black);
 }
 
-.date-picker {
+.sr-only {
   position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  z-index: 10;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
+  clip: rect(0, 0, 0, 0);
 }
 
 @media (max-width: 900px) {
-  .date-display {
-    font-size: 1.2rem;
-    gap: 8px;
+  .picker-select {
+    padding: 4px 8px;
+    font-size: 0.95rem;
   }
 }
 
 @media (max-width: 640px) {
-  .date-display {
-    font-size: 1rem;
+  .date-picker {
     gap: 6px;
+  }
+
+  .picker-select {
+    padding: 3px 7px;
+    font-size: 0.9rem;
   }
 }
 
 @media (max-width: 360px) {
-  .date-display {
-    font-size: 0.92rem;
+  .date-picker {
     gap: 4px;
+  }
+
+  .picker-select {
+    padding: 2px 6px;
+    font-size: 0.85rem;
   }
 }
 </style>
