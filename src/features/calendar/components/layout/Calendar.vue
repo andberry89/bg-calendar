@@ -67,7 +67,6 @@ const { staff } = storeToRefs(staffStore);
 
 const showEvents = ref(false);
 const isLoading = ref(true);
-const loadError = ref<string | null>(null);
 
 const sortedEvents = computed<EventsByYear>(() => sortEvents(events.value));
 
@@ -130,7 +129,6 @@ onMounted(async (): Promise<void> => {
     await refreshCalendarData();
   } catch (err) {
     console.warn(err);
-    loadError.value = 'Failed to load calendar data.';
   } finally {
     isLoading.value = false;
   }
