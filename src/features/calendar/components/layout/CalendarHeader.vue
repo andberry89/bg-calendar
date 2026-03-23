@@ -6,7 +6,7 @@
 
     <div class="header-main">
       <div class="date-container">
-        <DatePicker :current-date="currentDate" @update="emit('date', $event)" />
+        <MonthYearPicker :current-date="currentDate" @update="emit('date', $event)" />
 
         <div class="date-nav">
           <button
@@ -61,7 +61,7 @@
 </template>
 <script setup lang="ts">
 import { computed } from 'vue';
-import DatePicker from '@/features/calendar/components/controls/DatePicker.vue';
+import MonthYearPicker from '@/features/calendar/components/controls/MonthYearPicker.vue';
 import NewEventModal from '@/features/calendar/components/modals/NewEventModal.vue';
 import { month } from '@/features/calendar/utils/selectOptions';
 import type { EventFilters } from '@/features/calendar/utils/filterEvents';
@@ -234,7 +234,7 @@ function goToPreviousMonth(): void {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 6px;
     min-width: 0;
   }
 
