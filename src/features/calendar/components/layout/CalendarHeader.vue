@@ -21,31 +21,33 @@
             {{ nextMonth }} &gt;
           </button>
         </div>
+      </div>
+    </div>
 
-        <div class="filter-controls">
-          <select class="filter-select" :value="selectedType" @change="updateTypeFilter">
-            <option value="">All types</option>
-            <option v-for="eventType in eventTypes" :key="eventType" :value="eventType">
-              {{ eventType }}
-            </option>
-          </select>
+    <div class="header-filters">
+      <div class="filter-controls">
+        <select class="filter-select" :value="selectedType" @change="updateTypeFilter">
+          <option value="">All types</option>
+          <option v-for="eventType in eventTypes" :key="eventType" :value="eventType">
+            {{ eventType }}
+          </option>
+        </select>
 
-          <select class="filter-select" :value="selectedStaffId" @change="updateStaffFilter">
-            <option value="">All staff</option>
-            <option v-for="staffMember in staff" :key="staffMember.id" :value="staffMember.id">
-              {{ staffMember.shortName }}
-            </option>
-          </select>
+        <select class="filter-select" :value="selectedStaffId" @change="updateStaffFilter">
+          <option value="">All staff</option>
+          <option v-for="staffMember in staff" :key="staffMember.id" :value="staffMember.id">
+            {{ staffMember.shortName }}
+          </option>
+        </select>
 
-          <button
-            v-if="hasActiveFilters"
-            type="button"
-            class="header-control-button filter-reset-button"
-            @click="resetFilters"
-          >
-            Reset
-          </button>
-        </div>
+        <button
+          v-if="hasActiveFilters"
+          type="button"
+          class="header-control-button filter-reset-button"
+          @click="resetFilters"
+        >
+          Reset
+        </button>
       </div>
     </div>
 
@@ -176,8 +178,11 @@ function goToPreviousMonth(): void {
 <style lang="scss" scoped>
 .calendar-header {
   display: grid;
-  grid-template-columns: minmax(280px, 1fr) minmax(280px, auto) minmax(220px, 1fr);
-  grid-template-areas: 'main title action';
+  grid-template-columns: minmax(280px, 1fr) minmax(200px, auto) minmax(220px, auto) minmax(
+      220px,
+      1fr
+    );
+  grid-template-areas: 'main title filters action';
   align-items: center;
   gap: var(--layout-gap-md);
   padding: 20px 24px;
@@ -205,6 +210,14 @@ function goToPreviousMonth(): void {
   .header-main {
     grid-area: main;
     min-width: 0;
+  }
+
+  .header-filters {
+    grid-area: filters;
+    min-width: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .header-action {
@@ -269,24 +282,25 @@ function goToPreviousMonth(): void {
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
     width: 100%;
   }
 
   .filter-select {
     min-width: 0;
-    max-width: 150px;
-    border: 1px solid rgba(255, 255, 255, 0.85);
-    border-radius: 8px;
-    padding: 4px 8px;
+    max-width: 132px;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    border-radius: 7px;
+    padding: 3px 7px;
     background: transparent;
     color: inherit;
     font: inherit;
-    font-size: 0.82rem;
-    line-height: 1.1;
-    text-shadow: inherit;
+    font-size: 0.74rem;
+    font-weight: 400;
+    line-height: 1;
+    text-shadow: none;
     cursor: pointer;
-    opacity: 0.9;
+    opacity: 0.82;
   }
 
   .filter-select option {
@@ -294,15 +308,30 @@ function goToPreviousMonth(): void {
   }
 
   .filter-reset-button {
-    padding: 4px 10px;
-    font-size: 0.82rem;
+    padding: 3px 8px;
+    font-size: 0.74rem;
+    opacity: 0.82;
+  }
+
+  @media (max-width: 1100px) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, auto) minmax(0, auto);
+    grid-template-areas:
+      'title title title'
+      'main filters action';
+    column-gap: 14px;
+    row-gap: 14px;
+
+    .header-title h1 {
+      white-space: normal;
+    }
   }
 
   @media (max-width: 900px) {
-    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, auto);
     grid-template-areas:
       'title title'
-      'main action';
+      'main action'
+      'filters filters';
     column-gap: 18px;
     row-gap: 14px;
     padding: 20px 16px;
@@ -316,6 +345,10 @@ function goToPreviousMonth(): void {
       width: 100%;
       display: flex;
       justify-content: center;
+    }
+
+    .header-filters {
+      width: 100%;
     }
 
     .header-action {
@@ -352,14 +385,14 @@ function goToPreviousMonth(): void {
     }
 
     .filter-select {
-      max-width: 132px;
-      padding: 3px 6px;
-      font-size: 0.72rem;
+      max-width: 124px;
+      padding: 2px 6px;
+      font-size: 0.69rem;
     }
 
     .filter-reset-button {
-      padding: 3px 8px;
-      font-size: 0.72rem;
+      padding: 2px 7px;
+      font-size: 0.69rem;
     }
 
     .date-nav {
@@ -395,6 +428,10 @@ function goToPreviousMonth(): void {
       .small-month {
         font-size: 0.64rem;
       }
+    }
+
+    .filter-select {
+      max-width: 116px;
     }
   }
 }

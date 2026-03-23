@@ -14,6 +14,10 @@ export const filterEvents = (events: CalendarEvent[], filters: EventFilters): Ca
   }
 
   return events.filter((event) => {
+    if (event.type === 'Holiday') {
+      return true;
+    }
+
     const matchesType = !hasTypeFilters || filters.types.includes(event.type);
     const matchesStaff =
       !hasStaffFilters ||
