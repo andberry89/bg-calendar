@@ -64,7 +64,7 @@ function deleteEvent(): void {
   position: absolute;
   top: -12px;
   z-index: 99;
-  width: min(275px, calc(100vw - 24px));
+  width: 275px;
   max-width: calc(100vw - 24px);
   box-sizing: border-box;
   text-align: left;
@@ -151,38 +151,42 @@ function deleteEvent(): void {
 
 @media (max-width: 640px) {
   .event-modal {
-    top: -6px;
-    width: min(240px, calc(100vw - 16px));
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    width: min(280px, calc(100vw - 16px));
     max-width: calc(100vw - 16px);
+    max-height: calc(100vh - 24px);
     padding: 10px 8px 8px;
     font-size: 0.8rem;
-
-    .close-btn {
-      top: 5px;
-      right: 5px;
-      padding: 2px 6px;
-    }
-
-    .event-header {
-      padding-right: 30px;
-
-      .event-name {
-        font-size: 0.9rem;
-      }
-    }
-
-    .event-options {
-      margin-top: 14px;
-      font-size: 0.74rem;
-    }
+    overflow-y: auto;
+    transform: translate(-50%, -50%);
   }
 
-  .left {
-    right: 4px;
-  }
-
+  .left,
   .right {
-    left: 4px;
+    left: 50%;
+    right: auto;
+  }
+
+  .event-modal .close-btn {
+    top: 5px;
+    right: 5px;
+    padding: 2px 6px;
+  }
+
+  .event-modal .event-header {
+    padding-right: 30px;
+
+    .event-name {
+      font-size: 0.9rem;
+    }
+  }
+
+  .event-modal .event-options {
+    margin-top: 14px;
+    font-size: 0.74rem;
   }
 }
 </style>
