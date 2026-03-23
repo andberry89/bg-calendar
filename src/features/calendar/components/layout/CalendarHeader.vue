@@ -24,7 +24,9 @@
       </div>
     </div>
 
-    <div class="header-filters">
+    <div class="header-action">
+      <NewEventModal :staff="staff" key="new-event" @update="addEvent($event)" />
+
       <div class="filter-controls">
         <select class="filter-select" :value="selectedType" @change="updateTypeFilter">
           <option value="">All types</option>
@@ -49,10 +51,6 @@
           Reset
         </button>
       </div>
-    </div>
-
-    <div class="header-action">
-      <NewEventModal :staff="staff" key="new-event" @update="addEvent($event)" />
     </div>
   </header>
 </template>
@@ -178,12 +176,9 @@ function goToPreviousMonth(): void {
 <style lang="scss" scoped>
 .calendar-header {
   display: grid;
-  grid-template-columns: minmax(280px, 1fr) minmax(200px, auto) minmax(220px, auto) minmax(
-      220px,
-      1fr
-    );
-  grid-template-areas: 'main title filters action';
-  align-items: center;
+  grid-template-columns: minmax(280px, 1fr) minmax(280px, auto) minmax(220px, 1fr);
+  grid-template-areas: 'main title action';
+  align-items: start;
   gap: var(--layout-gap-md);
   padding: 20px 24px;
   color: var(--light-gray);
@@ -197,6 +192,7 @@ function goToPreviousMonth(): void {
     grid-area: title;
     min-width: 0;
     text-align: center;
+    align-self: center;
 
     h1 {
       margin: 0;
@@ -210,14 +206,7 @@ function goToPreviousMonth(): void {
   .header-main {
     grid-area: main;
     min-width: 0;
-  }
-
-  .header-filters {
-    grid-area: filters;
-    min-width: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    align-self: center;
   }
 
   .header-action {
@@ -226,8 +215,9 @@ function goToPreviousMonth(): void {
     width: max-content;
     max-width: 100%;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
+    gap: 8px;
   }
 
   .date-container {
@@ -282,62 +272,50 @@ function goToPreviousMonth(): void {
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     width: 100%;
+    margin: 0;
   }
 
   .filter-select {
     min-width: 0;
-    max-width: 132px;
-    border: 1px solid rgba(255, 255, 255, 0.65);
+    max-width: 122px;
+    border: 1px solid rgba(255, 255, 255, 0.75);
     border-radius: 7px;
-    padding: 3px 7px;
+    padding: 2px 6px;
     background: transparent;
-    color: inherit;
-    font: inherit;
-    font-size: 0.74rem;
+    color: var(--white);
+    font-family: Arial, sans-serif;
+    font-size: 0.72rem;
     font-weight: 400;
     line-height: 1;
     text-shadow: none;
     cursor: pointer;
-    opacity: 0.82;
+    appearance: auto;
   }
 
   .filter-select option {
     color: var(--black);
+    font-weight: 400;
   }
 
   .filter-reset-button {
-    padding: 3px 8px;
-    font-size: 0.74rem;
-    opacity: 0.82;
+    padding: 2px 7px;
+    font-family: Arial, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 400;
+    text-shadow: none;
   }
 
   @media (max-width: 1100px) {
-    grid-template-columns: minmax(0, 1fr) minmax(0, auto) minmax(0, auto);
-    grid-template-areas:
-      'title title title'
-      'main filters action';
-    column-gap: 14px;
-    row-gap: 14px;
-
-    .header-title h1 {
-      white-space: normal;
-    }
-  }
-
-  @media (max-width: 900px) {
-    grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
     grid-template-areas:
       'title title'
-      'main action'
-      'filters filters';
-    column-gap: 18px;
-    row-gap: 14px;
-    padding: 20px 16px;
+      'main action';
+    column-gap: 16px;
+    row-gap: 12px;
 
     .header-title h1 {
-      font-size: 1.3rem;
       white-space: normal;
     }
 
@@ -347,12 +325,17 @@ function goToPreviousMonth(): void {
       justify-content: center;
     }
 
-    .header-filters {
-      width: 100%;
-    }
-
     .header-action {
-      align-self: center;
+      align-self: start;
+    }
+  }
+
+  @media (max-width: 900px) {
+    padding: 20px 16px;
+
+    .header-title h1 {
+      font-size: 1.3rem;
+      white-space: normal;
     }
 
     .date-nav {
@@ -363,13 +346,22 @@ function goToPreviousMonth(): void {
         padding: 4px 12px;
       }
     }
+
+    .filter-select {
+      max-width: 116px;
+      font-size: 0.69rem;
+    }
+
+    .filter-reset-button {
+      font-size: 0.69rem;
+    }
   }
 
   @media (max-width: 640px) {
     grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
-    column-gap: 12px;
-    row-gap: 12px;
-    padding: 16px 12px;
+    column-gap: 10px;
+    row-gap: 8px;
+    padding: 14px 12px;
 
     .header-title h1 {
       font-size: 1.05rem;
@@ -380,19 +372,23 @@ function goToPreviousMonth(): void {
       gap: 6px;
     }
 
+    .header-action {
+      gap: 5px;
+    }
+
     .filter-controls {
-      gap: 4px;
+      gap: 3px;
     }
 
     .filter-select {
-      max-width: 124px;
-      padding: 2px 6px;
-      font-size: 0.69rem;
+      max-width: 108px;
+      padding: 2px 5px;
+      font-size: 0.66rem;
     }
 
     .filter-reset-button {
-      padding: 2px 7px;
-      font-size: 0.69rem;
+      padding: 2px 6px;
+      font-size: 0.66rem;
     }
 
     .date-nav {
@@ -411,10 +407,19 @@ function goToPreviousMonth(): void {
 
   @media (max-width: 360px) {
     column-gap: 8px;
-    padding: 14px 8px;
+    row-gap: 6px;
+    padding: 12px 8px;
 
     .header-title h1 {
       font-size: 0.98rem;
+    }
+
+    .header-action {
+      gap: 4px;
+    }
+
+    .filter-select {
+      max-width: 98px;
     }
 
     .date-nav {
@@ -428,10 +433,6 @@ function goToPreviousMonth(): void {
       .small-month {
         font-size: 0.64rem;
       }
-    }
-
-    .filter-select {
-      max-width: 116px;
     }
   }
 }
