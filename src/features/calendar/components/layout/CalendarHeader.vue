@@ -270,7 +270,7 @@ function goToPreviousMonth(): void {
   .filter-controls {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     gap: 4px;
     width: 100%;
@@ -301,6 +301,8 @@ function goToPreviousMonth(): void {
 
   .filter-reset-button {
     padding: 2px 7px;
+    margin-left: auto;
+    margin-right: auto;
     font-family: Arial, sans-serif;
     font-size: 0.72rem;
     font-weight: 400;
@@ -336,6 +338,19 @@ function goToPreviousMonth(): void {
     .header-title h1 {
       font-size: 1.3rem;
       white-space: normal;
+    }
+
+    .filter-controls {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .filter-select {
+      align-self: flex-start;
+    }
+
+    .filter-reset-button {
+      align-self: center;
     }
 
     .date-nav {
