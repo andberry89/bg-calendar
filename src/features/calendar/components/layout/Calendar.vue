@@ -1,8 +1,5 @@
 <template>
   <main>
-    <article id="staff-list">
-      <StaffList :staff="staff" @update="updateStaff" />
-    </article>
     <article id="calendar" :aria-busy="isLoading">
       <!-- <article
       id="calendar"
@@ -15,6 +12,7 @@
         @date="updateDate"
         @filters="updateFilters"
         @update="updateEvents('add', $event)"
+        @staff-update="updateStaff"
       />
       <CalendarBody
         :currentDate="currentDate"
@@ -26,19 +24,19 @@
         @delete="updateEvents('delete', $event)"
       />
     </article>
-    <EventList :events="filteredCurrentMonthEvents" :currentDate="currentDate" v-if="showEvents" />
+    <EventList v-if="showEvents" :events="filteredCurrentMonthEvents" :currentDate="currentDate" />
   </main>
   <footer>
     <em>Version {{ appVersion }}</em>
   </footer>
 </template>
+
 <script setup lang="ts">
 /* global __APP_VERSION__ */
 import { computed, onMounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import CalendarHeader from '@/features/calendar/components/layout/CalendarHeader.vue';
 import CalendarBody from '@/features/calendar/components/layout/CalendarBody.vue';
-import StaffList from '@/features/calendar/components/layout/StaffList.vue';
 import EventList from '@/features/calendar/components/layout/EventList.vue';
 import { useEventsStore } from '@/stores/events';
 import { useStaffStore } from '@/stores/staff';
@@ -69,7 +67,6 @@ const { staff } = storeToRefs(staffStore);
 
 const showEvents = ref(false);
 const isLoading = ref(true);
-const loadError = ref<string | null>(null);
 
 const sortedEvents = computed<EventsByYear>(() => sortEvents(events.value));
 
@@ -132,26 +129,23 @@ onMounted(async (): Promise<void> => {
     await refreshCalendarData();
   } catch (err) {
     console.warn(err);
-    loadError.value = 'Failed to load calendar data.';
   } finally {
     isLoading.value = false;
   }
 });
 </script>
+
 <style lang="scss" scoped>
 @import url('https://fonts.googleapis.com/css?family=Anton');
+
 main {
   display: grid;
-  grid-template-columns: minmax(150px, 200px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
   gap: var(--layout-gap-md);
   max-width: var(--layout-shell-max-width);
   margin: 0 auto;
   padding: 0 var(--layout-shell-padding);
-
-  #staff-list {
-    min-width: 0;
-  }
 
   #calendar {
     min-width: 0;
@@ -159,7 +153,7 @@ main {
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
-    gap: var(--layout-gap-sm);
+    gap: 0;
     background-color: var(--layout-panel-bg);
     color: var(--white);
     font-family: 'Anton';
@@ -174,17 +168,5 @@ main {
 footer {
   text-align: center;
   padding: var(--layout-gap-md) var(--layout-shell-padding);
-}
-
-@media (max-width: 1100px) {
-  main {
-    grid-template-columns: 1fr;
-  }
-  #staff-list {
-    display: none;
-  }
-  #calendar {
-    width: 100%;
-  }
 }
 </style>
