@@ -1,6 +1,12 @@
 <template>
   <div
-    :class="[dayClass, { weekend: isWeekend }, { fullClose: hasFullClosureHoliday }, 'container']"
+    :class="[
+      dayClass,
+      { weekend: isWeekend },
+      { fullClose: hasFullClosureHoliday },
+      { 'container--event-modal-open': showEventDetails },
+      'container'
+    ]"
   >
     <DayModal
       v-if="showDayModal"
@@ -310,6 +316,11 @@ function closeDayModal(): void {
   .container {
     height: 130px;
     overflow: hidden;
+  }
+
+  .container--event-modal-open {
+    overflow: visible;
+    z-index: 2;
   }
 
   .date-text {
