@@ -25,7 +25,14 @@
           :key="type"
           type="button"
           class="type-pill"
-          :class="[getEventClass(type), { active: isTypeSelected(type) }]"
+          :class="[
+            getEventClass(type),
+            {
+              active: isTypeSelected(type),
+              inactive: hasActiveTypeFilter && !isTypeSelected(type),
+              dimmed: !hasActiveTypeFilter
+            }
+          ]"
           @click="toggleType(type)"
         >
           {{ type }}
@@ -76,6 +83,10 @@ const eventClassByType: Record<Exclude<EventType, 'Holiday' | 'Birthday'>, Event
 
 const hasActiveFilters = computed((): boolean => {
   return props.filters.types.length > 0 || props.filters.staffIds.length > 0;
+});
+
+const hasActiveTypeFilter = computed((): boolean => {
+  return props.filters.types.length > 0;
 });
 
 function imgUrl(name: string): string {
@@ -244,44 +255,47 @@ function reset(): void {
   border: 1px solid rgba(255, 255, 255, 0.24);
   border-radius: 999px;
   padding: 4px 10px;
-
+  color: var(--dark-gray);
   font:
     600 0.72rem/1 Arial,
     sans-serif;
   text-shadow: none;
   cursor: pointer;
-
-  /* DIM inactive colors */
-  opacity: 0.5;
-  filter: grayscale(0.6) brightness(0.85);
-
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease,
     opacity 0.2s ease,
-    filter 0.2s ease;
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .type-pill:hover {
   transform: translateY(-1px);
-  opacity: 0.75;
-  filter: grayscale(0.3) brightness(0.95);
+}
+
+.type-pill.dimmed {
+  opacity: 0.6;
+}
+
+.type-pill.inactive {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.78);
+  box-shadow: none;
 }
 
 .type-pill.active {
   opacity: 1;
-  filter: none;
-  color: var(--dark-gray);
   box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.22);
 }
 
-/* CRITICAL: only apply event colors when active */
-.type-pill:not(.active).auto-show,
-.type-pill:not(.active).cd-event,
-.type-pill:not(.active).vacation,
-.type-pill:not(.active).sick-time,
-.type-pill:not(.active).press-trip {
-  background-color: rgba(255, 255, 255, 0.08) !important;
+.type-pill.inactive.auto-show,
+.type-pill.inactive.cd-event,
+.type-pill.inactive.vacation,
+.type-pill.inactive.sick-time,
+.type-pill.inactive.press-trip {
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .auto-show {
