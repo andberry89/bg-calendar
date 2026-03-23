@@ -10,8 +10,10 @@
       </div>
 
       <div class="header-action">
-        <NewEventModal :staff="staff" key="new-event" @update="addEvent($event)" />
-        <ManageStaffModal :staff="staff" @update="emit('staff-update', $event)" />
+        <div class="header-action-group">
+          <NewEventModal :staff="staff" key="new-event" @update="addEvent($event)" />
+          <ManageStaffModal :staff="staff" @update="emit('staff-update', $event)" />
+        </div>
       </div>
     </div>
 
@@ -102,6 +104,14 @@ function addEvent(event: NewCalendarEvent): void {
   gap: 8px;
 }
 
+.header-action-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
 .header-filters {
   width: 100%;
   box-sizing: border-box;
@@ -132,6 +142,10 @@ function addEvent(event: NewCalendarEvent): void {
 
   .header-action {
     align-self: start;
+  }
+
+  .header-action-group {
+    justify-content: flex-start;
   }
 }
 
@@ -169,6 +183,10 @@ function addEvent(event: NewCalendarEvent): void {
 
   .header-action {
     gap: 4px;
+  }
+
+  .header-action-group {
+    gap: 6px;
   }
 }
 
