@@ -42,8 +42,8 @@ const emit = defineEmits<{
 }>();
 
 const yearOptions = computed((): number[] => {
-  const startYear = currentDate.year - 5;
-  const endYear = currentDate.year + 5;
+  const startYear = 2023;
+  const endYear = 2035;
 
   return Array.from({ length: endYear - startYear + 1 }, (_, index) => startYear + index);
 });
