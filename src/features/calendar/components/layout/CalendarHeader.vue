@@ -48,6 +48,8 @@ function addEvent(event: NewCalendarEvent): void {
 .calendar-header {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
   color: var(--light-gray);
   text-shadow:
     1px 1px 1px var(--dark-gray),
@@ -99,6 +101,7 @@ function addEvent(event: NewCalendarEvent): void {
 
 .header-filters {
   width: 100%;
+  box-sizing: border-box;
   padding: 10px 24px 14px;
   background-color: rgba(0, 0, 0, 0.18);
   border-top: 1px solid rgba(255, 255, 255, 0.14);

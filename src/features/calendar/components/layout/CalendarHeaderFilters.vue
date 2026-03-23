@@ -1,6 +1,6 @@
 <template>
   <div class="filters">
-    <div class="filters-row">
+    <div class="filters-left">
       <div class="staff-filters">
         <button
           v-for="member in staff"
@@ -16,23 +16,25 @@
           <span class="staff-label">{{ member.shortName }}</span>
         </button>
       </div>
-
-      <button type="button" class="reset-button" :disabled="!hasActiveFilters" @click="reset">
-        Reset
-      </button>
     </div>
 
-    <div class="type-filters">
-      <button
-        v-for="type in eventTypes"
-        :key="type"
-        type="button"
-        class="type-pill"
-        :class="[getEventClass(type), { active: isTypeSelected(type) }]"
-        @click="toggleType(type)"
-      >
-        {{ type }}
-      </button>
+    <div class="filters-right">
+      <div class="type-filters">
+        <button
+          v-for="type in filterableEventTypes"
+          :key="type"
+          type="button"
+          class="type-pill"
+          :class="[getEventClass(type), { active: isTypeSelected(type) }]"
+          @click="toggleType(type)"
+        >
+          {{ type }}
+        </button>
+
+        <button type="button" class="reset-button" :disabled="!hasActiveFilters" @click="reset">
+          Reset
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -51,13 +53,11 @@ const emit = defineEmits<{
   (e: 'filters', value: EventFilters): void;
 }>();
 
-const eventTypes: EventType[] = [
+const filterableEventTypes: Exclude<EventType, 'Holiday' | 'Birthday'>[] = [
   'Vacation',
   'Sick Time',
-  'Holiday',
   'Press Trip',
   'Auto Show',
-  'Birthday',
   'C/D Event'
 ];
 
@@ -66,13 +66,11 @@ const images = import.meta.glob('@/assets/staff/*.{jpg,png}', {
   import: 'default'
 }) as Record<string, string>;
 
-const eventClassByType: Record<EventType, EventClass> = {
+const eventClassByType: Record<Exclude<EventType, 'Holiday' | 'Birthday'>, EventClass> = {
   Vacation: 'vacation',
   'Sick Time': 'sick-time',
-  Holiday: 'holiday',
   'Press Trip': 'press-trip',
   'Auto Show': 'auto-show',
-  Birthday: 'birthday',
   'C/D Event': 'cd-event'
 };
 
@@ -88,7 +86,7 @@ function imgUrl(name: string): string {
   );
 }
 
-function getEventClass(type: EventType): EventClass {
+function getEventClass(type: Exclude<EventType, 'Holiday' | 'Birthday'>): EventClass {
   return eventClassByType[type];
 }
 
@@ -96,7 +94,7 @@ function isStaffSelected(id: string): boolean {
   return props.filters.staffIds[0] === id;
 }
 
-function isTypeSelected(type: EventType): boolean {
+function isTypeSelected(type: Exclude<EventType, 'Holiday' | 'Birthday'>): boolean {
   return props.filters.types[0] === type;
 }
 
@@ -109,7 +107,7 @@ function toggleStaff(id: string): void {
   });
 }
 
-function toggleType(type: EventType): void {
+function toggleType(type: Exclude<EventType, 'Holiday' | 'Birthday'>): void {
   const current = props.filters.types[0];
 
   emit('filters', {
@@ -129,16 +127,23 @@ function reset(): void {
 <style scoped lang="scss">
 .filters {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-}
-
-.filters-row {
-  display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+
+.filters-left {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.filters-right {
+  display: flex;
+  justify-content: flex-end;
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
 .staff-filters {
@@ -152,6 +157,7 @@ function reset(): void {
 .staff-filter {
   display: inline-flex;
   align-items: center;
+  min-width: 0;
   border: 0;
   padding: 0;
   background: transparent;
@@ -227,10 +233,14 @@ function reset(): void {
 .type-filters {
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 6px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .type-pill {
+  flex: 0 0 auto;
   border: 1px solid rgba(255, 255, 255, 0.24);
   border-radius: 999px;
   padding: 4px 10px;
@@ -258,17 +268,8 @@ function reset(): void {
   background-color: var(--ocean-auto-show);
 }
 
-.birthday {
-  background-color: var(--ocean-birthday);
-}
-
 .cd-event {
   background-color: var(--ocean-cd-event);
-}
-
-.holiday {
-  background-color: rgba(255, 255, 255, 0.16);
-  color: var(--white);
 }
 
 .vacation {
@@ -286,7 +287,6 @@ function reset(): void {
 
 .reset-button {
   flex: 0 0 auto;
-  align-self: center;
   border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: 999px;
   padding: 4px 10px;
@@ -312,19 +312,27 @@ function reset(): void {
   cursor: not-allowed;
 }
 
-@media (max-width: 900px) {
-  .filters-row {
+@media (max-width: 1100px) {
+  .filters {
     flex-direction: column;
     align-items: stretch;
   }
 
-  .reset-button {
-    align-self: flex-start;
+  .filters-right {
+    justify-content: flex-start;
+  }
+
+  .type-filters {
+    justify-content: flex-start;
   }
 }
 
 @media (max-width: 640px) {
   .filters {
+    gap: 8px;
+  }
+
+  .filters-right {
     gap: 8px;
   }
 

@@ -159,7 +159,7 @@ main {
     display: flex;
     flex-flow: column nowrap;
     justify-content: flex-start;
-    gap: var(--layout-gap-sm);
+    gap: 0;
     background-color: var(--layout-panel-bg);
     color: var(--white);
     font-family: 'Anton';
