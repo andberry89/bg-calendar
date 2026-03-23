@@ -361,7 +361,7 @@ function goToPreviousMonth(): void {
     grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
     column-gap: 10px;
     row-gap: 8px;
-    padding: 14px 12px;
+    padding: 8px 6px;
 
     .header-title h1 {
       font-size: 1.05rem;
