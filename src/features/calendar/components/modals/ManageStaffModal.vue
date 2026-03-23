@@ -60,6 +60,7 @@ function emitStaffUpdate(payload: StaffUpdatePayload): void {
   background: transparent;
   color: var(--light-gray);
   font: inherit;
+  font-size: 14px;
   line-height: 1;
   text-shadow: inherit;
   white-space: nowrap;
@@ -124,6 +125,7 @@ function emitStaffUpdate(payload: StaffUpdatePayload): void {
 @media (max-width: 640px) {
   .manage-staff-button {
     padding: 3px 10px;
+    font-size: 12px;
   }
 
   .manage-staff-modal {
