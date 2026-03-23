@@ -64,7 +64,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { format } from 'date-fns';
-import BaseModal from '@/components/common/BaseModal.vue';
+import BaseModal from '@/components/BaseModal.vue';
 import type { CalendarEvent, CurrentDate } from '@/types/calendar';
 
 const props = defineProps<{

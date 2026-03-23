@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import CalendarDay from './CalendarDay.vue';
+import CalendarDay from '@/features/calendar/components/display/CalendarDay.vue';
 import assignEvents from '@/features/calendar/utils/assignEvents';
 import type { CalendarEvent, CurrentDate } from '@/types/calendar';
 

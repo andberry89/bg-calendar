@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { month } from '../utils/selectOptions';
+import { month } from '@/features/calendar/utils/selectOptions';
 import type { CurrentDate } from '@/types/calendar';
 
 const { currentDate } = defineProps<{
