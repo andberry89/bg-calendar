@@ -12,6 +12,7 @@
         @date="updateDate"
         @filters="updateFilters"
         @update="updateEvents('add', $event)"
+        @staff-update="updateStaff"
       />
       <CalendarBody
         :currentDate="currentDate"
@@ -44,7 +45,13 @@ import { getCurrentMonthEvents } from '@/features/calendar/utils/getCurrentMonth
 import { filterEvents, type EventFilters } from '@/features/calendar/utils/filterEvents';
 import { getPrevMonthDays, getCurrentMonthDays } from '@/features/calendar/utils/getMonthDayCounts';
 import { getCurrentDate as getInitialCurrentDate } from '@/features/calendar/utils/getCurrentDate';
-import type { CalendarEvent, CurrentDate, EventsByYear, NewCalendarEvent } from '@/types/calendar';
+import type {
+  CalendarEvent,
+  CurrentDate,
+  EventsByYear,
+  NewCalendarEvent,
+  StaffUpdatePayload
+} from '@/types/calendar';
 
 const currentDate = ref<CurrentDate>(getInitialCurrentDate());
 const filters = ref<EventFilters>({
@@ -96,6 +103,19 @@ async function updateEvents(
       fn === 'add'
         ? await eventsStore.addEvent(event as NewCalendarEvent)
         : await eventsStore.deleteEvent((event as CalendarEvent).id);
+
+    if (!result.success) {
+      console.warn(result.message, result.error);
+    }
+  } catch (err) {
+    console.warn(err);
+  }
+}
+
+async function updateStaff([fn, person]: StaffUpdatePayload): Promise<void> {
+  try {
+    const result =
+      fn === 'add' ? await staffStore.addStaff(person) : await staffStore.deleteStaff(person.id);
 
     if (!result.success) {
       console.warn(result.message, result.error);

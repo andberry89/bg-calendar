@@ -11,6 +11,7 @@
 
       <div class="header-action">
         <NewEventModal :staff="staff" key="new-event" @update="addEvent($event)" />
+        <ManageStaffModal :staff="staff" @update="emit('staff-update', $event)" />
       </div>
     </div>
 
@@ -24,8 +25,9 @@
 import CalendarHeaderDateControls from '@/features/calendar/components/layout/CalendarHeaderDateControls.vue';
 import CalendarHeaderFilters from '@/features/calendar/components/layout/CalendarHeaderFilters.vue';
 import NewEventModal from '@/features/calendar/components/modals/NewEventModal.vue';
+import ManageStaffModal from '@/features/calendar/components/modals/ManageStaffModal.vue';
 import type { EventFilters } from '@/features/calendar/utils/filterEvents';
-import type { CurrentDate, NewCalendarEvent, Staff } from '@/types/calendar';
+import type { CurrentDate, NewCalendarEvent, Staff, StaffUpdatePayload } from '@/types/calendar';
 
 const { currentDate, staff, filters } = defineProps<{
   currentDate: CurrentDate;
@@ -37,6 +39,7 @@ const emit = defineEmits<{
   (e: 'date', value: CurrentDate): void;
   (e: 'update', value: NewCalendarEvent): void;
   (e: 'filters', value: EventFilters): void;
+  (e: 'staff-update', value: StaffUpdatePayload): void;
 }>();
 
 function addEvent(event: NewCalendarEvent): void {
