@@ -310,8 +310,9 @@ function goToPreviousMonth(): void {
   }
 
   .filter-reset-button:disabled {
-    cursor: default;
-    opacity: 0.45;
+    border-color: rgba(255, 255, 255, 0.35);
+    color: rgba(255, 255, 255, 0.55);
+    cursor: not-allowed;
 
     &:hover {
       background-color: transparent;
@@ -352,14 +353,18 @@ function goToPreviousMonth(): void {
     .filter-controls {
       flex-direction: column;
       align-items: stretch;
+      gap: 3px;
     }
 
     .filter-select {
       align-self: flex-start;
+      max-width: 116px;
+      font-size: 0.69rem;
     }
 
     .filter-reset-button {
       align-self: center;
+      font-size: 0.69rem;
     }
 
     .date-nav {
@@ -369,15 +374,6 @@ function goToPreviousMonth(): void {
       .header-control-button {
         padding: 4px 12px;
       }
-    }
-
-    .filter-select {
-      max-width: 116px;
-      font-size: 0.69rem;
-    }
-
-    .filter-reset-button {
-      font-size: 0.69rem;
     }
   }
 
@@ -397,11 +393,11 @@ function goToPreviousMonth(): void {
     }
 
     .header-action {
-      gap: 5px;
+      gap: 4px;
     }
 
     .filter-controls {
-      gap: 3px;
+      gap: 2px;
     }
 
     .filter-select {
@@ -432,14 +428,14 @@ function goToPreviousMonth(): void {
   @media (max-width: 360px) {
     column-gap: 8px;
     row-gap: 6px;
-    padding: 12px 8px;
+    padding: 8px 6px;
 
     .header-title h1 {
       font-size: 0.98rem;
     }
 
     .header-action {
-      gap: 4px;
+      gap: 3px;
     }
 
     .filter-select {
