@@ -62,18 +62,21 @@ function deleteEvent(): void {
 <style lang="scss" scoped>
 .event-modal {
   position: absolute;
-  text-align: left;
-  width: 275px;
-  top: -25px;
+  top: -12px;
   z-index: 99;
+  width: min(275px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
+  box-sizing: border-box;
+  text-align: left;
   background-color: var(--light-gray);
   color: var(--black);
-  padding: 12px 8px 4px;
+  padding: 12px 10px 8px;
   border: 1px solid var(--black);
   border-radius: 8px;
   font:
-    400 0.9rem/1 'Arial',
+    400 0.9rem/1.2 'Arial',
     sans-serif;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
 
   div {
     margin: 5px 0;
@@ -81,13 +84,14 @@ function deleteEvent(): void {
 
   .close-btn {
     position: absolute;
-    padding: 3px 6px;
-    border-radius: 10px;
+    top: 6px;
+    right: 6px;
+    padding: 2px 7px;
+    border-radius: 999px;
     border: 1px solid var(--black);
     background-color: var(--ocean-event-detail);
     transition: 0.2s;
-    top: -15px;
-    left: -12px;
+    line-height: 1;
 
     &:hover {
       background-color: var(--white);
@@ -98,6 +102,8 @@ function deleteEvent(): void {
   }
 
   .event-header {
+    padding-right: 34px;
+
     .event-name {
       font-weight: 700;
       font-size: 1rem;
@@ -116,7 +122,7 @@ function deleteEvent(): void {
   }
 
   .event-options {
-    margin-top: 35px;
+    margin-top: 20px;
     padding-top: 5px;
     display: flex;
     flex-flow: row nowrap;
@@ -134,10 +140,49 @@ function deleteEvent(): void {
     }
   }
 }
+
 .left {
-  right: 25%;
+  right: 12px;
 }
+
 .right {
-  left: 25%;
+  left: 12px;
+}
+
+@media (max-width: 640px) {
+  .event-modal {
+    top: -6px;
+    width: min(240px, calc(100vw - 16px));
+    max-width: calc(100vw - 16px);
+    padding: 10px 8px 8px;
+    font-size: 0.8rem;
+
+    .close-btn {
+      top: 5px;
+      right: 5px;
+      padding: 2px 6px;
+    }
+
+    .event-header {
+      padding-right: 30px;
+
+      .event-name {
+        font-size: 0.9rem;
+      }
+    }
+
+    .event-options {
+      margin-top: 14px;
+      font-size: 0.74rem;
+    }
+  }
+
+  .left {
+    right: 4px;
+  }
+
+  .right {
+    left: 4px;
+  }
 }
 </style>
