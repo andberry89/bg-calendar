@@ -51,6 +51,11 @@
           Reset
         </button>
       </div>
+      <p v-if="hasActiveFilters" class="filter-summary">
+        <span v-if="selectedType"><strong>Type:</strong> {{ selectedType }}</span>
+        <span v-if="selectedType && selectedStaffName"> · </span>
+        <span v-if="selectedStaffName"><strong>Staff:</strong> {{ selectedStaffName }}</span>
+      </p>
     </div>
   </header>
 </template>
@@ -91,6 +96,11 @@ const emit = defineEmits<{
 
 const selectedType = computed((): string => filters.types[0] ?? '');
 const selectedStaffId = computed((): string => filters.staffIds[0] ?? '');
+const selectedStaffName = computed((): string => {
+  const selectedStaffMember = staff.find((staffMember) => staffMember.id === selectedStaffId.value);
+
+  return selectedStaffMember?.shortName ?? '';
+});
 const hasActiveFilters = computed(
   (): boolean => filters.types.length > 0 || filters.staffIds.length > 0
 );
@@ -319,6 +329,16 @@ function goToPreviousMonth(): void {
     }
   }
 
+  .filter-summary {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.8);
+    font:
+      400 0.68rem/1.2 Arial,
+      sans-serif;
+    text-align: center;
+    text-shadow: none;
+  }
+
   @media (max-width: 1100px) {
     grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
     grid-template-areas:
@@ -367,6 +387,10 @@ function goToPreviousMonth(): void {
       font-size: 0.69rem;
     }
 
+    .filter-summary {
+      font-size: 0.66rem;
+    }
+
     .date-nav {
       font-size: 1rem;
       gap: 6px;
@@ -410,7 +434,9 @@ function goToPreviousMonth(): void {
       padding: 2px 6px;
       font-size: 0.66rem;
     }
-
+    .filter-summary {
+      font-size: 0.62rem;
+    }
     .date-nav {
       font-size: 0.74rem;
       gap: 3px;
