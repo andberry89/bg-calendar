@@ -11,7 +11,7 @@
 
       <div class="header-action">
         <div class="header-action-group">
-          <NewEventModal :staff="staff" key="new-event" @update="addEvent($event)" />
+          <NewEventModal :staff="staff" @update="addEvent($event)" />
           <ManageStaffModal :staff="staff" @update="emit('staff-update', $event)" />
         </div>
       </div>
