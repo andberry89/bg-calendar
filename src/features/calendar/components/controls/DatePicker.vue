@@ -90,18 +90,33 @@ function updateYear(event: Event): void {
   min-width: 0;
   border: 1px solid var(--white);
   border-radius: 8px;
-  padding: 4px 10px;
+  padding: 4px 14px;
   background: transparent;
-  color: var(--white);
+  color: inherit;
   font: inherit;
   text-shadow: inherit;
-  line-height: 1.2;
+  line-height: 1;
+  white-space: nowrap;
   cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
   appearance: auto;
+
+  &:hover {
+    background-color: var(--ocean-lt-blue);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.8);
+    outline-offset: 2px;
+  }
 }
 
 .picker-select option {
   color: var(--black);
+  text-shadow: none;
 }
 
 .sr-only {
@@ -118,7 +133,7 @@ function updateYear(event: Event): void {
 
 @media (max-width: 900px) {
   .picker-select {
-    padding: 4px 8px;
+    padding: 4px 12px;
     font-size: 0.95rem;
   }
 }
@@ -140,8 +155,8 @@ function updateYear(event: Event): void {
   }
 
   .picker-select {
-    padding: 2px 6px;
-    font-size: 0.85rem;
+    padding: 3px 8px;
+    font-size: 0.9rem;
   }
 }
 </style>
