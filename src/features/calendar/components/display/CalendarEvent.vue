@@ -19,6 +19,9 @@
     <div v-if="event.class === 'cd-event'" :class="event.class">
       {{ event.details }}
     </div>
+    <div v-if="event.class === 'comp-day'" :class="event.class">
+      {{ event.staff[0].initials }} Comp Day
+    </div>
     <div v-if="event.class === 'holiday'" :class="event.class">
       <strong>{{ event.details }}</strong
       ><br />
@@ -82,6 +85,10 @@ function emitEvent(): void {
 
 .cd-event {
   background-color: var(--ocean-cd-event);
+}
+
+.comp-day {
+  background-color: var(--ocean-comp-day);
 }
 
 .holiday {
