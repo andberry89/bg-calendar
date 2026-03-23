@@ -43,9 +43,9 @@
         </select>
 
         <button
-          v-if="hasActiveFilters"
           type="button"
           class="header-control-button filter-reset-button"
+          :disabled="!hasActiveFilters"
           @click="resetFilters"
         >
           Reset
@@ -307,6 +307,15 @@ function goToPreviousMonth(): void {
     font-size: 0.72rem;
     font-weight: 400;
     text-shadow: none;
+  }
+
+  .filter-reset-button:disabled {
+    cursor: default;
+    opacity: 0.45;
+
+    &:hover {
+      background-color: transparent;
+    }
   }
 
   @media (max-width: 1100px) {
