@@ -18,6 +18,25 @@
             </option>
           </select>
 
+          <div
+            v-if="
+              newEvent.type === 'Press Trip' ||
+              newEvent.type === 'Auto Show' ||
+              newEvent.type === 'C/D Event' ||
+              newEvent.type === 'Comp Day'
+            "
+            class="event-reminder"
+          >
+            Reminder: Update the Special Day Tracker.
+            <a
+              href="https://www.myhearst.com/group/magazines/in-office-resources"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View In-Office Resources
+            </a>
+          </div>
+
           <div class="holiday-options" v-if="newEvent.type === 'Holiday'">
             <span class="office-closure-label">Office Closed?</span>
             <label><input type="radio" value="full" v-model="newEvent.closed" />Full Day</label>
@@ -311,6 +330,21 @@ function closeForm(): void {
     margin-bottom: 4px;
     font-size: 0.75rem;
     font-weight: 700;
+  }
+
+  .event-reminder {
+    font-size: 0.75rem;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background-color: var(--ocean-lt-blue);
+    color: var(--dark-gray);
+
+    a {
+      margin-left: 6px;
+      font-weight: 600;
+      color: var(--ocean-dark-blue);
+      text-decoration: underline;
+    }
   }
 
   input,
