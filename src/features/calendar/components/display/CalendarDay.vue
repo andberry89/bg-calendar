@@ -32,7 +32,12 @@
     >
       {{ date }}
       <span v-if="isFilteredEmptyDay" class="filtered-empty-note">Filtered</span>
-      <CalendarEvent v-for="(event, idx) in holidays" :key="'holiday-' + idx" :event="event" />
+    </div>
+
+    <div v-if="holidays.length > 0" class="holiday-strip">
+      <div v-for="(event, idx) in holidays" :key="'holiday-' + idx" class="holiday-chip">
+        {{ event.details || event.type }}
+      </div>
     </div>
     <CalendarEvent
       v-for="(event, idx) in filteredEvents"
@@ -232,7 +237,8 @@ function closeDayModal(): void {
   border-bottom: 1px solid var(--ocean-gray);
   width: 100%;
   text-align: center;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
+  padding-bottom: 2px;
 }
 
 .date-text--interactive {
@@ -249,6 +255,33 @@ function closeDayModal(): void {
   line-height: 1;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+}
+
+.holiday-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+  margin: 0 0 4px;
+}
+
+.holiday-chip {
+  width: 100%;
+  padding: 3px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  background-color: rgba(0, 0, 0, 0.16);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.64rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: 0.05em;
+  text-align: center;
+  text-shadow: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .more-events {
@@ -285,6 +318,17 @@ function closeDayModal(): void {
 
   .filtered-empty-note {
     font-size: 0.5rem;
+  }
+
+  .holiday-strip {
+    width: 100%;
+    margin-bottom: 3px;
+  }
+
+  .holiday-chip {
+    padding: 2px 3px;
+    font-size: 0.54rem;
+    letter-spacing: 0.04em;
   }
 
   .regular-event--overflow {
