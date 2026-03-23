@@ -299,6 +299,7 @@ function closeDayModal(): void {
   line-height: 1.1;
   text-align: center;
   cursor: pointer;
+  visibility: hidden;
 
   &:hover {
     background-color: var(--ocean-lt-blue);
@@ -340,6 +341,7 @@ function closeDayModal(): void {
     margin: 4px auto 0;
     padding: 3px 6px;
     font-size: 0.6rem;
+    visibility: visible;
   }
 }
 </style>
