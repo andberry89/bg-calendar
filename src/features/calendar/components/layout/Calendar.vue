@@ -21,6 +21,7 @@
         :prevMonthDays="prevMonthDays"
         :currentMonthDays="currentMonthDays"
         :currentMonthEvents="filteredCurrentMonthEvents"
+        :unfilteredCurrentMonthEvents="currentMonthEvents"
         @date="updateDate"
         @delete="updateEvents('delete', $event)"
       />

@@ -21,10 +21,17 @@
       @click.stop
     />
     <div
-      :class="['date-text', { 'date-text--interactive': canOpenDayModal }]"
+      :class="[
+        'date-text',
+        {
+          'date-text--interactive': canOpenDayModal,
+          'date-text--filtered-empty': isFilteredEmptyDay
+        }
+      ]"
       @click.stop="openDayModal"
     >
       {{ date }}
+      <span v-if="isFilteredEmptyDay" class="filtered-empty-note">Filtered</span>
       <CalendarEvent v-for="(event, idx) in holidays" :key="'holiday-' + idx" :event="event" />
     </div>
     <CalendarEvent
@@ -62,10 +69,12 @@ const props = withDefaults(
     currentDate: CurrentDate;
     month?: CalendarMonthOffset;
     events?: CalendarEventType[];
+    hasUnfilteredEvents?: boolean;
   }>(),
   {
     month: undefined,
-    events: () => []
+    events: () => [],
+    hasUnfilteredEvents: false
   }
 );
 
@@ -112,6 +121,10 @@ const canOpenDayModal = computed((): boolean => {
 
 const hiddenEventCount = computed((): number => {
   return Math.max(filteredEvents.value.length - 2, 0);
+});
+
+const isFilteredEmptyDay = computed((): boolean => {
+  return props.dayClass === 'day' && props.hasUnfilteredEvents && allEvents.value.length === 0;
 });
 
 const displayDate = computed((): CurrentDate => {
@@ -226,6 +239,18 @@ function closeDayModal(): void {
   cursor: pointer;
 }
 
+.date-text--filtered-empty {
+  color: var(--ocean-gray);
+}
+
+.filtered-empty-note {
+  margin-top: 2px;
+  font-size: 0.58rem;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 .more-events {
   display: inline-flex;
   align-items: center;
@@ -256,6 +281,10 @@ function closeDayModal(): void {
   .date-text {
     font-size: 0.85rem;
     margin-bottom: 3px;
+  }
+
+  .filtered-empty-note {
+    font-size: 0.5rem;
   }
 
   .regular-event--overflow {

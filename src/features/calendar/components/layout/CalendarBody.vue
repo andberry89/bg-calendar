@@ -25,6 +25,7 @@
         :date="date"
         :currentDate="currentDate"
         :events="events[date - 1]"
+        :hasUnfilteredEvents="unfilteredEvents[date - 1]?.length > 0"
       />
       <CalendarDay
         dayClass="day-hidden"
@@ -44,11 +45,18 @@ import CalendarDay from '@/features/calendar/components/display/CalendarDay.vue'
 import assignEvents from '@/features/calendar/utils/assignEvents';
 import type { CalendarEvent, CurrentDate } from '@/types/calendar';
 
-const { currentDate, prevMonthDays, currentMonthDays, currentMonthEvents } = defineProps<{
+const {
+  currentDate,
+  prevMonthDays,
+  currentMonthDays,
+  currentMonthEvents,
+  unfilteredCurrentMonthEvents
+} = defineProps<{
   currentDate: CurrentDate;
   prevMonthDays: number;
   currentMonthDays: number;
   currentMonthEvents: CalendarEvent[];
+  unfilteredCurrentMonthEvents: CalendarEvent[];
 }>();
 
 const emit = defineEmits<{
@@ -82,6 +90,10 @@ let cachedEvents: CalendarEvent[][] = [];
 let cachedMonth = -1;
 let cachedMonthDays = -1;
 let cachedSourceEvents: CalendarEvent[] | null = null;
+let cachedUnfilteredEvents: CalendarEvent[][] = [];
+let cachedUnfilteredMonth = -1;
+let cachedUnfilteredMonthDays = -1;
+let cachedUnfilteredSourceEvents: CalendarEvent[] | null = null;
 
 const events = computed((): CalendarEvent[][] => {
   if (!currentMonthDays || !currentMonthEvents.length) {
@@ -107,6 +119,36 @@ const events = computed((): CalendarEvent[][] => {
   cachedSourceEvents = currentMonthEvents;
 
   return cachedEvents;
+});
+
+const unfilteredEvents = computed((): CalendarEvent[][] => {
+  if (!currentMonthDays || !unfilteredCurrentMonthEvents.length) {
+    cachedUnfilteredEvents = [];
+    cachedUnfilteredMonth = currentDate.month;
+    cachedUnfilteredMonthDays = currentMonthDays;
+    cachedUnfilteredSourceEvents = unfilteredCurrentMonthEvents;
+
+    return cachedUnfilteredEvents;
+  }
+
+  if (
+    cachedUnfilteredSourceEvents === unfilteredCurrentMonthEvents &&
+    cachedUnfilteredMonth === currentDate.month &&
+    cachedUnfilteredMonthDays === currentMonthDays
+  ) {
+    return cachedUnfilteredEvents;
+  }
+
+  cachedUnfilteredEvents = assignEvents(
+    unfilteredCurrentMonthEvents,
+    currentDate.month,
+    currentMonthDays
+  );
+  cachedUnfilteredMonth = currentDate.month;
+  cachedUnfilteredMonthDays = currentMonthDays;
+  cachedUnfilteredSourceEvents = unfilteredCurrentMonthEvents;
+
+  return cachedUnfilteredEvents;
 });
 
 const dataReady = computed((): boolean => {
