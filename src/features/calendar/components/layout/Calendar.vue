@@ -1,8 +1,5 @@
 <template>
   <main>
-    <article id="staff-list">
-      <StaffList :staff="staff" @update="updateStaff" />
-    </article>
     <article id="calendar" :aria-busy="isLoading">
       <!-- <article
       id="calendar"
@@ -26,19 +23,19 @@
         @delete="updateEvents('delete', $event)"
       />
     </article>
-    <EventList :events="filteredCurrentMonthEvents" :currentDate="currentDate" v-if="showEvents" />
+    <EventList v-if="showEvents" :events="filteredCurrentMonthEvents" :currentDate="currentDate" />
   </main>
   <footer>
     <em>Version {{ appVersion }}</em>
   </footer>
 </template>
+
 <script setup lang="ts">
 /* global __APP_VERSION__ */
 import { computed, onMounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import CalendarHeader from '@/features/calendar/components/layout/CalendarHeader.vue';
 import CalendarBody from '@/features/calendar/components/layout/CalendarBody.vue';
-import StaffList from '@/features/calendar/components/layout/StaffList.vue';
 import EventList from '@/features/calendar/components/layout/EventList.vue';
 import { useEventsStore } from '@/stores/events';
 import { useStaffStore } from '@/stores/staff';
@@ -47,13 +44,7 @@ import { getCurrentMonthEvents } from '@/features/calendar/utils/getCurrentMonth
 import { filterEvents, type EventFilters } from '@/features/calendar/utils/filterEvents';
 import { getPrevMonthDays, getCurrentMonthDays } from '@/features/calendar/utils/getMonthDayCounts';
 import { getCurrentDate as getInitialCurrentDate } from '@/features/calendar/utils/getCurrentDate';
-import type {
-  CalendarEvent,
-  CurrentDate,
-  EventsByYear,
-  NewCalendarEvent,
-  StaffUpdatePayload
-} from '@/types/calendar';
+import type { CalendarEvent, CurrentDate, EventsByYear, NewCalendarEvent } from '@/types/calendar';
 
 const currentDate = ref<CurrentDate>(getInitialCurrentDate());
 const filters = ref<EventFilters>({
@@ -114,19 +105,6 @@ async function updateEvents(
   }
 }
 
-async function updateStaff([fn, person]: StaffUpdatePayload): Promise<void> {
-  try {
-    const result =
-      fn === 'add' ? await staffStore.addStaff(person) : await staffStore.deleteStaff(person.id);
-
-    if (!result.success) {
-      console.warn(result.message, result.error);
-    }
-  } catch (err) {
-    console.warn(err);
-  }
-}
-
 onMounted(async (): Promise<void> => {
   try {
     await refreshCalendarData();
@@ -138,20 +116,18 @@ onMounted(async (): Promise<void> => {
   }
 });
 </script>
+
 <style lang="scss" scoped>
 @import url('https://fonts.googleapis.com/css?family=Anton');
+
 main {
   display: grid;
-  grid-template-columns: minmax(150px, 200px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: start;
   gap: var(--layout-gap-md);
   max-width: var(--layout-shell-max-width);
   margin: 0 auto;
   padding: 0 var(--layout-shell-padding);
-
-  #staff-list {
-    min-width: 0;
-  }
 
   #calendar {
     min-width: 0;
@@ -174,17 +150,5 @@ main {
 footer {
   text-align: center;
   padding: var(--layout-gap-md) var(--layout-shell-padding);
-}
-
-@media (max-width: 1100px) {
-  main {
-    grid-template-columns: 1fr;
-  }
-  #staff-list {
-    display: none;
-  }
-  #calendar {
-    width: 100%;
-  }
 }
 </style>
