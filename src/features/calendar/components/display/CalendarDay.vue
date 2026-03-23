@@ -227,9 +227,24 @@ function closeDayModal(): void {
 }
 
 .more-events {
-  display: none;
-  border: 0;
-  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - 12px);
+  margin: auto auto 6px;
+  padding: 3px 6px;
+  border: 1px solid var(--ocean-gray);
+  border-radius: 999px;
+  background-color: var(--md-tran-black);
+  color: var(--white);
+  font-size: 0.63rem;
+  line-height: 1.1;
+  text-align: center;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--ocean-lt-blue);
+  }
 }
 
 @media (max-width: 640px) {
@@ -248,17 +263,10 @@ function closeDayModal(): void {
   }
 
   .more-events {
-    display: block;
     width: calc(100% - 8px);
     margin: 4px auto 0;
     padding: 3px 6px;
-    border-radius: 999px;
-    background-color: var(--md-tran-black);
-    color: var(--white);
     font-size: 0.6rem;
-    line-height: 1.1;
-    text-align: center;
-    cursor: pointer;
   }
 }
 </style>
