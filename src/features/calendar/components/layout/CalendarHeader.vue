@@ -23,25 +23,28 @@
         </div>
 
         <div class="filter-controls">
-          <label class="filter-field">
-            <span class="filter-label">Type</span>
-            <select class="filter-select" :value="selectedType" @change="updateTypeFilter">
-              <option value="">All types</option>
-              <option v-for="eventType in eventTypes" :key="eventType" :value="eventType">
-                {{ eventType }}
-              </option>
-            </select>
-          </label>
+          <select class="filter-select" :value="selectedType" @change="updateTypeFilter">
+            <option value="">All types</option>
+            <option v-for="eventType in eventTypes" :key="eventType" :value="eventType">
+              {{ eventType }}
+            </option>
+          </select>
 
-          <label class="filter-field">
-            <span class="filter-label">Staff</span>
-            <select class="filter-select" :value="selectedStaffId" @change="updateStaffFilter">
-              <option value="">All staff</option>
-              <option v-for="staffMember in staff" :key="staffMember.id" :value="staffMember.id">
-                {{ staffMember.shortName }}
-              </option>
-            </select>
-          </label>
+          <select class="filter-select" :value="selectedStaffId" @change="updateStaffFilter">
+            <option value="">All staff</option>
+            <option v-for="staffMember in staff" :key="staffMember.id" :value="staffMember.id">
+              {{ staffMember.shortName }}
+            </option>
+          </select>
+
+          <button
+            v-if="hasActiveFilters"
+            type="button"
+            class="header-control-button filter-reset-button"
+            @click="resetFilters"
+          >
+            Reset
+          </button>
         </div>
       </div>
     </div>
@@ -69,6 +72,11 @@ const eventTypes: EventType[] = [
   'C/D Event'
 ];
 
+const emptyFilters: EventFilters = {
+  types: [],
+  staffIds: []
+};
+
 const { currentDate, staff, filters } = defineProps<{
   currentDate: CurrentDate;
   staff: Staff[];
@@ -83,6 +91,9 @@ const emit = defineEmits<{
 
 const selectedType = computed((): string => filters.types[0] ?? '');
 const selectedStaffId = computed((): string => filters.staffIds[0] ?? '');
+const hasActiveFilters = computed(
+  (): boolean => filters.types.length > 0 || filters.staffIds.length > 0
+);
 
 function getMonthLabel(monthIndex: number): string {
   return month[monthIndex].substring(0, 3);
@@ -122,6 +133,10 @@ function updateStaffFilter(event: Event): void {
     ...filters,
     staffIds: value === '' ? [] : [value]
   });
+}
+
+function resetFilters(): void {
+  emit('filters', emptyFilters);
 }
 
 function goToToday(): void {
@@ -253,35 +268,34 @@ function goToPreviousMonth(): void {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 8px;
+    align-items: center;
+    gap: 6px;
     width: 100%;
   }
 
-  .filter-field {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 140px;
-  }
-
-  .filter-label {
-    font-size: 0.85rem;
-    letter-spacing: 0.02em;
-  }
-
   .filter-select {
-    border: 1px solid var(--white);
+    min-width: 0;
+    max-width: 150px;
+    border: 1px solid rgba(255, 255, 255, 0.85);
     border-radius: 8px;
-    padding: 6px 10px;
-    background: rgba(255, 255, 255, 0.12);
-    color: var(--white);
+    padding: 4px 8px;
+    background: transparent;
+    color: inherit;
     font: inherit;
-    text-shadow: none;
+    font-size: 0.82rem;
+    line-height: 1.1;
+    text-shadow: inherit;
     cursor: pointer;
+    opacity: 0.9;
   }
 
   .filter-select option {
     color: var(--black);
+  }
+
+  .filter-reset-button {
+    padding: 4px 10px;
+    font-size: 0.82rem;
   }
 
   @media (max-width: 900px) {
@@ -334,20 +348,18 @@ function goToPreviousMonth(): void {
     }
 
     .filter-controls {
-      gap: 6px;
-    }
-
-    .filter-field {
-      min-width: 120px;
-    }
-
-    .filter-label {
-      font-size: 0.75rem;
+      gap: 4px;
     }
 
     .filter-select {
-      padding: 5px 8px;
-      font-size: 0.8rem;
+      max-width: 132px;
+      padding: 3px 6px;
+      font-size: 0.72rem;
+    }
+
+    .filter-reset-button {
+      padding: 3px 8px;
+      font-size: 0.72rem;
     }
 
     .date-nav {
