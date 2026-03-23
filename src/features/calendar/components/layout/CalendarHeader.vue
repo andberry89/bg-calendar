@@ -234,7 +234,7 @@ function goToPreviousMonth(): void {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 6px;
     min-width: 0;
   }
 
