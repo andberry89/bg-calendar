@@ -18,12 +18,12 @@
         :currentDate="currentDate"
         :prevMonthDays="prevMonthDays"
         :currentMonthDays="currentMonthDays"
-        :currentMonthEvents="currentMonthEvents"
+        :currentMonthEvents="filteredCurrentMonthEvents"
         @date="updateDate"
         @delete="updateEvents('delete', $event)"
       />
     </article>
-    <EventList :events="currentMonthEvents" :currentDate="currentDate" v-if="showEvents" />
+    <EventList :events="filteredCurrentMonthEvents" :currentDate="currentDate" v-if="showEvents" />
   </main>
   <footer>
     <em>Version {{ appVersion }}</em>
@@ -41,6 +41,7 @@ import { useEventsStore } from '@/stores/events';
 import { useStaffStore } from '@/stores/staff';
 import { sortEvents } from '@/features/calendar/utils/sortEvents';
 import { getCurrentMonthEvents } from '@/features/calendar/utils/getCurrentMonthEvents';
+import { filterEvents, type EventFilters } from '@/features/calendar/utils/filterEvents';
 import { getPrevMonthDays, getCurrentMonthDays } from '@/features/calendar/utils/getMonthDayCounts';
 import { getCurrentDate as getInitialCurrentDate } from '@/features/calendar/utils/getCurrentDate';
 import type {
@@ -52,6 +53,10 @@ import type {
 } from '@/types/calendar';
 
 const currentDate = ref<CurrentDate>(getInitialCurrentDate());
+const filters = ref<EventFilters>({
+  types: [],
+  staffIds: []
+});
 
 const eventsStore = useEventsStore();
 const staffStore = useStaffStore();
@@ -70,6 +75,10 @@ const prevMonthDays = computed(() => getPrevMonthDays(currentDate.value));
 const currentMonthDays = computed(() => getCurrentMonthDays(currentDate.value));
 const currentMonthEvents = computed((): CalendarEvent[] =>
   getCurrentMonthEvents(sortedEvents.value, currentDate.value)
+);
+
+const filteredCurrentMonthEvents = computed((): CalendarEvent[] =>
+  filterEvents(currentMonthEvents.value, filters.value)
 );
 
 function updateDate(newDate: CurrentDate): void {
