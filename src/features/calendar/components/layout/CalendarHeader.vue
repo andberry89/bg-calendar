@@ -21,6 +21,28 @@
             {{ nextMonth }} &gt;
           </button>
         </div>
+
+        <div class="filter-controls">
+          <label class="filter-field">
+            <span class="filter-label">Type</span>
+            <select class="filter-select" :value="selectedType" @change="updateTypeFilter">
+              <option value="">All types</option>
+              <option v-for="eventType in eventTypes" :key="eventType" :value="eventType">
+                {{ eventType }}
+              </option>
+            </select>
+          </label>
+
+          <label class="filter-field">
+            <span class="filter-label">Staff</span>
+            <select class="filter-select" :value="selectedStaffId" @change="updateStaffFilter">
+              <option value="">All staff</option>
+              <option v-for="staffMember in staff" :key="staffMember.id" :value="staffMember.id">
+                {{ staffMember.shortName }}
+              </option>
+            </select>
+          </label>
+        </div>
       </div>
     </div>
 
@@ -34,17 +56,33 @@ import { computed } from 'vue';
 import DatePicker from '@/features/calendar/components/controls/DatePicker.vue';
 import NewEventModal from '@/features/calendar/components/modals/NewEventModal.vue';
 import { month } from '@/features/calendar/utils/selectOptions';
-import type { CurrentDate, NewCalendarEvent, Staff } from '@/types/calendar';
+import type { EventFilters } from '@/features/calendar/utils/filterEvents';
+import type { CurrentDate, EventType, NewCalendarEvent, Staff } from '@/types/calendar';
 
-const { currentDate, staff } = defineProps<{
+const eventTypes: EventType[] = [
+  'Vacation',
+  'Sick Time',
+  'Holiday',
+  'Press Trip',
+  'Auto Show',
+  'Birthday',
+  'C/D Event'
+];
+
+const { currentDate, staff, filters } = defineProps<{
   currentDate: CurrentDate;
   staff: Staff[];
+  filters: EventFilters;
 }>();
 
 const emit = defineEmits<{
   (e: 'date', value: CurrentDate): void;
   (e: 'update', value: NewCalendarEvent): void;
+  (e: 'filters', value: EventFilters): void;
 }>();
+
+const selectedType = computed((): string => filters.types[0] ?? '');
+const selectedStaffId = computed((): string => filters.staffIds[0] ?? '');
 
 function getMonthLabel(monthIndex: number): string {
   return month[monthIndex].substring(0, 3);
@@ -64,6 +102,26 @@ const nextMonth = computed((): string => {
 
 function addEvent(event: NewCalendarEvent): void {
   emit('update', event);
+}
+
+function updateTypeFilter(event: Event): void {
+  const target = event.target as HTMLSelectElement;
+  const value = target.value;
+
+  emit('filters', {
+    ...filters,
+    types: value === '' ? [] : [value as EventType]
+  });
+}
+
+function updateStaffFilter(event: Event): void {
+  const target = event.target as HTMLSelectElement;
+  const value = target.value;
+
+  emit('filters', {
+    ...filters,
+    staffIds: value === '' ? [] : [value]
+  });
 }
 
 function goToToday(): void {
@@ -191,6 +249,41 @@ function goToPreviousMonth(): void {
     }
   }
 
+  .filter-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 140px;
+  }
+
+  .filter-label {
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+  }
+
+  .filter-select {
+    border: 1px solid var(--white);
+    border-radius: 8px;
+    padding: 6px 10px;
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--white);
+    font: inherit;
+    text-shadow: none;
+    cursor: pointer;
+  }
+
+  .filter-select option {
+    color: var(--black);
+  }
+
   @media (max-width: 900px) {
     grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
     grid-template-areas:
@@ -238,6 +331,23 @@ function goToPreviousMonth(): void {
 
     .date-container {
       gap: 6px;
+    }
+
+    .filter-controls {
+      gap: 6px;
+    }
+
+    .filter-field {
+      min-width: 120px;
+    }
+
+    .filter-label {
+      font-size: 0.75rem;
+    }
+
+    .filter-select {
+      padding: 5px 8px;
+      font-size: 0.8rem;
     }
 
     .date-nav {

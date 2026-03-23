@@ -10,9 +10,11 @@
     > -->
       <CalendarHeader
         :currentDate="currentDate"
-        @date="updateDate"
-        @update="updateEvents('add', $event)"
         :staff="staff"
+        :filters="filters"
+        @date="updateDate"
+        @filters="updateFilters"
+        @update="updateEvents('add', $event)"
       />
       <CalendarBody
         :currentDate="currentDate"
@@ -83,6 +85,10 @@ const filteredCurrentMonthEvents = computed((): CalendarEvent[] =>
 
 function updateDate(newDate: CurrentDate): void {
   currentDate.value = newDate;
+}
+
+function updateFilters(newFilters: EventFilters): void {
+  filters.value = newFilters;
 }
 
 async function refreshCalendarData(): Promise<void> {
