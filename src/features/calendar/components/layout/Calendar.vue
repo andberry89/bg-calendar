@@ -33,10 +33,10 @@
 /* global __APP_VERSION__ */
 import { computed, onMounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
-import CalendarHeader from './CalendarHeader.vue';
-import CalendarBody from './CalendarBody.vue';
-import StaffList from './StaffList.vue';
-import EventList from './EventList.vue';
+import CalendarHeader from '@/features/calendar/components/layout/CalendarHeader.vue';
+import CalendarBody from '@/features/calendar/components/layout/CalendarBody.vue';
+import StaffList from '@/features/calendar/components/layout/StaffList.vue';
+import EventList from '@/features/calendar/components/layout/EventList.vue';
 import { useEventsStore } from '@/stores/events';
 import { useStaffStore } from '@/stores/staff';
 import { sortEvents } from '@/features/calendar/utils/sortEvents';
