@@ -19,7 +19,8 @@ export type EventType =
   | 'Press Trip'
   | 'Auto Show'
   | 'Birthday'
-  | 'C/D Event';
+  | 'C/D Event'
+  | 'Comp Day';
 
 export type EventClass =
   | ''
@@ -29,7 +30,8 @@ export type EventClass =
   | 'press-trip'
   | 'auto-show'
   | 'birthday'
-  | 'cd-event';
+  | 'cd-event'
+  | 'comp-day';
 
 export type HolidayClosure = '' | 'none' | 'half' | 'full';
 

@@ -21,6 +21,7 @@
   --ocean-auto-show: rgb(150, 186, 96); /* #96ba60 */
   --ocean-off: rgb(186, 132, 96); /* #ba8460 */
   --ocean-event-detail: rgb(186, 96, 105); /* #ba6069 */
+  --ocean-comp-day: rgb(96, 186, 150); /* balanced teal */
 
   --md-tran-black: rgba(0, 0, 0, 0.5);
   --lt-tran-black: rgba(0, 0, 0, 0.7);

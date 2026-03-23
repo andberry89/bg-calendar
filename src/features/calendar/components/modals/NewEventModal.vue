@@ -150,6 +150,8 @@ function getEventClass(type: EventType): EventClass {
       return 'press-trip';
     case 'C/D Event':
       return 'cd-event';
+    case 'Comp Day':
+      return 'comp-day';
     case 'Vacation':
       return 'vacation';
     case 'Sick Time':
@@ -222,7 +224,8 @@ function validateEvent(event: DraftCalendarEvent): string[] {
     event.type &&
     event.type !== 'Vacation' &&
     event.type !== 'Sick Time' &&
-    event.type !== 'Birthday';
+    event.type !== 'Birthday' &&
+    event.type !== 'Comp Day';
 
   if (requiresDetails && !event.details) {
     validationErrors.push('Event Details');
@@ -230,7 +233,9 @@ function validateEvent(event: DraftCalendarEvent): string[] {
 
   const requiresStaff = event.type && event.type !== 'Holiday' && event.type !== 'C/D Event';
 
-  if (requiresStaff && event.staff.length === 0) {
+  if (event.type === 'Comp Day' && event.staff.length !== 1) {
+    validationErrors.push('Exactly 1 Staff Member');
+  } else if (requiresStaff && event.staff.length === 0) {
     validationErrors.push('Staff');
   }
 

@@ -30,5 +30,6 @@ export const eventType = [
   'Press Trip',
   'Auto Show',
   'Birthday',
-  'C/D Event'
+  'C/D Event',
+  'Comp Day'
 ];

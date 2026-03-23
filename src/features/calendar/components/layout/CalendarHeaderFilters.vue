@@ -65,7 +65,8 @@ const filterableEventTypes: Exclude<EventType, 'Holiday' | 'Birthday'>[] = [
   'Sick Time',
   'Press Trip',
   'Auto Show',
-  'C/D Event'
+  'C/D Event',
+  'Comp Day'
 ];
 
 const images = import.meta.glob('@/assets/staff/*.{jpg,png}', {
@@ -78,7 +79,8 @@ const eventClassByType: Record<Exclude<EventType, 'Holiday' | 'Birthday'>, Event
   'Sick Time': 'sick-time',
   'Press Trip': 'press-trip',
   'Auto Show': 'auto-show',
-  'C/D Event': 'cd-event'
+  'C/D Event': 'cd-event',
+  'Comp Day': 'comp-day'
 };
 
 const hasActiveFilters = computed((): boolean => {
@@ -317,6 +319,10 @@ function reset(): void {
 
 .press-trip {
   background-color: var(--ocean-press-trip);
+}
+
+.comp-day {
+  background-color: var(--ocean-comp-day);
 }
 
 .reset-button {
