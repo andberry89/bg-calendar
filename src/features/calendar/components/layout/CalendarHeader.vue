@@ -11,60 +11,17 @@
     <div class="header-action">
       <NewEventModal :staff="staff" key="new-event" @update="addEvent($event)" />
 
-      <div class="filter-controls">
-        <select class="filter-select" :value="selectedType" @change="updateTypeFilter">
-          <option value="">All types</option>
-          <option v-for="eventType in eventTypes" :key="eventType" :value="eventType">
-            {{ eventType }}
-          </option>
-        </select>
-
-        <select class="filter-select" :value="selectedStaffId" @change="updateStaffFilter">
-          <option value="">All staff</option>
-          <option v-for="staffMember in staff" :key="staffMember.id" :value="staffMember.id">
-            {{ staffMember.shortName }}
-          </option>
-        </select>
-
-        <button
-          type="button"
-          class="header-control-button filter-reset-button"
-          :disabled="!hasActiveFilters"
-          @click="resetFilters"
-        >
-          Reset
-        </button>
-      </div>
-      <p v-if="hasActiveFilters" class="filter-summary">
-        <span v-if="selectedType"><strong>Type:</strong> {{ selectedType }}</span>
-        <span v-if="selectedType && selectedStaffName"> · </span>
-        <span v-if="selectedStaffName"><strong>Staff:</strong> {{ selectedStaffName }}</span>
-      </p>
+      <CalendarHeaderFilters :staff="staff" :filters="filters" @filters="emit('filters', $event)" />
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
 import CalendarHeaderDateControls from '@/features/calendar/components/layout/CalendarHeaderDateControls.vue';
+import CalendarHeaderFilters from '@/features/calendar/components/layout/CalendarHeaderFilters.vue';
 import NewEventModal from '@/features/calendar/components/modals/NewEventModal.vue';
 import type { EventFilters } from '@/features/calendar/utils/filterEvents';
-import type { CurrentDate, EventType, NewCalendarEvent, Staff } from '@/types/calendar';
-
-const eventTypes: EventType[] = [
-  'Vacation',
-  'Sick Time',
-  'Holiday',
-  'Press Trip',
-  'Auto Show',
-  'Birthday',
-  'C/D Event'
-];
-
-const emptyFilters: EventFilters = {
-  types: [],
-  staffIds: []
-};
+import type { CurrentDate, NewCalendarEvent, Staff } from '@/types/calendar';
 
 const { currentDate, staff, filters } = defineProps<{
   currentDate: CurrentDate;
@@ -78,43 +35,8 @@ const emit = defineEmits<{
   (e: 'filters', value: EventFilters): void;
 }>();
 
-const selectedType = computed((): string => filters.types[0] ?? '');
-const selectedStaffId = computed((): string => filters.staffIds[0] ?? '');
-const selectedStaffName = computed((): string => {
-  const selectedStaffMember = staff.find((staffMember) => staffMember.id === selectedStaffId.value);
-
-  return selectedStaffMember?.shortName ?? '';
-});
-const hasActiveFilters = computed(
-  (): boolean => filters.types.length > 0 || filters.staffIds.length > 0
-);
-
 function addEvent(event: NewCalendarEvent): void {
   emit('update', event);
-}
-
-function updateTypeFilter(event: Event): void {
-  const target = event.target as HTMLSelectElement;
-  const value = target.value;
-
-  emit('filters', {
-    ...filters,
-    types: value === '' ? [] : [value as EventType]
-  });
-}
-
-function updateStaffFilter(event: Event): void {
-  const target = event.target as HTMLSelectElement;
-  const value = target.value;
-
-  emit('filters', {
-    ...filters,
-    staffIds: value === '' ? [] : [value]
-  });
-}
-
-function resetFilters(): void {
-  emit('filters', emptyFilters);
 }
 </script>
 
