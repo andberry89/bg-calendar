@@ -21,11 +21,23 @@
       @click.stop
     />
     <div
-      :class="['date-text', { 'date-text--interactive': canOpenDayModal }]"
+      :class="[
+        'date-text',
+        {
+          'date-text--interactive': canOpenDayModal,
+          'date-text--filtered-empty': isFilteredEmptyDay
+        }
+      ]"
       @click.stop="openDayModal"
     >
       {{ date }}
-      <CalendarEvent v-for="(event, idx) in holidays" :key="'holiday-' + idx" :event="event" />
+      <span v-if="isFilteredEmptyDay" class="filtered-empty-note">Filtered</span>
+    </div>
+
+    <div v-if="holidays.length > 0" class="holiday-strip">
+      <div v-for="(event, idx) in holidays" :key="'holiday-' + idx" class="holiday-chip">
+        {{ event.details || event.type }}
+      </div>
     </div>
     <CalendarEvent
       v-for="(event, idx) in filteredEvents"
@@ -62,10 +74,12 @@ const props = withDefaults(
     currentDate: CurrentDate;
     month?: CalendarMonthOffset;
     events?: CalendarEventType[];
+    hasUnfilteredEvents?: boolean;
   }>(),
   {
     month: undefined,
-    events: () => []
+    events: () => [],
+    hasUnfilteredEvents: false
   }
 );
 
@@ -112,6 +126,10 @@ const canOpenDayModal = computed((): boolean => {
 
 const hiddenEventCount = computed((): number => {
   return Math.max(filteredEvents.value.length - 2, 0);
+});
+
+const isFilteredEmptyDay = computed((): boolean => {
+  return props.dayClass === 'day' && props.hasUnfilteredEvents && allEvents.value.length === 0;
 });
 
 const displayDate = computed((): CurrentDate => {
@@ -219,17 +237,72 @@ function closeDayModal(): void {
   border-bottom: 1px solid var(--ocean-gray);
   width: 100%;
   text-align: center;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
+  padding-bottom: 2px;
 }
 
 .date-text--interactive {
   cursor: pointer;
 }
 
+.date-text--filtered-empty {
+  color: var(--ocean-gray);
+}
+
+.filtered-empty-note {
+  margin-top: 2px;
+  font-size: 0.58rem;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.holiday-strip {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  width: 100%;
+  margin: 0 0 4px;
+}
+
+.holiday-chip {
+  width: 100%;
+  padding: 3px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+  background-color: rgba(0, 0, 0, 0.16);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.64rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: 0.05em;
+  text-align: center;
+  text-shadow: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .more-events {
-  display: none;
-  border: 0;
-  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - 12px);
+  margin: auto auto 6px;
+  padding: 3px 6px;
+  border: 1px solid var(--ocean-gray);
+  border-radius: 999px;
+  background-color: var(--md-tran-black);
+  color: var(--white);
+  font-size: 0.63rem;
+  line-height: 1.1;
+  text-align: center;
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--ocean-lt-blue);
+  }
 }
 
 @media (max-width: 640px) {
@@ -243,22 +316,30 @@ function closeDayModal(): void {
     margin-bottom: 3px;
   }
 
+  .filtered-empty-note {
+    font-size: 0.5rem;
+  }
+
+  .holiday-strip {
+    width: 100%;
+    margin-bottom: 3px;
+  }
+
+  .holiday-chip {
+    padding: 2px 3px;
+    font-size: 0.54rem;
+    letter-spacing: 0.04em;
+  }
+
   .regular-event--overflow {
     display: none;
   }
 
   .more-events {
-    display: block;
     width: calc(100% - 8px);
     margin: 4px auto 0;
     padding: 3px 6px;
-    border-radius: 999px;
-    background-color: var(--md-tran-black);
-    color: var(--white);
     font-size: 0.6rem;
-    line-height: 1.1;
-    text-align: center;
-    cursor: pointer;
   }
 }
 </style>

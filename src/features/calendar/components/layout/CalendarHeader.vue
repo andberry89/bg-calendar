@@ -26,6 +26,36 @@
 
     <div class="header-action">
       <NewEventModal :staff="staff" key="new-event" @update="addEvent($event)" />
+
+      <div class="filter-controls">
+        <select class="filter-select" :value="selectedType" @change="updateTypeFilter">
+          <option value="">All types</option>
+          <option v-for="eventType in eventTypes" :key="eventType" :value="eventType">
+            {{ eventType }}
+          </option>
+        </select>
+
+        <select class="filter-select" :value="selectedStaffId" @change="updateStaffFilter">
+          <option value="">All staff</option>
+          <option v-for="staffMember in staff" :key="staffMember.id" :value="staffMember.id">
+            {{ staffMember.shortName }}
+          </option>
+        </select>
+
+        <button
+          type="button"
+          class="header-control-button filter-reset-button"
+          :disabled="!hasActiveFilters"
+          @click="resetFilters"
+        >
+          Reset
+        </button>
+      </div>
+      <p v-if="hasActiveFilters" class="filter-summary">
+        <span v-if="selectedType"><strong>Type:</strong> {{ selectedType }}</span>
+        <span v-if="selectedType && selectedStaffName"> · </span>
+        <span v-if="selectedStaffName"><strong>Staff:</strong> {{ selectedStaffName }}</span>
+      </p>
     </div>
   </header>
 </template>
@@ -34,17 +64,46 @@ import { computed } from 'vue';
 import DatePicker from '@/features/calendar/components/controls/DatePicker.vue';
 import NewEventModal from '@/features/calendar/components/modals/NewEventModal.vue';
 import { month } from '@/features/calendar/utils/selectOptions';
-import type { CurrentDate, NewCalendarEvent, Staff } from '@/types/calendar';
+import type { EventFilters } from '@/features/calendar/utils/filterEvents';
+import type { CurrentDate, EventType, NewCalendarEvent, Staff } from '@/types/calendar';
 
-const { currentDate, staff } = defineProps<{
+const eventTypes: EventType[] = [
+  'Vacation',
+  'Sick Time',
+  'Holiday',
+  'Press Trip',
+  'Auto Show',
+  'Birthday',
+  'C/D Event'
+];
+
+const emptyFilters: EventFilters = {
+  types: [],
+  staffIds: []
+};
+
+const { currentDate, staff, filters } = defineProps<{
   currentDate: CurrentDate;
   staff: Staff[];
+  filters: EventFilters;
 }>();
 
 const emit = defineEmits<{
   (e: 'date', value: CurrentDate): void;
   (e: 'update', value: NewCalendarEvent): void;
+  (e: 'filters', value: EventFilters): void;
 }>();
+
+const selectedType = computed((): string => filters.types[0] ?? '');
+const selectedStaffId = computed((): string => filters.staffIds[0] ?? '');
+const selectedStaffName = computed((): string => {
+  const selectedStaffMember = staff.find((staffMember) => staffMember.id === selectedStaffId.value);
+
+  return selectedStaffMember?.shortName ?? '';
+});
+const hasActiveFilters = computed(
+  (): boolean => filters.types.length > 0 || filters.staffIds.length > 0
+);
 
 function getMonthLabel(monthIndex: number): string {
   return month[monthIndex].substring(0, 3);
@@ -64,6 +123,30 @@ const nextMonth = computed((): string => {
 
 function addEvent(event: NewCalendarEvent): void {
   emit('update', event);
+}
+
+function updateTypeFilter(event: Event): void {
+  const target = event.target as HTMLSelectElement;
+  const value = target.value;
+
+  emit('filters', {
+    ...filters,
+    types: value === '' ? [] : [value as EventType]
+  });
+}
+
+function updateStaffFilter(event: Event): void {
+  const target = event.target as HTMLSelectElement;
+  const value = target.value;
+
+  emit('filters', {
+    ...filters,
+    staffIds: value === '' ? [] : [value]
+  });
+}
+
+function resetFilters(): void {
+  emit('filters', emptyFilters);
 }
 
 function goToToday(): void {
@@ -105,7 +188,7 @@ function goToPreviousMonth(): void {
   display: grid;
   grid-template-columns: minmax(280px, 1fr) minmax(280px, auto) minmax(220px, 1fr);
   grid-template-areas: 'main title action';
-  align-items: center;
+  align-items: start;
   gap: var(--layout-gap-md);
   padding: 20px 24px;
   color: var(--light-gray);
@@ -119,6 +202,7 @@ function goToPreviousMonth(): void {
     grid-area: title;
     min-width: 0;
     text-align: center;
+    align-self: center;
 
     h1 {
       margin: 0;
@@ -132,6 +216,7 @@ function goToPreviousMonth(): void {
   .header-main {
     grid-area: main;
     min-width: 0;
+    align-self: center;
   }
 
   .header-action {
@@ -140,8 +225,9 @@ function goToPreviousMonth(): void {
     width: max-content;
     max-width: 100%;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
+    gap: 8px;
   }
 
   .date-container {
@@ -191,17 +277,77 @@ function goToPreviousMonth(): void {
     }
   }
 
-  @media (max-width: 900px) {
-    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  .filter-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    margin: 0;
+  }
+
+  .filter-select {
+    min-width: 0;
+    max-width: 122px;
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 7px;
+    padding: 2px 6px;
+    background: transparent;
+    color: var(--white);
+    font-family: Arial, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 400;
+    line-height: 1;
+    text-shadow: none;
+    cursor: pointer;
+    appearance: auto;
+  }
+
+  .filter-select option {
+    color: var(--black);
+    font-weight: 400;
+  }
+
+  .filter-reset-button {
+    padding: 2px 7px;
+    margin-left: auto;
+    margin-right: auto;
+    font-family: Arial, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 400;
+    text-shadow: none;
+  }
+
+  .filter-reset-button:disabled {
+    border-color: rgba(255, 255, 255, 0.35);
+    color: rgba(255, 255, 255, 0.55);
+    cursor: not-allowed;
+
+    &:hover {
+      background-color: transparent;
+    }
+  }
+
+  .filter-summary {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.8);
+    font:
+      400 0.68rem/1.2 Arial,
+      sans-serif;
+    text-align: center;
+    text-shadow: none;
+  }
+
+  @media (max-width: 1100px) {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
     grid-template-areas:
       'title title'
       'main action';
-    column-gap: 18px;
-    row-gap: 14px;
-    padding: 20px 16px;
+    column-gap: 16px;
+    row-gap: 12px;
 
     .header-title h1 {
-      font-size: 1.3rem;
       white-space: normal;
     }
 
@@ -212,7 +358,37 @@ function goToPreviousMonth(): void {
     }
 
     .header-action {
+      align-self: start;
+    }
+  }
+
+  @media (max-width: 900px) {
+    padding: 20px 16px;
+
+    .header-title h1 {
+      font-size: 1.3rem;
+      white-space: normal;
+    }
+
+    .filter-controls {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 3px;
+    }
+
+    .filter-select {
+      align-self: flex-start;
+      max-width: 116px;
+      font-size: 0.69rem;
+    }
+
+    .filter-reset-button {
       align-self: center;
+      font-size: 0.69rem;
+    }
+
+    .filter-summary {
+      font-size: 0.66rem;
     }
 
     .date-nav {
@@ -227,9 +403,9 @@ function goToPreviousMonth(): void {
 
   @media (max-width: 640px) {
     grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
-    column-gap: 12px;
-    row-gap: 12px;
-    padding: 16px 12px;
+    column-gap: 10px;
+    row-gap: 8px;
+    padding: 8px 6px;
 
     .header-title h1 {
       font-size: 1.05rem;
@@ -240,6 +416,27 @@ function goToPreviousMonth(): void {
       gap: 6px;
     }
 
+    .header-action {
+      gap: 4px;
+    }
+
+    .filter-controls {
+      gap: 2px;
+    }
+
+    .filter-select {
+      max-width: 108px;
+      padding: 2px 5px;
+      font-size: 0.66rem;
+    }
+
+    .filter-reset-button {
+      padding: 2px 6px;
+      font-size: 0.66rem;
+    }
+    .filter-summary {
+      font-size: 0.62rem;
+    }
     .date-nav {
       font-size: 0.74rem;
       gap: 3px;
@@ -256,10 +453,19 @@ function goToPreviousMonth(): void {
 
   @media (max-width: 360px) {
     column-gap: 8px;
-    padding: 14px 8px;
+    row-gap: 6px;
+    padding: 8px 6px;
 
     .header-title h1 {
       font-size: 0.98rem;
+    }
+
+    .header-action {
+      gap: 3px;
+    }
+
+    .filter-select {
+      max-width: 98px;
     }
 
     .date-nav {
