@@ -1,44 +1,71 @@
 <template>
-  <div class="edit-staff-container">
-    <button class="staff-button" @click="toggleEditStaffForm('add')">Add Staff</button>
-    <button class="staff-button" @click="toggleEditStaffForm('remove')">Remove Staff</button>
-    <div class="edit-staff-form">
-      <div class="add-staff-form" v-if="showForm.add">
+  <div class="edit-staff">
+    <div class="edit-staff__actions">
+      <button
+        type="button"
+        class="staff-button"
+        :class="{ active: showForm.add }"
+        @click="toggleEditStaffForm('add')"
+      >
+        Add Staff
+      </button>
+      <button
+        type="button"
+        class="staff-button"
+        :class="{ active: showForm.remove }"
+        @click="toggleEditStaffForm('remove')"
+      >
+        Remove Staff
+      </button>
+    </div>
+
+    <div v-if="showForm.add" class="edit-staff__panel">
+      <div class="add-staff-form">
         <input
-          type="text"
-          placeholder="First Name"
-          v-model="newStaff.firstName"
-          name="newFirstName"
           id="newFirstName"
           ref="firstNameInput"
+          v-model.trim="newStaff.firstName"
+          type="text"
+          name="newFirstName"
+          placeholder="First Name"
         />
         <input
-          type="text"
-          placeholder="Last Name"
-          v-model="newStaff.lastName"
-          name="newLastName"
           id="newLastName"
+          v-model.trim="newStaff.lastName"
+          type="text"
+          name="newLastName"
+          placeholder="Last Name"
         />
-        <button class="staff-button" @click="emitStaff('add')">
-          Add {{ newStaff.firstName + ' ' + newStaff.lastName }}
+        <button
+          type="button"
+          class="staff-button staff-button--primary"
+          :disabled="!canAddStaff"
+          @click="emitStaff('add')"
+        >
+          Add {{ pendingStaffLabel }}
         </button>
       </div>
-      <div class="remove-staff-form" v-if="showForm.remove">
-        <div
+    </div>
+
+    <div v-if="showForm.remove" class="edit-staff__panel">
+      <div class="remove-staff-form">
+        <button
           v-for="(person, idx) in staff"
           :key="'staff-' + idx"
+          type="button"
           class="remove-staff-card"
           @click="emitStaff(person)"
         >
-          <div class="remove-staff-name">{{ person.firstName + ' ' + person.lastName }}</div>
-          <div class="remove-text">Remove?</div>
-        </div>
+          <span class="remove-staff-name">{{ person.firstName }} {{ person.lastName }}</span>
+          <span class="remove-text">Remove</span>
+        </button>
       </div>
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
-import { ref, nextTick } from 'vue';
+import { computed, nextTick, ref } from 'vue';
 import type { NewStaffInput, Staff, StaffUpdatePayload } from '@/types/calendar';
 
 defineProps<{
@@ -64,9 +91,34 @@ const showForm = ref<{
   remove: false
 });
 
+const canAddStaff = computed((): boolean => {
+  return newStaff.value.firstName.trim().length > 0 && newStaff.value.lastName.trim().length > 0;
+});
+
+const pendingStaffLabel = computed((): string => {
+  const firstName = newStaff.value.firstName.trim();
+  const lastName = newStaff.value.lastName.trim();
+
+  if (firstName.length === 0 && lastName.length === 0) {
+    return 'Staff Member';
+  }
+
+  return `${firstName} ${lastName}`.trim();
+});
+
 function emitStaff(payload: 'add' | Staff): void {
   if (payload === 'add') {
-    emit('update', ['add', newStaff.value]);
+    if (!canAddStaff.value) {
+      return;
+    }
+
+    emit('update', [
+      'add',
+      {
+        firstName: newStaff.value.firstName.trim(),
+        lastName: newStaff.value.lastName.trim()
+      }
+    ]);
   } else {
     emit('update', ['remove', payload]);
   }
@@ -93,70 +145,174 @@ function toggleEditStaffForm(form: 'add' | 'remove'): void {
   }
 }
 </script>
+
 <style lang="scss" scoped>
-.edit-staff-container {
+.edit-staff {
   display: flex;
-  flex-flow: column nowrap;
-  align-items: flex-start;
-  gap: 5px;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  text-shadow: none;
+}
 
-  .staff-button {
-    font:
-      400 14px/1.2 'Public Sans',
-      sans-serif;
-    background-color: #c4a1ff;
-    margin: 0 2px;
-    padding: 5px 8px;
-    transition: all 0.3s;
+.edit-staff__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
 
-    &:hover {
-      color: var(--ocean-gray);
-      background-color: #a388ee;
-      cursor: pointer;
-    }
+.edit-staff__panel {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--layout-radius-sm);
+  background-color: rgba(255, 255, 255, 0.05);
+  box-sizing: border-box;
+}
+
+.staff-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 999px;
+  padding: 7px 12px;
+  background: transparent;
+  color: var(--white);
+  font:
+    600 0.78rem/1 Arial,
+    sans-serif;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.12);
   }
 
-  .edit-staff-form {
-    margin-top: 15px;
+  &:disabled {
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.45);
+    cursor: not-allowed;
+  }
 
-    .add-staff-form {
-      display: flex;
-      flex-flow: column nowrap;
-      gap: 3px;
+  &.active {
+    border-color: var(--white);
+    background-color: rgba(255, 255, 255, 0.14);
+  }
+}
+
+.staff-button--primary {
+  background-color: rgba(255, 255, 255, 0.12);
+
+  &:hover:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+}
+
+.add-staff-form {
+  display: grid;
+  gap: 8px;
+
+  input {
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 8px;
+    padding: 10px 12px;
+    background-color: rgba(0, 0, 0, 0.18);
+    color: var(--white);
+    font:
+      400 0.85rem/1.2 Arial,
+      sans-serif;
+    box-sizing: border-box;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.58);
     }
 
-    .remove-staff-form {
-      display: flex;
-      flex-flow: column nowrap;
-      gap: 5px;
-
-      .remove-staff-card {
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: space-between;
-        align-items: center;
-        background: linear-gradient(var(--ocean-red) 0 0) var(--p, 0) / var(--p, 0) no-repeat;
-        transition:
-          0.5s,
-          background-position 0s;
-        padding: 3px;
-        font:
-          400 14px/1.2 'Arial',
-          sans-serif;
-
-        &:hover {
-          cursor: pointer;
-          --p: 100%;
-          background-position: right;
-          color: var(--white);
-        }
-
-        .remove-text {
-          font-size: 12px;
-          color: var(--white);
-        }
-      }
+    &:focus {
+      outline: 1px solid rgba(255, 255, 255, 0.4);
+      border-color: rgba(255, 255, 255, 0.38);
     }
+  }
+}
+
+.remove-staff-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.remove-staff-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--white);
+  font:
+    400 0.85rem/1.2 Arial,
+    sans-serif;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.26);
+    background-color: rgba(190, 40, 40, 0.28);
+    transform: translateY(-1px);
+  }
+}
+
+.remove-staff-name {
+  font-weight: 600;
+}
+
+.remove-text {
+  flex: 0 0 auto;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 640px) {
+  .edit-staff {
+    gap: 10px;
+  }
+
+  .edit-staff__actions {
+    gap: 6px;
+  }
+
+  .edit-staff__panel {
+    padding: 10px;
+  }
+
+  .staff-button {
+    padding: 6px 10px;
+    font-size: 0.72rem;
+  }
+
+  .add-staff-form input,
+  .remove-staff-card {
+    font-size: 0.8rem;
+  }
+
+  .remove-text {
+    font-size: 0.68rem;
   }
 }
 </style>
