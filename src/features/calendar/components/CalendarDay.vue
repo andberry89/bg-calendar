@@ -49,8 +49,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import CalendarEvent from './CalendarEvent.vue';
-import EventModal from './EventModal.vue';
-import DayModal from './DayModal.vue';
+import EventModal from '@/features/calendar/components/modals/EventModal.vue';
+import DayModal from '@/features/calendar/components/modals/DayModal.vue';
 import type { CalendarEvent as CalendarEventType, CurrentDate } from '@/types/calendar';
 
 type CalendarMonthOffset = 'prev' | 'next';

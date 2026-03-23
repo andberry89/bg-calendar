@@ -32,7 +32,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import DatePicker from './DatePicker.vue';
-import NewEventModal from './NewEventModal.vue';
+import NewEventModal from '@/features/calendar/components/modals/NewEventModal.vue';
 import { month } from '@/features/calendar/utils/selectOptions';
 import type { CurrentDate, NewCalendarEvent, Staff } from '@/types/calendar';
 

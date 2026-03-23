@@ -97,7 +97,7 @@ import { ref } from 'vue';
 import { compareDesc, parse } from 'date-fns';
 import Button from '@/components/Button.vue';
 import BaseModal from '@/components/BaseModal.vue';
-import { eventType } from '../utils/selectOptions';
+import { eventType } from '@/features/calendar/utils/selectOptions';
 import type {
   EventClass,
   EventType,
