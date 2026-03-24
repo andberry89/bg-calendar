@@ -98,34 +98,32 @@ const showEventDetails = ref(false);
 const modalEvent = ref<CalendarEventType | null>(null);
 const showDayModal = ref(false);
 
-const eventGroups = computed(
-  (): { holidays: CalendarEventType[]; regularEvents: CalendarEventType[] } => {
-    return props.events.reduce(
-      (groups, event) => {
-        if (event.type === 'Holiday') {
-          groups.holidays.push(event);
-        } else {
-          groups.regularEvents.push(event);
-        }
+const eventsByDisplayType = computed(() => {
+  const holidays: CalendarEventType[] = [];
+  const regular: CalendarEventType[] = [];
 
-        return groups;
-      },
-      {
-        holidays: [] as CalendarEventType[],
-        regularEvents: [] as CalendarEventType[]
-      }
-    );
+  for (const event of props.events) {
+    if (event.type === 'Holiday') {
+      holidays.push(event);
+    } else {
+      regular.push(event);
+    }
   }
-);
 
-const holidays = computed((): CalendarEventType[] => eventGroups.value.holidays);
-
-const filteredEvents = computed((): CalendarEventType[] => eventGroups.value.regularEvents);
-
-const allEvents = computed((): CalendarEventType[] => {
-  return [...holidays.value, ...filteredEvents.value];
+  return {
+    holidays,
+    regular
+  };
 });
 
+const holidays = computed((): CalendarEventType[] => eventsByDisplayType.value.holidays);
+
+const filteredEvents = computed((): CalendarEventType[] => eventsByDisplayType.value.regular);
+
+const allEvents = computed((): CalendarEventType[] => [
+  ...eventsByDisplayType.value.holidays,
+  ...eventsByDisplayType.value.regular
+]);
 const canOpenDayModal = computed((): boolean => {
   return props.dayClass === 'day' && allEvents.value.length > 0;
 });
