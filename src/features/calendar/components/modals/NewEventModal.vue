@@ -112,26 +112,14 @@ import Button from '@/components/Button.vue';
 import BaseModal from '@/components/BaseModal.vue';
 import { eventType } from '@/features/calendar/utils/selectOptions';
 import { shouldShowSpecialDayReminder } from '@/features/calendar/utils/eventRules';
+import {
+  createNewCalendarEvent,
+  type DraftCalendarEventInput
+} from '@/features/calendar/utils/eventCreation';
 import { validateEvent, getRequiredEventFields } from '@/features/calendar/utils/eventValidation';
-import type {
-  EventClass,
-  EventType,
-  HolidayClosure,
-  NewCalendarEvent,
-  Staff
-} from '@/types/calendar';
+import type { NewCalendarEvent, Staff } from '@/types/calendar';
 
 type CompareTarget = 'start' | 'end';
-
-interface DraftCalendarEvent {
-  class: EventClass | '';
-  closed: HolidayClosure;
-  details: string;
-  end: string;
-  type: EventType | '';
-  start: string;
-  staff: Staff[];
-}
 
 const { staff } = defineProps<{
   staff: Staff[];
@@ -145,7 +133,7 @@ const errors = ref<string[]>([]);
 const showErrMsg = ref(false);
 const showForm = ref(false);
 
-const createEmptyEvent = (): DraftCalendarEvent => ({
+const createEmptyEvent = (): DraftCalendarEventInput => ({
   class: '',
   closed: '',
   details: '',
@@ -155,7 +143,7 @@ const createEmptyEvent = (): DraftCalendarEvent => ({
   staff: []
 });
 
-const newEvent = ref<DraftCalendarEvent>(createEmptyEvent());
+const newEvent = ref<DraftCalendarEventInput>(createEmptyEvent());
 
 const requiredFields = computed(() =>
   newEvent.value.type ? new Set(getRequiredEventFields(newEvent.value.type)) : new Set()
@@ -163,27 +151,6 @@ const requiredFields = computed(() =>
 
 function isFieldDisabled(field: 'details' | 'staff'): boolean {
   return !!newEvent.value.type && !requiredFields.value.has(field);
-}
-
-function getEventClass(type: EventType): EventClass {
-  switch (type) {
-    case 'Auto Show':
-      return 'auto-show';
-    case 'Press Trip':
-      return 'press-trip';
-    case 'C/D Event':
-      return 'cd-event';
-    case 'Comp Day':
-      return 'comp-day';
-    case 'Vacation':
-      return 'vacation';
-    case 'Sick Time':
-      return 'sick-time';
-    case 'Holiday':
-      return 'holiday';
-    case 'Birthday':
-      return 'birthday';
-  }
 }
 
 function emitNewEvent(): void {
@@ -197,15 +164,7 @@ function emitNewEvent(): void {
     return;
   }
 
-  const normalizedEvent: NewCalendarEvent = {
-    ...event,
-    closed: event.type === 'Holiday' ? event.closed || 'none' : 'none',
-    staff: event.type === 'Holiday' ? [] : [...event.staff],
-    class: getEventClass(event.type),
-    type: event.type
-  };
-
-  emit('update', normalizedEvent);
+  emit('update', createNewCalendarEvent(event));
   closeForm();
 }
 
