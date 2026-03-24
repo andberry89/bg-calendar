@@ -1,12 +1,14 @@
 import type { EventType } from '@/types/calendar';
 
+type DraftEventType = EventType | '';
+
 export interface EventReminder {
   message: string;
   linkHref: string;
   linkLabel: string;
 }
 
-const specialDayReminderTypes: ReadonlySet<EventType> = new Set([
+export const specialDayReminderTypes: ReadonlySet<EventType> = new Set([
   'Press Trip',
   'Auto Show',
   'C/D Event',
@@ -19,10 +21,14 @@ export const specialDayReminder: EventReminder = {
   linkLabel: 'View In-Office Resources'
 };
 
-export function shouldShowSpecialDayReminder(type: EventType | ''): boolean {
+export function shouldShowSpecialDayReminder(type: DraftEventType): boolean {
   return type !== '' && specialDayReminderTypes.has(type);
 }
 
-export function getEventReminder(type: EventType | ''): EventReminder | null {
+export function getSpecialDayReminder(type: DraftEventType): EventReminder | null {
   return shouldShowSpecialDayReminder(type) ? specialDayReminder : null;
+}
+
+export function getEventReminder(type: DraftEventType): EventReminder | null {
+  return getSpecialDayReminder(type);
 }
