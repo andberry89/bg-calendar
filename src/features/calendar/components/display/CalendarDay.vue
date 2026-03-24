@@ -46,9 +46,9 @@
       </div>
     </div>
     <CalendarEvent
-      v-for="(event, idx) in filteredEvents"
+      v-for="(event, idx) in visibleRegularEvents"
       :key="'event-' + idx"
-      :class="['regular-event', { 'regular-event--overflow': idx >= 2 }]"
+      class="regular-event"
       :event="event"
       @click="openEventModal(event)"
       @update="updateEvents"
@@ -118,18 +118,21 @@ const eventsByDisplayType = computed(() => {
 
 const holidays = computed((): CalendarEventType[] => eventsByDisplayType.value.holidays);
 
-const filteredEvents = computed((): CalendarEventType[] => eventsByDisplayType.value.regular);
+const regularEvents = computed((): CalendarEventType[] => eventsByDisplayType.value.regular);
+
+const visibleRegularEvents = computed((): CalendarEventType[] => regularEvents.value.slice(0, 2));
 
 const allEvents = computed((): CalendarEventType[] => [
   ...eventsByDisplayType.value.holidays,
   ...eventsByDisplayType.value.regular
 ]);
+
 const canOpenDayModal = computed((): boolean => {
   return props.dayClass === 'day' && allEvents.value.length > 0;
 });
 
 const hiddenEventCount = computed((): number => {
-  return Math.max(filteredEvents.value.length - 2, 0);
+  return Math.max(regularEvents.value.length - visibleRegularEvents.value.length, 0);
 });
 
 const isFilteredEmptyDay = computed((): boolean => {
@@ -339,10 +342,6 @@ function closeDayModal(): void {
     padding: 2px 3px;
     font-size: 0.54rem;
     letter-spacing: 0.04em;
-  }
-
-  .regular-event--overflow {
-    display: none;
   }
 
   .more-events {
