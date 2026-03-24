@@ -1,36 +1,27 @@
 <template>
   <div class="event-container" @click.stop="emitEvent">
-    <div v-if="event.class === 'birthday'" :class="event.class">
-      {{ event.staff[0].shortName }}'s Birthday! 🎂
-    </div>
-    <div v-if="event.class === 'press-trip'" :class="event.class">
-      {{ event.staff[0].initials }} Press Trip
-    </div>
-    <div v-if="event.class === 'vacation'" :class="event.class">
-      {{ event.staff[0].initials }} Off (PTO)
-    </div>
-    <div v-if="event.class === 'sick-time'" :class="event.class">
-      {{ event.staff[0].initials }} Sick Time
-    </div>
-    <div v-if="event.class === 'auto-show'" :class="event.class">
-      <strong>Auto Show</strong><br />
-      {{ event.details }}
-    </div>
-    <div v-if="event.class === 'cd-event'" :class="event.class">
-      {{ event.details }}
-    </div>
-    <div v-if="event.class === 'comp-day'" :class="event.class">
-      {{ event.staff[0].initials }} Comp Day
-    </div>
-    <div v-if="event.class === 'holiday'" :class="event.class">
-      <strong>{{ event.details }}</strong
-      ><br />
-      <span class="office-closure" v-if="event.closed === 'half'">Early Close</span>
-      <span class="office-closure" v-if="event.closed === 'full'">Office Closed</span>
+    <div :class="event.class">
+      <template v-if="event.class === 'holiday'">
+        <strong>{{ primaryText }}</strong
+        ><br />
+        <span v-if="secondaryText" class="office-closure">{{ secondaryText }}</span>
+      </template>
+
+      <template v-else-if="event.class === 'auto-show'">
+        <strong>{{ primaryText }}</strong
+        ><br />
+        {{ secondaryText }}
+      </template>
+
+      <template v-else>
+        {{ primaryText }}
+      </template>
     </div>
   </div>
 </template>
+
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { CalendarEvent } from '@/types/calendar';
 
 const { event } = defineProps<{
@@ -41,10 +32,53 @@ const emit = defineEmits<{
   (e: 'update', value: CalendarEvent): void;
 }>();
 
+const primaryText = computed((): string => {
+  switch (event.class) {
+    case 'birthday':
+      return `${event.staff[0].firstName}'s Birthday! 🎂`;
+    case 'press-trip':
+      return `${event.staff[0].initials} Press Trip`;
+    case 'vacation':
+      return `${event.staff[0].initials} Off (PTO)`;
+    case 'sick-time':
+      return `${event.staff[0].initials} Sick Time`;
+    case 'auto-show':
+      return 'Auto Show';
+    case 'cd-event':
+      return event.details;
+    case 'comp-day':
+      return `${event.staff[0].initials} Comp Day`;
+    case 'holiday':
+      return event.details;
+    default:
+      return '';
+  }
+});
+
+const secondaryText = computed((): string => {
+  switch (event.class) {
+    case 'auto-show':
+      return event.details;
+    case 'holiday':
+      if (event.closed === 'half') {
+        return 'Early Close';
+      }
+
+      if (event.closed === 'full') {
+        return 'Office Closed';
+      }
+
+      return '';
+    default:
+      return '';
+  }
+});
+
 function emitEvent(): void {
   emit('update', event);
 }
 </script>
+
 <style lang="scss" scoped>
 .event-container {
   width: 100%;
