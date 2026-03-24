@@ -10,6 +10,35 @@ interface EventValidationInput {
   staff: Staff[];
 }
 
+export type EventField = 'details' | 'staff';
+
+export function getRequiredEventFields(type: DraftEventType): EventField[] {
+  if (!type) {
+    return [];
+  }
+
+  const requiredFields: EventField[] = [];
+
+  if (requiresDetails(type)) {
+    requiredFields.push('details');
+  }
+
+  if (type === 'Comp Day' || type === 'Birthday') {
+    requiredFields.push('staff');
+    return requiredFields;
+  }
+
+  if (requiresStaff(type)) {
+    requiredFields.push('staff');
+  }
+
+  return requiredFields;
+}
+
+export function isFieldRequired(type: DraftEventType, field: EventField): boolean {
+  return getRequiredEventFields(type).includes(field);
+}
+
 const detailOptionalTypes: ReadonlySet<EventType> = new Set([
   'Vacation',
   'Sick Time',
