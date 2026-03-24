@@ -1,10 +1,11 @@
 import type { EventType } from '@/types/calendar';
-import type { EventField } from '@/features/calendar/utils/eventValidation';
 
 type DraftEventType = EventType | '';
 
+export type EventTypeField = 'details' | 'staff';
+
 export interface EventTypeConfig {
-  requiredFields: EventField[];
+  requiredFields: EventTypeField[];
   showsSpecialDayReminder: boolean;
 }
 
@@ -47,7 +48,7 @@ export function getEventTypeConfig(type: DraftEventType): EventTypeConfig | null
   return type ? eventTypeConfig[type] : null;
 }
 
-export function isEventFieldRequired(type: DraftEventType, field: EventField): boolean {
+export function isEventFieldRequired(type: DraftEventType, field: EventTypeField): boolean {
   const config = getEventTypeConfig(type);
 
   return config ? config.requiredFields.includes(field) : false;
