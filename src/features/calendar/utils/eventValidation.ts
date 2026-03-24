@@ -1,4 +1,5 @@
 import type { EventType, Staff } from '@/types/calendar';
+import { getEventTypeConfig } from '@/features/calendar/utils/eventTypeConfig';
 
 type DraftEventType = EventType | '';
 
@@ -13,47 +14,12 @@ interface EventValidationInput {
 export type EventField = 'details' | 'staff';
 
 export function getRequiredEventFields(type: DraftEventType): EventField[] {
-  if (!type) {
-    return [];
-  }
-
-  const requiredFields: EventField[] = [];
-
-  if (requiresDetails(type)) {
-    requiredFields.push('details');
-  }
-
-  if (type === 'Comp Day' || type === 'Birthday') {
-    requiredFields.push('staff');
-    return requiredFields;
-  }
-
-  if (requiresStaff(type)) {
-    requiredFields.push('staff');
-  }
-
-  return requiredFields;
+  const config = getEventTypeConfig(type);
+  return config ? config.requiredFields : [];
 }
 
 export function isFieldRequired(type: DraftEventType, field: EventField): boolean {
   return getRequiredEventFields(type).includes(field);
-}
-
-const detailOptionalTypes: ReadonlySet<EventType> = new Set([
-  'Vacation',
-  'Sick Time',
-  'Birthday',
-  'Comp Day'
-]);
-
-const staffOptionalTypes: ReadonlySet<EventType> = new Set(['Holiday', 'C/D Event']);
-
-function requiresDetails(type: DraftEventType): boolean {
-  return type !== '' && !detailOptionalTypes.has(type);
-}
-
-function requiresStaff(type: DraftEventType): boolean {
-  return type !== '' && !staffOptionalTypes.has(type);
 }
 
 export function validateEvent(input: EventValidationInput): string[] {
@@ -71,7 +37,7 @@ export function validateEvent(input: EventValidationInput): string[] {
     errors.push('End Date');
   }
 
-  if (requiresDetails(input.type) && !input.details) {
+  if (getRequiredEventFields(input.type).includes('details') && !input.details) {
     errors.push('Event Details');
   }
 
@@ -83,7 +49,7 @@ export function validateEvent(input: EventValidationInput): string[] {
     return errors;
   }
 
-  if (requiresStaff(input.type) && input.staff.length === 0) {
+  if (getRequiredEventFields(input.type).includes('staff') && input.staff.length === 0) {
     errors.push('Staff');
   }
 
