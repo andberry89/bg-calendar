@@ -13,7 +13,7 @@
       :currentDate="currentDate"
       :date="date"
       :day="getDay"
-      :events="allEvents"
+      :events="eventsForDay"
       @update="closeDayModal"
       @delete="deleteEvent"
       @click.stop
@@ -122,13 +122,13 @@ const regularEvents = computed((): CalendarEventType[] => eventsByDisplayType.va
 
 const visibleRegularEvents = computed((): CalendarEventType[] => regularEvents.value.slice(0, 2));
 
-const allEvents = computed((): CalendarEventType[] => [
+const eventsForDay = computed((): CalendarEventType[] => [
   ...eventsByDisplayType.value.holidays,
   ...eventsByDisplayType.value.regular
 ]);
 
 const canOpenDayModal = computed((): boolean => {
-  return props.dayClass === 'day' && allEvents.value.length > 0;
+  return props.dayClass === 'day' && eventsForDay.value.length > 0;
 });
 
 const hiddenEventCount = computed((): number => {
@@ -136,7 +136,7 @@ const hiddenEventCount = computed((): number => {
 });
 
 const isFilteredEmptyDay = computed((): boolean => {
-  return props.dayClass === 'day' && props.hasUnfilteredEvents && allEvents.value.length === 0;
+  return props.dayClass === 'day' && props.hasUnfilteredEvents && eventsForDay.value.length === 0;
 });
 
 const displayDate = computed((): CurrentDate => {
