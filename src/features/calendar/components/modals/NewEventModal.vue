@@ -18,15 +18,7 @@
             </option>
           </select>
 
-          <div
-            v-if="
-              newEvent.type === 'Press Trip' ||
-              newEvent.type === 'Auto Show' ||
-              newEvent.type === 'C/D Event' ||
-              newEvent.type === 'Comp Day'
-            "
-            class="event-reminder"
-          >
+          <div v-if="shouldShowSpecialDayReminder(newEvent.type)" class="event-reminder">
             Reminder: Update the Special Day Tracker.
             <a
               href="https://www.myhearst.com/group/magazines/in-office-resources"
@@ -117,6 +109,7 @@ import { compareDesc, parse } from 'date-fns';
 import Button from '@/components/Button.vue';
 import BaseModal from '@/components/BaseModal.vue';
 import { eventType } from '@/features/calendar/utils/selectOptions';
+import { shouldShowSpecialDayReminder } from '@/features/calendar/utils/eventRules';
 import type {
   EventClass,
   EventType,
