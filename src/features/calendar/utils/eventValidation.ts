@@ -46,7 +46,7 @@ export function validateEvent(input: EventValidationInput): string[] {
     errors.push('Event Details');
   }
 
-  if (input.type === 'Comp Day') {
+  if (input.type === 'Comp Day' || input.type === 'Birthday') {
     if (input.staff.length !== 1) {
       errors.push('Exactly 1 Staff Member');
     }
