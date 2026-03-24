@@ -1,4 +1,5 @@
 import type { EventType } from '@/types/calendar';
+import { showsSpecialDayReminder } from '@/features/calendar/utils/eventTypeConfig';
 
 type DraftEventType = EventType | '';
 
@@ -8,13 +9,6 @@ export interface EventReminder {
   linkLabel: string;
 }
 
-export const specialDayReminderTypes: ReadonlySet<EventType> = new Set([
-  'Press Trip',
-  'Auto Show',
-  'C/D Event',
-  'Comp Day'
-]);
-
 export const specialDayReminder: EventReminder = {
   message: 'Reminder: Update the Special Day Tracker.',
   linkHref: 'https://www.myhearst.com/group/magazines/in-office-resources',
@@ -22,7 +16,7 @@ export const specialDayReminder: EventReminder = {
 };
 
 export function shouldShowSpecialDayReminder(type: DraftEventType): boolean {
-  return type !== '' && specialDayReminderTypes.has(type);
+  return showsSpecialDayReminder(type);
 }
 
 export function getSpecialDayReminder(type: DraftEventType): EventReminder | null {
