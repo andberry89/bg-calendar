@@ -106,7 +106,7 @@ import { computed, ref } from 'vue';
 import Button from '@/components/Button.vue';
 import BaseModal from '@/components/BaseModal.vue';
 import { eventType } from '@/features/calendar/utils/selectOptions';
-import { getEventReminder } from '@/features/calendar/utils/eventRules';
+import { getSpecialDayReminder } from '@/features/calendar/utils/eventRules';
 import {
   createNewCalendarEvent,
   type DraftCalendarEventInput
@@ -139,7 +139,7 @@ const createEmptyEvent = (): DraftCalendarEventInput => ({
 
 const newEvent = ref<DraftCalendarEventInput>(createEmptyEvent());
 
-const eventReminder = computed(() => getEventReminder(newEvent.value.type));
+const eventReminder = computed(() => getSpecialDayReminder(newEvent.value.type));
 
 const requiredFields = computed(() =>
   newEvent.value.type ? new Set(getRequiredEventFields(newEvent.value.type)) : new Set()
