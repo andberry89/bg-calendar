@@ -79,7 +79,7 @@ function deleteEvent(): void {
   border: 1px solid var(--black);
   border-radius: 8px;
   font:
-    400 0.9rem/1.2 'Arial',
+    400 0.95rem/1.35 'Arial',
     sans-serif;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
   min-height: 140px;
@@ -118,7 +118,7 @@ function deleteEvent(): void {
 
     .event-name {
       font-weight: 700;
-      font-size: 1rem;
+      font-size: 1.05rem;
       border-bottom: 1px solid var(--black);
 
       .event-type {
@@ -211,11 +211,11 @@ function deleteEvent(): void {
   }
 
   .event-modal .event-header {
-    padding-right: 34px;
+    padding-right: 38px;
 
     .event-name {
-      font-size: 0.95rem;
-      line-height: 1.3;
+      font-size: 1rem;
+      line-height: 1.4;
     }
   }
 
