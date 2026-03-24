@@ -18,14 +18,10 @@
             </option>
           </select>
 
-          <div v-if="shouldShowSpecialDayReminder(newEvent.type)" class="event-reminder">
-            Reminder: Update the Special Day Tracker.
-            <a
-              href="https://www.myhearst.com/group/magazines/in-office-resources"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View In-Office Resources
+          <div v-if="eventReminder" class="event-reminder">
+            {{ eventReminder.message }}
+            <a :href="eventReminder.linkHref" target="_blank" rel="noopener noreferrer">
+              {{ eventReminder.linkLabel }}
             </a>
           </div>
 
@@ -111,7 +107,7 @@ import { compareDesc, parse } from 'date-fns';
 import Button from '@/components/Button.vue';
 import BaseModal from '@/components/BaseModal.vue';
 import { eventType } from '@/features/calendar/utils/selectOptions';
-import { shouldShowSpecialDayReminder } from '@/features/calendar/utils/eventRules';
+import { getEventReminder } from '@/features/calendar/utils/eventRules';
 import {
   createNewCalendarEvent,
   type DraftCalendarEventInput
@@ -144,6 +140,8 @@ const createEmptyEvent = (): DraftCalendarEventInput => ({
 });
 
 const newEvent = ref<DraftCalendarEventInput>(createEmptyEvent());
+
+const eventReminder = computed(() => getEventReminder(newEvent.value.type));
 
 const requiredFields = computed(() =>
   newEvent.value.type ? new Set(getRequiredEventFields(newEvent.value.type)) : new Set()
