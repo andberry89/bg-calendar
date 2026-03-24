@@ -44,6 +44,7 @@
               v-model="newEvent.details"
               name="details"
               id="details"
+              :disabled="isFieldDisabled('details')"
             />
           </div>
 
@@ -81,6 +82,7 @@
                 :name="'staff-' + idx"
                 :value="s"
                 v-model="newEvent.staff"
+                :disabled="isFieldDisabled('staff')"
               />
               <label :for="'staff-' + idx">{{ s.shortName }}</label>
             </li>
@@ -110,7 +112,7 @@ import Button from '@/components/Button.vue';
 import BaseModal from '@/components/BaseModal.vue';
 import { eventType } from '@/features/calendar/utils/selectOptions';
 import { shouldShowSpecialDayReminder } from '@/features/calendar/utils/eventRules';
-import { validateEvent } from '@/features/calendar/utils/eventValidation';
+import { validateEvent, isFieldRequired } from '@/features/calendar/utils/eventValidation';
 import type {
   EventClass,
   EventType,
@@ -154,6 +156,10 @@ const createEmptyEvent = (): DraftCalendarEvent => ({
 });
 
 const newEvent = ref<DraftCalendarEvent>(createEmptyEvent());
+
+function isFieldDisabled(field: 'details' | 'staff'): boolean {
+  return !!newEvent.value.type && !isFieldRequired(newEvent.value.type, field);
+}
 
 function getEventClass(type: EventType): EventClass {
   switch (type) {
