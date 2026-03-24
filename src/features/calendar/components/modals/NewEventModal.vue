@@ -110,6 +110,7 @@ import Button from '@/components/Button.vue';
 import BaseModal from '@/components/BaseModal.vue';
 import { eventType } from '@/features/calendar/utils/selectOptions';
 import { shouldShowSpecialDayReminder } from '@/features/calendar/utils/eventRules';
+import { validateEvent } from '@/features/calendar/utils/eventValidation';
 import type {
   EventClass,
   EventType,
@@ -215,43 +216,6 @@ function compareDates(target: CompareTarget): void {
       if (target === 'start') newEvent.value.start = newEvent.value.end;
     }
   }
-}
-
-function validateEvent(event: DraftCalendarEvent): string[] {
-  const validationErrors: string[] = [];
-
-  if (!event.type) {
-    validationErrors.push('Event Type');
-  }
-
-  if (!event.start) {
-    validationErrors.push('Start Date');
-  }
-
-  if (!event.end) {
-    validationErrors.push('End Date');
-  }
-
-  const requiresDetails =
-    event.type &&
-    event.type !== 'Vacation' &&
-    event.type !== 'Sick Time' &&
-    event.type !== 'Birthday' &&
-    event.type !== 'Comp Day';
-
-  if (requiresDetails && !event.details) {
-    validationErrors.push('Event Details');
-  }
-
-  const requiresStaff = event.type && event.type !== 'Holiday' && event.type !== 'C/D Event';
-
-  if (event.type === 'Comp Day' && event.staff.length !== 1) {
-    validationErrors.push('Exactly 1 Staff Member');
-  } else if (requiresStaff && event.staff.length === 0) {
-    validationErrors.push('Staff');
-  }
-
-  return validationErrors;
 }
 
 function resetNewEvent(): void {
