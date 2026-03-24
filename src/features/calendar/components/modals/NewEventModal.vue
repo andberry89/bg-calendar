@@ -106,13 +106,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { compareDesc, parse } from 'date-fns';
 import Button from '@/components/Button.vue';
 import BaseModal from '@/components/BaseModal.vue';
 import { eventType } from '@/features/calendar/utils/selectOptions';
 import { shouldShowSpecialDayReminder } from '@/features/calendar/utils/eventRules';
-import { validateEvent, isFieldRequired } from '@/features/calendar/utils/eventValidation';
+import { validateEvent, getRequiredEventFields } from '@/features/calendar/utils/eventValidation';
 import type {
   EventClass,
   EventType,
@@ -157,8 +157,12 @@ const createEmptyEvent = (): DraftCalendarEvent => ({
 
 const newEvent = ref<DraftCalendarEvent>(createEmptyEvent());
 
+const requiredFields = computed(() =>
+  newEvent.value.type ? new Set(getRequiredEventFields(newEvent.value.type)) : new Set()
+);
+
 function isFieldDisabled(field: 'details' | 'staff'): boolean {
-  return !!newEvent.value.type && !isFieldRequired(newEvent.value.type, field);
+  return !!newEvent.value.type && !requiredFields.value.has(field);
 }
 
 function getEventClass(type: EventType): EventClass {
