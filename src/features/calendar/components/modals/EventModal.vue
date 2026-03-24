@@ -69,6 +69,9 @@ function deleteEvent(): void {
   width: 275px;
   max-width: calc(100vw - 24px);
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   text-align: left;
   background-color: var(--light-gray);
   color: var(--black);
@@ -79,10 +82,7 @@ function deleteEvent(): void {
     400 0.9rem/1.2 'Arial',
     sans-serif;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
-
-  div {
-    margin: 5px 0;
-  }
+  min-height: 140px;
 
   .close-btn {
     position: absolute;
@@ -111,6 +111,9 @@ function deleteEvent(): void {
   }
 
   .event-header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     padding-right: 34px;
 
     .event-name {
@@ -122,8 +125,11 @@ function deleteEvent(): void {
         font-weight: 400;
       }
     }
-
     .event-staff {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
       p {
         margin: 0;
       }
@@ -131,11 +137,12 @@ function deleteEvent(): void {
   }
 
   .event-options {
-    margin-top: 20px;
-    padding-top: 5px;
+    margin-top: auto;
+    padding-top: 10px;
     display: flex;
     flex-flow: row nowrap;
     justify-content: flex-end;
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
     font-size: 0.8rem;
   }
 
@@ -171,13 +178,18 @@ function deleteEvent(): void {
     top: 50%;
     left: 50%;
     right: auto;
-    width: min(280px, calc(100vw - 16px));
+    width: min(320px, calc(100vw - 16px));
     max-width: calc(100vw - 16px);
-    max-height: calc(100vh - 24px);
-    padding: 10px 8px 8px;
-    font-size: 0.8rem;
+    max-height: min(420px, calc(100vh - 24px));
+    padding: 12px 10px 10px;
+    font-size: 0.85rem;
     overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
     transform: translate(-50%, -50%);
+    margin: 0;
+    box-sizing: border-box;
+    scrollbar-gutter: stable;
   }
 
   .left,
@@ -187,8 +199,8 @@ function deleteEvent(): void {
   }
 
   .event-modal .close-btn {
-    top: 5px;
-    right: 5px;
+    top: 6px;
+    right: 6px;
     min-width: 36px;
     min-height: 36px;
   }
@@ -199,16 +211,17 @@ function deleteEvent(): void {
   }
 
   .event-modal .event-header {
-    padding-right: 30px;
+    padding-right: 34px;
 
     .event-name {
-      font-size: 0.9rem;
+      font-size: 0.95rem;
+      line-height: 1.3;
     }
   }
 
   .event-modal .event-options {
-    margin-top: 14px;
-    font-size: 0.74rem;
+    margin-top: 8px;
+    font-size: 0.8rem;
   }
 }
 </style>
