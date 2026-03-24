@@ -1,6 +1,8 @@
 <template>
   <div :class="['event-modal', day < 4 ? 'right' : 'left']" v-click-outside="closeModal">
-    <div class="close-btn" @click="closeModal">X</div>
+    <button class="close-btn" type="button" aria-label="Close event details" @click="closeModal">
+      ×
+    </button>
     <div class="event-header">
       <div class="event-name">
         <span class="event-type"
@@ -18,7 +20,7 @@
       </div>
     </div>
     <div class="event-options">
-      <span @click="deleteEvent">Delete Event &#x2718;</span>
+      <button class="delete-btn" type="button" @click="deleteEvent">Delete Event ✘</button>
     </div>
   </div>
 </template>
@@ -86,18 +88,25 @@ function deleteEvent(): void {
     position: absolute;
     top: 6px;
     right: 6px;
-    padding: 2px 7px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0;
     border-radius: 999px;
     border: 1px solid var(--black);
     background-color: var(--ocean-event-detail);
+    color: var(--black);
     transition: 0.2s;
     line-height: 1;
+    font: inherit;
+    cursor: pointer;
 
     &:hover {
       background-color: var(--white);
       border-color: var(--black);
       color: var(--black);
-      cursor: pointer;
     }
   }
 
@@ -128,15 +137,22 @@ function deleteEvent(): void {
     flex-flow: row nowrap;
     justify-content: flex-end;
     font-size: 0.8rem;
+  }
 
-    span {
-      display: inline-block;
-      transition: 0.2s;
+  .delete-btn {
+    min-height: 32px;
+    padding: 6px 10px;
+    border: 1px solid var(--black);
+    border-radius: 8px;
+    background-color: var(--white);
+    color: var(--black);
+    font: inherit;
+    transition: 0.2s;
+    cursor: pointer;
 
-      &:hover {
-        color: var(--ocean-event-detail);
-        cursor: pointer;
-      }
+    &:hover {
+      color: var(--ocean-event-detail);
+      border-color: var(--ocean-event-detail);
     }
   }
 }
@@ -173,7 +189,13 @@ function deleteEvent(): void {
   .event-modal .close-btn {
     top: 5px;
     right: 5px;
-    padding: 2px 6px;
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  .event-modal .delete-btn {
+    min-height: 36px;
+    padding: 8px 12px;
   }
 
   .event-modal .event-header {
