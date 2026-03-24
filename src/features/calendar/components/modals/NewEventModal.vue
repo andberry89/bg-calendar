@@ -103,7 +103,6 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { compareDesc, parse } from 'date-fns';
 import Button from '@/components/Button.vue';
 import BaseModal from '@/components/BaseModal.vue';
 import { eventType } from '@/features/calendar/utils/selectOptions';
@@ -112,10 +111,9 @@ import {
   createNewCalendarEvent,
   type DraftCalendarEventInput
 } from '@/features/calendar/utils/eventCreation';
+import { syncEventDates, type DateSyncTarget } from '@/features/calendar/utils/eventDateSync';
 import { validateEvent, getRequiredEventFields } from '@/features/calendar/utils/eventValidation';
 import type { NewCalendarEvent, Staff } from '@/types/calendar';
-
-type CompareTarget = 'start' | 'end';
 
 const { staff } = defineProps<{
   staff: Staff[];
@@ -166,23 +164,16 @@ function emitNewEvent(): void {
   closeForm();
 }
 
-function compareDates(target: CompareTarget): void {
-  if (newEvent.value.end === '') {
-    newEvent.value.end = newEvent.value.start;
-  } else if (newEvent.value.start === '') {
-    newEvent.value.start = newEvent.value.end;
-  } else if (newEvent.value.type === 'Birthday') {
-    newEvent.value.end = newEvent.value.start;
-  } else {
-    const startDate = parse(newEvent.value.start, 'yyyy-MM-dd', new Date());
-    const endDate = parse(newEvent.value.end, 'yyyy-MM-dd', new Date());
-    const result = compareDesc(startDate, endDate);
+function compareDates(target: DateSyncTarget): void {
+  const syncedDates = syncEventDates({
+    start: newEvent.value.start,
+    end: newEvent.value.end,
+    type: newEvent.value.type,
+    target
+  });
 
-    if (result < 0) {
-      if (target === 'end') newEvent.value.end = newEvent.value.start;
-      if (target === 'start') newEvent.value.start = newEvent.value.end;
-    }
-  }
+  newEvent.value.start = syncedDates.start;
+  newEvent.value.end = syncedDates.end;
 }
 
 function resetNewEvent(): void {
