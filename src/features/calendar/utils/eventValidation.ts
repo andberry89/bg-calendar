@@ -19,10 +19,6 @@ export function getRequiredEventFields(type: DraftEventType): EventField[] {
   return config ? config.requiredFields : [];
 }
 
-export function isFieldRequired(type: DraftEventType, field: EventField): boolean {
-  return getRequiredEventFields(type).includes(field);
-}
-
 export function validateEvent(input: EventValidationInput): string[] {
   const errors: string[] = [];
 
