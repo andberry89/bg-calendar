@@ -1,4 +1,5 @@
 import type { EventType, Staff } from '@/types/calendar';
+import type { EventTypeField } from '@/features/calendar/utils/eventTypeConfig';
 import { getEventTypeConfig } from '@/features/calendar/utils/eventTypeConfig';
 
 type DraftEventType = EventType | '';
@@ -11,7 +12,7 @@ interface EventValidationInput {
   staff: Staff[];
 }
 
-export type EventField = 'details' | 'staff';
+export type EventField = EventTypeField;
 
 export function getRequiredEventFields(type: DraftEventType): EventField[] {
   const config = getEventTypeConfig(type);
