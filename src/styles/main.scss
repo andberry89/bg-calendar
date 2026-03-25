@@ -1,1 +1,6 @@
+@import './tokens.scss';
+@import './base.scss';
+@import './utilities.scss';
+
+/* Temporary bridge: keep existing global CSS */
 @import '../main.css';
