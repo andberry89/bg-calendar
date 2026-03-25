@@ -287,22 +287,22 @@ function reset(): void {
   align-items: center;
   gap: 8px;
   flex: 0 0 auto;
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 999px;
   padding: 5px 12px;
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(248, 250, 252, 0.9);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(248, 250, 252, 0.92);
   font:
     600 0.72rem/1 Arial,
     sans-serif;
   cursor: pointer;
-  backdrop-filter: blur(6px);
   transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease,
-    opacity 0.18s ease,
-    background-color 0.18s ease,
-    border-color 0.18s ease;
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    opacity 0.16s ease,
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease;
 }
 
 .type-pill-dot {
@@ -310,13 +310,13 @@ function reset(): void {
   height: 8px;
   border-radius: 999px;
   background: var(--type-pill-color);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.14);
   flex: 0 0 8px;
 }
 
 .type-pill:hover {
   transform: translateY(-1px);
-  background: rgba(255, 255, 255, 0.18);
+  background: color-mix(in srgb, var(--type-pill-color) 12%, white 88%);
+  color: rgba(15, 23, 42, 0.92);
 }
 
 .type-pill.dimmed {
@@ -330,9 +330,10 @@ function reset(): void {
 
 .type-pill.active {
   opacity: 1;
-  background: rgba(255, 255, 255, 0.22);
-  border-color: rgba(255, 255, 255, 0.45);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.18);
+  background: color-mix(in srgb, var(--type-pill-color) 18%, white 82%);
+  border-color: color-mix(in srgb, var(--type-pill-color) 40%, white 60%);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--type-pill-color) 20%, transparent);
+  color: rgba(15, 23, 42, 0.94);
 }
 
 .reset-button {
