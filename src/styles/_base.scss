@@ -12,7 +12,8 @@ body,
 }
 
 body {
-  color: var(--color-text);
-  background: var(--color-background);
+  color: var(--calendar-text);
+  background: var(--calendar-bg);
   font-family: Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
