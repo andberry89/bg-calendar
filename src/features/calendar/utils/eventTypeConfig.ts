@@ -68,3 +68,8 @@ export function showsSpecialDayReminder(type: DraftEventType): boolean {
 
   return config ? config.showsSpecialDayReminder : false;
 }
+
+export function getEventTypeColor(type: DraftEventType): string | null {
+  const config = getEventTypeConfig(type);
+  return config ? `var(${config.colorVar})` : null;
+}
