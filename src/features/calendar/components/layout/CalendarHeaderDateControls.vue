@@ -92,23 +92,28 @@ function goToPreviousMonth(): void {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--white);
-  border-radius: 8px;
-  padding: 4px 14px;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  text-shadow: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  padding: 5px 14px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(248, 250, 252, 0.92);
+  font:
+    600 0.85rem/1 Arial,
+    sans-serif;
   line-height: 1;
   white-space: nowrap;
   cursor: pointer;
+  backdrop-filter: blur(6px);
   transition:
     background-color 0.2s ease,
     border-color 0.2s ease,
-    transform 0.2s ease;
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
-    background-color: var(--ocean-lt-blue);
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-1px);
   }
 }
 

@@ -254,42 +254,43 @@ function reset(): void {
 
 .type-pill {
   flex: 0 0 auto;
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.22);
   border-radius: 999px;
-  padding: 4px 10px;
-  color: var(--dark-gray);
+  padding: 5px 12px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(248, 250, 252, 0.9);
   font:
     600 0.72rem/1 Arial,
     sans-serif;
-  text-shadow: none;
   cursor: pointer;
+  backdrop-filter: blur(6px);
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    opacity 0.2s ease,
-    background-color 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease;
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    opacity 0.18s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease;
 }
 
 .type-pill:hover {
   transform: translateY(-1px);
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .type-pill.dimmed {
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 .type-pill.inactive {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.78);
-  box-shadow: none;
+  opacity: 0.55;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .type-pill.active {
   opacity: 1;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.18);
 }
 
 .type-pill.inactive.auto-show,
@@ -300,55 +301,30 @@ function reset(): void {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-.auto-show {
-  background-color: var(--ocean-auto-show);
-}
-
-.cd-event {
-  background-color: var(--ocean-cd-event);
-}
-
-.vacation {
-  background-color: var(--ocean-off);
-  opacity: 0.85;
-}
-
-.sick-time {
-  background-color: var(--ocean-yellow);
-}
-
-.press-trip {
-  background-color: var(--ocean-press-trip);
-}
-
-.comp-day {
-  background-color: var(--ocean-comp-day);
-}
-
 .reset-button {
   flex: 0 0 auto;
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.45);
   border-radius: 999px;
-  padding: 4px 10px;
-  background: transparent;
-  color: var(--white);
+  padding: 5px 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(248, 250, 252, 0.9);
   font:
     600 0.72rem/1 Arial,
     sans-serif;
-  text-shadow: none;
   cursor: pointer;
+  backdrop-filter: blur(6px);
   transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease;
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    opacity 0.18s ease;
 }
 
 .reset-button:hover:not(:disabled) {
-  background-color: var(--ocean-lt-blue);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .reset-button:disabled {
-  border-color: rgba(255, 255, 255, 0.24);
-  color: rgba(255, 255, 255, 0.5);
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
