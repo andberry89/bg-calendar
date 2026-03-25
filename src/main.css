@@ -19,13 +19,3 @@
   --layout-panel-bg: var(--calendar-header-gradient-jan);
   --layout-panel-overlay: var(--lt-tran-black);
 }
-
-body {
-  margin: 0;
-  background-color: var(--calendar-bg);
-  color: var(--calendar-text);
-}
-
-#app {
-  min-height: 100vh;
-}
