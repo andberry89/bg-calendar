@@ -159,7 +159,7 @@ const primaryText = computed((): string => {
     case 'auto-show':
       return 'Auto Show';
     case 'cd-event':
-      return event.details || 'C/D Event';
+      return 'C/D Event';
     case 'comp-day':
       return event.staff[0]?.initials ?? 'Staff';
     case 'holiday':
@@ -180,6 +180,8 @@ const secondaryText = computed((): string => {
     case 'sick-time':
       return 'Sick Time';
     case 'auto-show':
+      return event.details;
+    case 'cd-event':
       return event.details;
     case 'comp-day':
       return 'Comp Day';
