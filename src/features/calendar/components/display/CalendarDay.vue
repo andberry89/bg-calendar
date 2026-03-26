@@ -171,7 +171,7 @@ const visibleRegularEventLimit = computed((): number => {
     return 1;
   }
 
-  return 2;
+  return isMobile.value ? 2 : 3;
 });
 
 const visibleRegularEvents = computed((): CalendarEventType[] => {
@@ -468,14 +468,12 @@ function closeDayModal(): void {
     background-color 0.16s ease,
     border-color 0.16s ease,
     transform 0.16s ease;
-  visibility: hidden;
 
   &:hover {
     background: color-mix(in srgb, var(--calendar-surface-muted) 70%, white 30%);
     transform: translateY(-1px);
   }
 }
-
 @media (max-width: 900px) and (min-width: 641px) {
   .holiday-chip {
     padding: 8px 12px;
