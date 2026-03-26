@@ -37,24 +37,31 @@
       ]"
       @click.stop="openDayModal"
     >
-      <span class="date-text__day">{{ date }}</span>
-      <span v-if="isFilteredEmptyDay" class="filtered-empty-note">Filtered</span>
-    </div>
+      <div class="date-text__row">
+        <div class="date-text__main">
+          <span class="date-text__day">{{ date }}</span>
+          <span v-if="isFilteredEmptyDay" class="filtered-empty-note">Filtered</span>
+        </div>
 
-    <div v-if="visibleHolidayBadges.length > 0" class="date-badges">
-      <div
-        v-for="(event, idx) in visibleHolidayBadges"
-        :key="'holiday-badge-' + idx"
-        class="date-badge"
-        :class="{
-          'date-badge--half': event.closed === 'half',
-          'date-badge--open': event.closed === 'none' || event.closed === ''
-        }"
-      >
-        <span class="date-badge__label">
-          {{ event.details || event.type }}
-        </span>
-        <span v-if="event.closed === 'half'" class="date-badge__meta">Early Close</span>
+        <div
+          v-if="primaryHolidayBadge"
+          class="date-badge"
+          :class="{
+            'date-badge--half': primaryHolidayBadge.closed === 'half',
+            'date-badge--open':
+              primaryHolidayBadge.closed === 'none' || primaryHolidayBadge.closed === ''
+          }"
+        >
+          <span class="date-badge__label">
+            {{ primaryHolidayBadge.details || primaryHolidayBadge.type }}
+          </span>
+          <span v-if="primaryHolidayBadge.closed === 'half'" class="date-badge__meta">
+            Early Close
+          </span>
+          <span v-else-if="hiddenHolidayBadgeCount > 0" class="date-badge__meta">
+            +{{ hiddenHolidayBadgeCount }}
+          </span>
+        </div>
       </div>
     </div>
 
@@ -160,6 +167,14 @@ const holidays = computed((): CalendarEventType[] => eventGroups.value.holidays)
 
 const visibleHolidayBadges = computed((): CalendarEventType[] => {
   return holidays.value.filter((event) => event.closed !== 'full');
+});
+
+const primaryHolidayBadge = computed((): CalendarEventType | null => {
+  return visibleHolidayBadges.value[0] ?? null;
+});
+
+const hiddenHolidayBadgeCount = computed((): number => {
+  return Math.max(visibleHolidayBadges.value.length - 1, 0);
 });
 
 const filteredEvents = computed((): CalendarEventType[] => eventGroups.value.regularEvents);
@@ -364,14 +379,32 @@ function closeDayModal(): void {
 .date-text {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 2px;
   width: 100%;
+  min-height: 30px;
   margin-bottom: 2px;
   padding: 0 0 6px;
   border-bottom: 1px solid var(--calendar-border-subtle);
   color: var(--calendar-text);
   text-align: left;
+}
+
+.date-text__row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+.date-text__main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
 }
 
 .date-text__day {
@@ -416,7 +449,8 @@ function closeDayModal(): void {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  max-width: 100%;
+  flex: 0 1 auto;
+  max-width: 62%;
   min-width: 0;
   padding: 2px 6px;
   border: 1px solid var(--holiday-open-border);
@@ -434,6 +468,7 @@ function closeDayModal(): void {
 
 .date-badge__label,
 .date-badge__meta {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -448,6 +483,7 @@ function closeDayModal(): void {
 }
 
 .date-badge__meta {
+  flex: 0 0 auto;
   font-size: 0.5rem;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -527,12 +563,16 @@ function closeDayModal(): void {
   }
 }
 @media (max-width: 900px) and (min-width: 641px) {
-  .date-badges {
-    gap: 3px;
-    margin-bottom: 3px;
+  .date-text {
+    min-height: 28px;
+  }
+
+  .date-text__row {
+    gap: 5px;
   }
 
   .date-badge {
+    max-width: 58%;
     padding: 2px 5px;
   }
 
@@ -576,12 +616,16 @@ function closeDayModal(): void {
     font-size: 0.48rem;
   }
 
-  .date-badges {
-    gap: 3px;
-    margin: -1px 0 3px;
+  .date-text {
+    min-height: 24px;
+  }
+
+  .date-text__row {
+    gap: 4px;
   }
 
   .date-badge {
+    max-width: 56%;
     gap: 3px;
     padding: 2px 5px;
   }
