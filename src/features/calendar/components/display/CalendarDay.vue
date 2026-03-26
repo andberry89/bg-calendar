@@ -376,7 +376,7 @@ function closeDayModal(): void {
   align-items: center;
   gap: 4px;
   width: 100%;
-  padding: 7px 8px;
+  padding: 8px 12px;
   border: 1px solid var(--holiday-open-border);
   border-radius: 10px;
   background: var(--holiday-open-bg);
@@ -389,6 +389,11 @@ function closeDayModal(): void {
   border-color: var(--holiday-halfday-border);
   background: var(--holiday-halfday-bg);
   box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.25);
+}
+
+.holiday-chip--open {
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 .holiday-chip__title {
@@ -471,6 +476,25 @@ function closeDayModal(): void {
   }
 }
 
+@media (max-width: 900px) and (min-width: 641px) {
+  .holiday-chip {
+    padding: 8px 12px;
+    gap: 3px;
+  }
+
+  .holiday-chip--open {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .holiday-chip__title,
+  .holiday-chip__meta {
+    font-size: 0.64rem;
+    line-height: 1.1;
+    letter-spacing: 0.04em;
+  }
+}
+
 @media (max-width: 640px) {
   .container {
     height: 130px;
@@ -514,8 +538,26 @@ function closeDayModal(): void {
     justify-content: center;
   }
 
+  .holiday-chip--open {
+    min-height: 32px;
+    justify-content: center;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
   .holiday-chip__title {
     display: none;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.56rem;
+    line-height: 1.05;
+    letter-spacing: 0.04em;
+  }
+
+  .holiday-chip--open .holiday-chip__title {
+    display: block;
   }
 
   .holiday-chip__meta {
