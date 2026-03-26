@@ -11,7 +11,16 @@
       class="event-pill"
       :class="[`event-pill--${event.class}`, { 'event-pill--holiday': isHoliday }]"
     >
-      <span v-if="!isHoliday" class="event-pill__dot" />
+      <span v-if="showAvatar" class="event-pill__avatar">
+        <img
+          v-if="avatarSrc"
+          class="event-pill__avatar-image"
+          :src="avatarSrc"
+          :alt="`${avatarFallback} avatar`"
+        />
+        <span v-else class="event-pill__avatar-fallback">{{ avatarFallback }}</span>
+      </span>
+      <span v-else-if="!isHoliday" class="event-pill__dot" />
       <span class="event-pill__primary">{{ primaryText }}</span>
       <span v-if="secondaryText" class="event-pill__secondary">{{ secondaryText }}</span>
     </div>
@@ -21,7 +30,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { getEventTypeConfig } from '@/features/calendar/utils/eventTypeConfig';
-import type { CalendarEvent } from '@/types/calendar';
+import type { CalendarEvent, Staff } from '@/types/calendar';
 
 const { event } = defineProps<{
   event: CalendarEvent;
@@ -30,6 +39,19 @@ const { event } = defineProps<{
 const emit = defineEmits<{
   (e: 'update', value: CalendarEvent): void;
 }>();
+
+const images = import.meta.glob('@/assets/staff/*.{jpg,png}', {
+  eager: true,
+  import: 'default'
+}) as Record<string, string>;
+
+function imgUrl(name: string): string {
+  return (
+    images[`/src/assets/staff/${name}.jpg`] ||
+    images[`/src/assets/staff/${name}.png`] ||
+    images['/src/assets/staff/user.png']
+  );
+}
 
 const eventTypeTintByClass: Partial<Record<CalendarEvent['class'], string>> = {
   vacation: 'rgba(22, 163, 74, 0.16)',
@@ -53,7 +75,47 @@ const eventTypeBorderByClass: Partial<Record<CalendarEvent['class'], string>> = 
   'comp-day': 'rgba(15, 118, 110, 0.3)'
 };
 
+type StaffMember = Staff;
+
 const isHoliday = computed((): boolean => event.class === 'holiday');
+
+const leadStaff = computed((): StaffMember | undefined => event.staff[0]);
+
+const showAvatar = computed((): boolean => !isHoliday.value && Boolean(leadStaff.value));
+
+const avatarSrc = computed((): string => {
+  const staff = leadStaff.value;
+
+  if (!staff?.lastName) {
+    return images['/src/assets/staff/user.png'] || '';
+  }
+
+  return imgUrl(staff.lastName);
+});
+
+const avatarFallback = computed((): string => {
+  const staff = leadStaff.value;
+
+  if (!staff) {
+    return 'ST';
+  }
+
+  if (typeof staff.initials === 'string' && staff.initials.trim()) {
+    return staff.initials.trim().slice(0, 2).toUpperCase();
+  }
+
+  if (typeof staff.shortName === 'string' && staff.shortName.trim()) {
+    return staff.shortName
+      .trim()
+      .split(/\s+/)
+      .map((part) => part[0] ?? '')
+      .join('')
+      .slice(0, 2)
+      .toUpperCase();
+  }
+
+  return 'ST';
+});
 
 const primaryText = computed((): string => {
   switch (event.class) {
@@ -165,6 +227,37 @@ function emitEvent(): void {
   background: var(--event-pill-color);
 }
 
+.event-pill__avatar {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--event-pill-color) 16%, white 84%);
+  color: var(--event-pill-color);
+}
+
+.event-pill__avatar-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.event-pill__avatar-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font:
+    700 0.52rem/1 Arial,
+    sans-serif;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
 .event-pill__primary,
 .event-pill__secondary {
   min-width: 0;
@@ -252,6 +345,16 @@ function emitEvent(): void {
 
   .event-pill__dot {
     display: none;
+  }
+
+  .event-pill__avatar {
+    width: 16px;
+    height: 16px;
+    flex-basis: 16px;
+  }
+
+  .event-pill__avatar-fallback {
+    font-size: 0.48rem;
   }
 
   .event-pill__primary {
