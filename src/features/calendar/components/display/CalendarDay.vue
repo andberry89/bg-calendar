@@ -53,12 +53,9 @@
           }"
         >
           <span class="date-badge__label">
-            {{ primaryHolidayBadge.details || primaryHolidayBadge.type }}
+            {{ holidayBadgeLabel }}
           </span>
-          <span v-if="primaryHolidayBadge.closed === 'half'" class="date-badge__meta">
-            Early Close
-          </span>
-          <span v-else-if="hiddenHolidayBadgeCount > 0" class="date-badge__meta">
+          <span v-if="hiddenHolidayBadgeCount > 0" class="date-badge__count">
             +{{ hiddenHolidayBadgeCount }}
           </span>
         </div>
@@ -175,6 +172,14 @@ const primaryHolidayBadge = computed((): CalendarEventType | null => {
 
 const hiddenHolidayBadgeCount = computed((): number => {
   return Math.max(visibleHolidayBadges.value.length - 1, 0);
+});
+
+const holidayBadgeLabel = computed((): string => {
+  if (!primaryHolidayBadge.value) {
+    return '';
+  }
+
+  return primaryHolidayBadge.value.closed === 'half' ? 'Early Close' : 'Holiday';
 });
 
 const filteredEvents = computed((): CalendarEventType[] => eventGroups.value.regularEvents);
@@ -392,7 +397,7 @@ function closeDayModal(): void {
 
 .date-text__row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 6px;
   width: 100%;
@@ -401,6 +406,7 @@ function closeDayModal(): void {
 
 .date-text__main {
   display: flex;
+  flex: 0 0 auto;
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
@@ -437,57 +443,52 @@ function closeDayModal(): void {
   opacity: 0.72;
 }
 
-.date-badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  width: 100%;
-  margin: -2px 0 4px;
-}
-
 .date-badge {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  flex: 0 1 auto;
-  max-width: 62%;
+  justify-content: flex-start;
+  gap: 6px;
+  flex: 1 1 auto;
   min-width: 0;
-  padding: 2px 6px;
-  border: 1px solid var(--holiday-open-border);
-  border-radius: 999px;
-  background: var(--holiday-open-bg);
+  max-width: none;
+  min-height: 26px;
+  padding: 4px 10px;
+  border: 1px solid color-mix(in srgb, var(--holiday-open-border) 70%, transparent 30%);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--holiday-open-bg) 82%, white 18%);
   color: var(--calendar-text);
+  text-align: left;
   box-sizing: border-box;
 }
 
 .date-badge--half {
-  border-color: var(--holiday-halfday-border);
-  background: var(--holiday-halfday-bg);
-  box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.18);
+  border-color: color-mix(in srgb, var(--holiday-halfday-border) 72%, transparent 28%);
+  background: color-mix(in srgb, var(--holiday-halfday-bg) 88%, white 12%);
+  box-shadow: none;
 }
 
 .date-badge__label,
-.date-badge__meta {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  line-height: 1;
-  text-transform: uppercase;
+.date-badge__count {
+  line-height: 1.2;
+  text-transform: none;
 }
 
 .date-badge__label {
-  font-size: 0.54rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  min-width: 0;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: 0.03em;
 }
 
-.date-badge__meta {
+.date-badge__count {
   flex: 0 0 auto;
-  font-size: 0.5rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  opacity: 0.9;
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  opacity: 0.72;
 }
 
 .full-close-message {
@@ -562,6 +563,7 @@ function closeDayModal(): void {
     transform: translateY(-1px);
   }
 }
+
 @media (max-width: 900px) and (min-width: 641px) {
   .date-text {
     min-height: 28px;
@@ -572,16 +574,17 @@ function closeDayModal(): void {
   }
 
   .date-badge {
-    max-width: 58%;
-    padding: 2px 5px;
+    gap: 5px;
+    min-height: 24px;
+    padding: 3px 8px;
   }
 
   .date-badge__label {
-    font-size: 0.5rem;
+    font-size: 0.66rem;
   }
 
-  .date-badge__meta {
-    font-size: 0.48rem;
+  .date-badge__count {
+    font-size: 0.58rem;
   }
 
   .regular-event-lane,
@@ -605,7 +608,13 @@ function closeDayModal(): void {
   }
 
   .date-text {
+    min-height: 24px;
     padding-bottom: 4px;
+  }
+
+  .date-text__row {
+    align-items: center;
+    gap: 4px;
   }
 
   .date-text__day {
@@ -616,29 +625,27 @@ function closeDayModal(): void {
     font-size: 0.48rem;
   }
 
-  .date-text {
-    min-height: 24px;
-  }
-
-  .date-text__row {
-    gap: 4px;
-  }
-
   .date-badge {
-    max-width: 56%;
-    gap: 3px;
-    padding: 2px 5px;
+    gap: 4px;
+    min-height: 22px;
+    padding: 2px 6px;
   }
 
   .date-badge__label {
+    min-width: 0;
     max-width: 100%;
-    font-size: 0.46rem;
-    letter-spacing: 0.03em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.58rem;
+    font-weight: 400;
+    letter-spacing: 0;
   }
 
-  .date-badge__meta {
-    font-size: 0.44rem;
-    letter-spacing: 0.03em;
+  .date-badge__count {
+    font-size: 0.5rem;
+    font-weight: 400;
+    letter-spacing: 0;
   }
 
   .full-close-message {
