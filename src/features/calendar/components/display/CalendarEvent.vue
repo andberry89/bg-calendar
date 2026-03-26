@@ -170,21 +170,51 @@ function emitEvent(): void {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
   line-height: 1.1;
 }
 
 .event-pill__primary {
+  white-space: nowrap;
   font:
     700 0.72rem/1.1 Arial,
     sans-serif;
 }
 
 .event-pill__secondary {
+  white-space: nowrap;
   color: var(--calendar-text-muted);
   font:
     600 0.68rem/1.1 Arial,
     sans-serif;
+}
+
+.event-pill--auto-show {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.event-pill--auto-show .event-pill__primary {
+  white-space: nowrap;
+}
+
+.event-pill--auto-show .event-pill__secondary {
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.event-pill--auto-show .event-pill__dot {
+  display: none;
+}
+
+.event-pill--auto-show .event-pill__primary,
+.event-pill--auto-show .event-pill__secondary {
+  display: block;
+  white-space: nowrap;
+}
+
+.event-pill--auto-show .event-pill__secondary {
+  max-width: 100%;
 }
 
 .event-pill--holiday {
@@ -221,9 +251,7 @@ function emitEvent(): void {
   }
 
   .event-pill__dot {
-    width: 7px;
-    height: 7px;
-    flex-basis: 7px;
+    display: none;
   }
 
   .event-pill__primary {
