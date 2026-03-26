@@ -6,38 +6,29 @@
       </div>
     </div>
     <div class="date" v-if="dataReady">
-      <CalendarDay
-        dayClass="day-hidden"
-        v-for="(date, idx) in previousMonthVisibleDays"
-        :key="'prev' + idx"
-        :date="date"
-        :currentDate="currentDate"
-        month="prev"
-      />
       <template v-for="(week, wIdx) in weeks" :key="'week-' + wIdx">
-        <CalendarDay
-          dayClass="day"
-          v-for="(date, dIdx) in week"
-          :key="'day' + wIdx + '-' + dIdx"
-          :class="{ active: date === currentDate.date }"
-          @click="updateDate(date)"
-          @update="updateEvents"
-          @delete="deleteEvent($event)"
-          :date="date"
-          :currentDate="currentDate"
-          :events="orderedWeekEvents[wIdx][dIdx]"
-          :regularEventLaneSlots="weekRegularEventLaneSlots[wIdx][dIdx]"
-          :hasUnfilteredEvents="unfilteredEvents[date - 1]?.length > 0"
-        />
+        <div class="calendar-week">
+          <CalendarDay
+            v-for="(cell, dIdx) in week"
+            :key="'day' + wIdx + '-' + dIdx"
+            :dayClass="cell.month === 'current' ? 'day' : 'day-hidden'"
+            :class="{ active: cell.month === 'current' && cell.date === currentDate.date }"
+            @click="cell.month === 'current' && updateDate(cell.date)"
+            @update="updateEvents"
+            @delete="deleteEvent($event)"
+            :date="cell.date"
+            :currentDate="currentDate"
+            :month="cell.month === 'current' ? undefined : cell.month"
+            :events="cell.month === 'current' ? orderedWeekEvents[wIdx][dIdx] : undefined"
+            :regularEventLaneSlots="
+              cell.month === 'current' ? weekRegularEventLaneSlots[wIdx][dIdx] : undefined
+            "
+            :hasUnfilteredEvents="
+              cell.month === 'current' ? unfilteredEvents[cell.date - 1]?.length > 0 : false
+            "
+          />
+        </div>
       </template>
-      <CalendarDay
-        dayClass="day-hidden"
-        v-for="(date, idx) in nextMonthVisibleDays"
-        :key="'next' + idx"
-        :date="date"
-        :currentDate="currentDate"
-        month="next"
-      />
     </div>
   </section>
 </template>
@@ -52,6 +43,11 @@ import type {
   CalendarEventLaneSlot,
   CurrentDate
 } from '@/types/calendar';
+
+type CalendarWeekCell = {
+  date: number;
+  month: 'prev' | 'current' | 'next';
+};
 
 const {
   currentDate,
@@ -159,21 +155,26 @@ const unfilteredEvents = computed((): AssignedCalendarEvent[][] => {
   return cachedUnfilteredEvents;
 });
 
-const weeks = computed((): number[][] => {
-  const days = currentMonthVisibleDays.value;
-  const rows: number[][] = [];
+const weeks = computed((): CalendarWeekCell[][] => {
+  const cells: CalendarWeekCell[] = [
+    ...previousMonthVisibleDays.value.map((date) => ({
+      date,
+      month: 'prev' as const
+    })),
+    ...currentMonthVisibleDays.value.map((date) => ({
+      date,
+      month: 'current' as const
+    })),
+    ...nextMonthVisibleDays.value.map((date) => ({
+      date,
+      month: 'next' as const
+    }))
+  ];
 
-  let currentWeek: number[] = [];
+  const rows: CalendarWeekCell[][] = [];
 
-  for (let i = 0; i < days.length; i += 1) {
-    currentWeek.push(days[i]);
-
-    const isEndOfWeek = (i + firstMonthDay.value) % 7 === 0;
-
-    if (isEndOfWeek || i === days.length - 1) {
-      rows.push(currentWeek);
-      currentWeek = [];
-    }
+  for (let i = 0; i < cells.length; i += 7) {
+    rows.push(cells.slice(i, i + 7));
   }
 
   return rows;
@@ -181,7 +182,13 @@ const weeks = computed((): number[][] => {
 
 const weekEvents = computed((): AssignedCalendarEvent[][][] => {
   return weeks.value.map((week) => {
-    return week.map((date) => events.value[date - 1] ?? []);
+    return week.map((cell) => {
+      if (cell.month !== 'current') {
+        return [];
+      }
+
+      return events.value[cell.date - 1] ?? [];
+    });
   });
 });
 
@@ -379,13 +386,22 @@ function updateEvents(): void {
 }
 
 .date {
-  @include calendar-layout(10px 20px 20px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px 0;
+  padding: 10px 20px 20px;
   background-color: var(--layout-panel-overlay);
   flex-grow: 4;
 
   .active {
     background-color: var(--ocean-lt-blue);
   }
+}
+
+.calendar-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 10px 2px;
 }
 
 @media (max-width: 900px) {
@@ -400,8 +416,12 @@ function updateEvents(): void {
 
 @media (max-width: 640px) {
   .weekdays,
-  .date {
+  .calendar-week {
     gap: 6px 2px;
+  }
+
+  .date {
+    gap: 6px 0;
   }
 
   .weekdays {
