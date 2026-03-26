@@ -196,7 +196,7 @@ function emitEvent(): void {
 .event-pill {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   min-width: 0;
   width: 100%;
   margin: 3px 0;
@@ -228,16 +228,17 @@ function emitEvent(): void {
 }
 
 .event-pill__avatar {
-  width: 18px;
-  height: 18px;
-  flex: 0 0 18px;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--event-pill-color) 16%, white 84%);
+  background: color-mix(in srgb, var(--event-pill-color) 14%, white 86%);
   color: var(--event-pill-color);
+  transform: translateY(0.5px);
 }
 
 .event-pill__avatar-image {
@@ -252,7 +253,7 @@ function emitEvent(): void {
   align-items: center;
   justify-content: center;
   font:
-    700 0.52rem/1 Arial,
+    700 0.48rem/1 Arial,
     sans-serif;
   letter-spacing: 0.01em;
   text-transform: uppercase;
@@ -348,13 +349,7 @@ function emitEvent(): void {
   }
 
   .event-pill__avatar {
-    width: 16px;
-    height: 16px;
-    flex-basis: 16px;
-  }
-
-  .event-pill__avatar-fallback {
-    font-size: 0.48rem;
+    display: none;
   }
 
   .event-pill__primary {
