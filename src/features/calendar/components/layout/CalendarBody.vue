@@ -25,7 +25,7 @@
           @delete="deleteEvent($event)"
           :date="date"
           :currentDate="currentDate"
-          :events="events[date - 1]"
+          :events="weekEvents[wIdx][dIdx]"
           :hasUnfilteredEvents="unfilteredEvents[date - 1]?.length > 0"
         />
       </template>
@@ -171,6 +171,12 @@ const weeks = computed((): number[][] => {
   }
 
   return rows;
+});
+
+const weekEvents = computed(() => {
+  return weeks.value.map((week) => {
+    return week.map((date) => events.value[date - 1] ?? []);
+  });
 });
 
 const dataReady = computed((): boolean => {
