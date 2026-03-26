@@ -1,37 +1,54 @@
 <template>
-  <header class="calendar-header" :style="headerStyle">
-    <div class="header-top">
-      <div class="header-main">
-        <CalendarHeaderDateControls :current-date="currentDate" @date="emit('date', $event)" />
-      </div>
-
-      <div class="header-title">
-        <p class="header-eyebrow">Team calendar</p>
-        <h1>C/D Buyers Guide</h1>
-      </div>
-
-      <div class="header-action">
-        <div class="header-action-group">
-          <NewEventModal :staff="staff" @update="addEvent($event)" />
-          <ManageStaffModal :staff="staff" @update="emit('staff-update', $event)" />
-        </div>
-      </div>
+  <header
+    class="calendar-header"
+    :class="{ 'calendar-header--transitioning': isTransitioning }"
+    :style="headerStyle"
+  >
+    <div class="calendar-header__bg" aria-hidden="true">
+      <div class="calendar-header__layer calendar-header__layer--base" />
+      <div class="calendar-header__layer calendar-header__layer--incoming" />
     </div>
 
-    <div class="header-filters">
-      <CalendarHeaderFilters :staff="staff" :filters="filters" @filters="emit('filters', $event)" />
+    <div class="calendar-header__content">
+      <div class="header-top">
+        <div class="header-main">
+          <CalendarHeaderDateControls :current-date="currentDate" @date="emit('date', $event)" />
+        </div>
+
+        <div class="header-title">
+          <p class="header-eyebrow">Team calendar</p>
+          <h1>C/D Buyers Guide</h1>
+        </div>
+
+        <div class="header-action">
+          <div class="header-action-group">
+            <NewEventModal :staff="staff" @update="addEvent($event)" />
+            <ManageStaffModal :staff="staff" @update="emit('staff-update', $event)" />
+          </div>
+        </div>
+      </div>
+
+      <div class="header-filters">
+        <CalendarHeaderFilters
+          :staff="staff"
+          :filters="filters"
+          @filters="emit('filters', $event)"
+        />
+      </div>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import CalendarHeaderDateControls from '@/features/calendar/components/layout/CalendarHeaderDateControls.vue';
 import CalendarHeaderFilters from '@/features/calendar/components/layout/CalendarHeaderFilters.vue';
 import NewEventModal from '@/features/calendar/components/modals/NewEventModal.vue';
 import ManageStaffModal from '@/features/calendar/components/modals/ManageStaffModal.vue';
 import type { EventFilters } from '@/features/calendar/utils/filterEvents';
 import type { CurrentDate, NewCalendarEvent, Staff, StaffUpdatePayload } from '@/types/calendar';
+
+const TRANSITION_DURATION_MS = 360;
 
 const { currentDate, staff, filters } = defineProps<{
   currentDate: CurrentDate;
@@ -61,9 +78,64 @@ const monthGradientVars = [
   '--calendar-header-gradient-dec'
 ] as const;
 
+const activeGradientVar = ref<(typeof monthGradientVars)[number]>(
+  monthGradientVars[currentDate.month]
+);
+const incomingGradientVar = ref<(typeof monthGradientVars)[number]>(
+  monthGradientVars[currentDate.month]
+);
+const isTransitioning = ref(false);
+
+let transitionTimeout: ReturnType<typeof setTimeout> | null = null;
+
 const headerStyle = computed(() => ({
-  '--calendar-header-gradient': `var(${monthGradientVars[currentDate.month]})`
+  '--calendar-header-gradient-current': `var(${activeGradientVar.value})`,
+  '--calendar-header-gradient-incoming': `var(${incomingGradientVar.value})`
 }));
+
+watch(
+  () => ({ month: currentDate.month, year: currentDate.year }),
+  (nextDate, previousDate) => {
+    const nextGradientVar = monthGradientVars[nextDate.month];
+
+    if (!previousDate) {
+      activeGradientVar.value = nextGradientVar;
+      incomingGradientVar.value = nextGradientVar;
+      return;
+    }
+
+    if (nextDate.month === previousDate.month && nextDate.year === previousDate.year) {
+      return;
+    }
+
+    incomingGradientVar.value = nextGradientVar;
+    isTransitioning.value = false;
+
+    if (transitionTimeout) {
+      clearTimeout(transitionTimeout);
+      transitionTimeout = null;
+    }
+
+    requestAnimationFrame(() => {
+      isTransitioning.value = true;
+    });
+
+    transitionTimeout = setTimeout(() => {
+      activeGradientVar.value = nextGradientVar;
+      incomingGradientVar.value = nextGradientVar;
+      isTransitioning.value = false;
+      transitionTimeout = null;
+    }, TRANSITION_DURATION_MS);
+  },
+  { flush: 'post' }
+);
+
+onBeforeUnmount((): void => {
+  if (transitionTimeout) {
+    clearTimeout(transitionTimeout);
+    transitionTimeout = null;
+  }
+});
 
 function addEvent(event: NewCalendarEvent): void {
   emit('update', event);
@@ -72,17 +144,61 @@ function addEvent(event: NewCalendarEvent): void {
 
 <style lang="scss" scoped>
 .calendar-header {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
   box-sizing: border-box;
   color: #f8fafc;
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.08) 0%, rgba(15, 23, 42, 0.22) 100%),
-    var(--calendar-header-gradient);
   border-radius: 0 0 24px 24px;
   box-shadow: var(--calendar-shadow-soft);
   overflow: hidden;
+  isolation: isolate;
+}
+
+.calendar-header__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.calendar-header__layer {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.08) 0%, rgba(15, 23, 42, 0.22) 100%),
+    var(--calendar-header-gradient-current);
+  opacity: 1;
+  transform: scale(1);
+  will-change: opacity, transform;
+}
+
+.calendar-header__layer--base {
+  z-index: 0;
+}
+
+.calendar-header__layer--incoming {
+  z-index: 1;
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.08) 0%, rgba(15, 23, 42, 0.22) 100%),
+    var(--calendar-header-gradient-incoming);
+  opacity: 0;
+  transform: scale(1.02);
+}
+
+.calendar-header--transitioning .calendar-header__layer--incoming {
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity 0.36s ease,
+    transform 0.36s ease;
+}
+
+.calendar-header__content {
+  position: relative;
+  z-index: 1;
 }
 
 .header-top {
@@ -128,19 +244,20 @@ function addEvent(event: NewCalendarEvent): void {
 
 .header-action {
   grid-area: action;
-  justify-self: end;
-  width: max-content;
+  justify-self: center;
+  width: 100%;
   max-width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   gap: 10px;
 }
 
 .header-action-group {
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-end;
+  justify-content: center;
+  align-items: center;
   gap: 10px;
   width: 100%;
 }
@@ -175,7 +292,7 @@ function addEvent(event: NewCalendarEvent): void {
   }
 
   .header-action {
-    align-self: start;
+    align-self: center;
   }
 }
 
