@@ -175,7 +175,17 @@ const visibleRegularEventLimit = computed((): number => {
 });
 
 const visibleRegularEvents = computed((): CalendarEventType[] => {
-  return filteredEvents.value.slice(0, visibleRegularEventLimit.value);
+  const prioritizedEvents = [...filteredEvents.value].sort((a, b) => {
+    const aHasDisplay = 'display' in a && a.display;
+    const bHasDisplay = 'display' in b && b.display;
+
+    const aPriority = !aHasDisplay || a.display.startsToday === true ? 0 : 1;
+    const bPriority = !bHasDisplay || b.display.startsToday === true ? 0 : 1;
+
+    return aPriority - bPriority;
+  });
+
+  return prioritizedEvents.slice(0, visibleRegularEventLimit.value);
 });
 
 const hiddenEventCount = computed((): number => {
