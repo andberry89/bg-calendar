@@ -62,38 +62,42 @@
       </div>
     </div>
 
-    <div v-if="hasFullClosureHoliday" class="full-close-message">
-      <span class="full-close-message__title">Office Closed</span>
-      <span v-if="holidays[0]?.details" class="full-close-message__detail">
-        {{ holidays[0].details }}
-      </span>
-    </div>
-
-    <template v-else>
-      <div
-        v-for="(laneEvent, idx) in visibleRegularLaneSlots"
-        :key="'regular-lane-' + idx"
-        class="regular-event-lane"
-      >
-        <CalendarEvent
-          v-if="laneEvent"
-          class="regular-event"
-          :event="laneEvent"
-          @click="openEventModal(laneEvent)"
-          @update="updateEvents"
-        />
-        <div v-else class="regular-event-placeholder" aria-hidden="true" />
+    <div class="day-body">
+      <div v-if="hasFullClosureHoliday" class="full-close-message">
+        <span class="full-close-message__title">Office Closed</span>
+        <span v-if="holidays[0]?.details" class="full-close-message__detail">
+          {{ holidays[0].details }}
+        </span>
       </div>
 
-      <button
-        v-if="hiddenEventCount > 0"
-        class="more-events"
-        type="button"
-        @click.stop="openDayModal"
-      >
-        +{{ hiddenEventCount }} more
-      </button>
-    </template>
+      <template v-else>
+        <div class="regular-event-lanes">
+          <div
+            v-for="(laneEvent, idx) in visibleRegularLaneSlots"
+            :key="'regular-lane-' + idx"
+            class="regular-event-lane"
+          >
+            <CalendarEvent
+              v-if="laneEvent"
+              class="regular-event"
+              :event="laneEvent"
+              @click="openEventModal(laneEvent)"
+              @update="updateEvents"
+            />
+            <div v-else class="regular-event-placeholder" aria-hidden="true" />
+          </div>
+        </div>
+
+        <button
+          v-if="hiddenEventCount > 0"
+          class="more-events"
+          type="button"
+          @click.stop="openDayModal"
+        >
+          +{{ hiddenEventCount }} more
+        </button>
+      </template>
+    </div>
   </div>
 </template>
 
@@ -345,8 +349,8 @@ function closeDayModal(): void {
 <style lang="scss" scoped>
 .container {
   position: relative;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   gap: 4px;
   height: 200px;
   padding: 6px;
@@ -385,14 +389,18 @@ function closeDayModal(): void {
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  justify-content: center;
   gap: 2px;
   width: 100%;
-  min-height: 30px;
-  margin-bottom: 2px;
+  height: 34px;
+  min-height: 34px;
+  margin-bottom: 0;
   padding: 0 0 6px;
   border-bottom: 1px solid var(--calendar-border-subtle);
   color: var(--calendar-text);
   text-align: left;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .date-text__row {
@@ -402,6 +410,7 @@ function closeDayModal(): void {
   gap: 6px;
   width: 100%;
   min-width: 0;
+  min-height: 0;
 }
 
 .date-text__main {
@@ -409,8 +418,10 @@ function closeDayModal(): void {
   flex: 0 0 auto;
   flex-direction: column;
   align-items: flex-start;
+  justify-content: center;
   gap: 2px;
   min-width: 0;
+  min-height: 0;
 }
 
 .date-text__day {
@@ -451,14 +462,16 @@ function closeDayModal(): void {
   flex: 1 1 auto;
   min-width: 0;
   max-width: none;
-  min-height: 26px;
-  padding: 4px 10px;
+  height: 24px;
+  min-height: 24px;
+  padding: 2px 8px;
   border: 1px solid color-mix(in srgb, var(--holiday-open-border) 70%, transparent 30%);
   border-radius: 8px;
   background: color-mix(in srgb, var(--holiday-open-bg) 82%, white 18%);
   color: var(--calendar-text);
   text-align: left;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .date-badge--half {
@@ -469,14 +482,14 @@ function closeDayModal(): void {
 
 .date-badge__label,
 .date-badge__count {
-  line-height: 1.2;
+  line-height: 1.1;
   text-transform: none;
 }
 
 .date-badge__label {
   min-width: 0;
-  overflow: visible;
-  text-overflow: clip;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 0.9rem;
   font-weight: 400;
@@ -485,10 +498,25 @@ function closeDayModal(): void {
 
 .date-badge__count {
   flex: 0 0 auto;
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 400;
-  letter-spacing: 0;
+  letter-spacing: 0.02em;
   opacity: 0.72;
+}
+
+.day-body {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.regular-event-lanes {
+  display: grid;
+  grid-auto-rows: min-content;
+  align-content: start;
+  gap: 0;
+  min-height: 0;
 }
 
 .full-close-message {
@@ -523,8 +551,10 @@ function closeDayModal(): void {
   display: flex;
   align-items: stretch;
   width: 100%;
+  height: 38px;
   min-height: 38px;
   max-height: 38px;
+  overflow: hidden;
 }
 
 .regular-event {
@@ -533,6 +563,7 @@ function closeDayModal(): void {
 
 .regular-event-placeholder {
   width: 100%;
+  height: 38px;
   min-height: 38px;
   max-height: 38px;
 }
@@ -542,7 +573,7 @@ function closeDayModal(): void {
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin-top: auto;
+  margin-top: 4px;
   padding: 4px 8px;
   border: 1px solid var(--calendar-border-strong);
   border-radius: var(--radius-pill);
@@ -566,7 +597,8 @@ function closeDayModal(): void {
 
 @media (max-width: 900px) and (min-width: 641px) {
   .date-text {
-    min-height: 28px;
+    height: 30px;
+    min-height: 30px;
   }
 
   .date-text__row {
@@ -574,21 +606,23 @@ function closeDayModal(): void {
   }
 
   .date-badge {
+    height: 22px;
+    min-height: 22px;
     gap: 5px;
-    min-height: 24px;
-    padding: 3px 8px;
+    padding: 2px 7px;
   }
 
   .date-badge__label {
-    font-size: 0.66rem;
+    font-size: 0.8rem;
   }
 
   .date-badge__count {
-    font-size: 0.58rem;
+    font-size: 0.64rem;
   }
 
   .regular-event-lane,
   .regular-event-placeholder {
+    height: 34px;
     min-height: 34px;
     max-height: 34px;
   }
@@ -608,7 +642,8 @@ function closeDayModal(): void {
   }
 
   .date-text {
-    min-height: 24px;
+    height: 26px;
+    min-height: 26px;
     padding-bottom: 4px;
   }
 
@@ -626,8 +661,9 @@ function closeDayModal(): void {
   }
 
   .date-badge {
+    height: 20px;
+    min-height: 20px;
     gap: 4px;
-    min-height: 22px;
     padding: 2px 6px;
   }
 
@@ -637,15 +673,15 @@ function closeDayModal(): void {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 0.58rem;
+    font-size: 0.68rem;
     font-weight: 400;
-    letter-spacing: 0;
+    letter-spacing: 0.02em;
   }
 
   .date-badge__count {
-    font-size: 0.5rem;
+    font-size: 0.52rem;
     font-weight: 400;
-    letter-spacing: 0;
+    letter-spacing: 0.02em;
   }
 
   .full-close-message {
@@ -663,6 +699,7 @@ function closeDayModal(): void {
 
   .regular-event-lane,
   .regular-event-placeholder {
+    height: 28px;
     min-height: 28px;
     max-height: 28px;
   }
