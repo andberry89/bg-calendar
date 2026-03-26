@@ -9,7 +9,16 @@
   >
     <div
       class="event-pill"
-      :class="[`event-pill--${event.class}`, { 'event-pill--holiday': isHoliday }]"
+      :class="[
+        `event-pill--${event.class}`,
+        {
+          'event-pill--holiday': isHoliday,
+          'event-pill--multi-day': isMultiDay,
+          'event-pill--multi-day-start': isMultiDayStart,
+          'event-pill--multi-day-middle': isMultiDayMiddle,
+          'event-pill--multi-day-end': isMultiDayEnd
+        }
+      ]"
     >
       <span v-if="showAvatar" class="event-pill__avatar">
         <img
@@ -30,14 +39,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { getEventTypeConfig } from '@/features/calendar/utils/eventTypeConfig';
-import type { CalendarEvent, Staff } from '@/types/calendar';
+import type { AssignedCalendarEvent, CalendarEvent, Staff } from '@/types/calendar';
 
 const { event } = defineProps<{
-  event: CalendarEvent;
+  event: CalendarEvent | AssignedCalendarEvent;
 }>();
 
 const emit = defineEmits<{
-  (e: 'update', value: CalendarEvent): void;
+  (e: 'update', value: CalendarEvent | AssignedCalendarEvent): void;
 }>();
 
 const images = import.meta.glob('@/assets/staff/*.{jpg,png}', {
@@ -78,6 +87,26 @@ const eventTypeBorderByClass: Partial<Record<CalendarEvent['class'], string>> = 
 type StaffMember = Staff;
 
 const isHoliday = computed((): boolean => event.class === 'holiday');
+
+const isAssignedEvent = computed((): boolean => {
+  return 'display' in event && typeof event.display === 'object' && event.display !== null;
+});
+
+const isMultiDay = computed((): boolean => {
+  return isAssignedEvent.value && event.display.isMultiDay === true;
+});
+
+const isMultiDayStart = computed((): boolean => {
+  return isMultiDay.value && event.display.startsToday === true;
+});
+
+const isMultiDayEnd = computed((): boolean => {
+  return isMultiDay.value && event.display.endsToday === true;
+});
+
+const isMultiDayMiddle = computed((): boolean => {
+  return isMultiDay.value && !isMultiDayStart.value && !isMultiDayEnd.value;
+});
 
 const leadStaff = computed((): StaffMember | undefined => event.staff[0]);
 
@@ -183,7 +212,6 @@ function emitEvent(): void {
   emit('update', event);
 }
 </script>
-
 <style lang="scss" scoped>
 .event-container {
   width: 100%;
