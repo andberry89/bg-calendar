@@ -350,6 +350,44 @@ function emitEvent(): void {
   color: inherit;
 }
 
+.event-pill--multi-day {
+  border-radius: 0;
+}
+
+.event-pill--multi-day-start {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.event-pill--multi-day-end {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.event-pill--multi-day-middle {
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+.event-pill--multi-day.event-pill--auto-show {
+  border-radius: 0;
+}
+
+.event-pill--multi-day.event-pill--auto-show.event-pill--multi-day-start {
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+}
+
+.event-pill--multi-day.event-pill--auto-show.event-pill--multi-day-end {
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+}
+
+.event-pill--holiday .event-pill__primary,
+.event-pill--holiday .event-pill__secondary {
+  color: inherit;
+}
+
 @media (max-width: 900px) {
   .event-pill {
     padding: 5px 6px;
@@ -362,6 +400,20 @@ function emitEvent(): void {
 
   .event-pill__secondary {
     font-size: 0.62rem;
+  }
+
+  .event-pill--multi-day {
+    border-radius: 0;
+  }
+
+  .event-pill--multi-day-start {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+  }
+
+  .event-pill--multi-day-end {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
   }
 }
 
@@ -386,6 +438,20 @@ function emitEvent(): void {
 
   .event-pill__secondary {
     font-size: 0.58rem;
+  }
+
+  .event-pill--multi-day {
+    border-radius: 0;
+  }
+
+  .event-pill--multi-day-start {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+  }
+
+  .event-pill--multi-day-end {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
   }
 }
 </style>
