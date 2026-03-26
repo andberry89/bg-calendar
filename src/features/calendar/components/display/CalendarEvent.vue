@@ -369,6 +369,25 @@ function emitEvent(): void {
   padding-right: 6px;
 }
 
+.event-pill--multi-day-middle,
+.event-pill--multi-day-end {
+  gap: 0;
+  min-height: 31px;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+.event-pill--multi-day-middle .event-pill__avatar,
+.event-pill--multi-day-middle .event-pill__dot,
+.event-pill--multi-day-middle .event-pill__primary,
+.event-pill--multi-day-middle .event-pill__secondary,
+.event-pill--multi-day-end .event-pill__avatar,
+.event-pill--multi-day-end .event-pill__dot,
+.event-pill--multi-day-end .event-pill__primary,
+.event-pill--multi-day-end .event-pill__secondary {
+  display: none;
+}
+
 .event-pill--multi-day.event-pill--auto-show {
   border-radius: 0;
 }
@@ -414,6 +433,11 @@ function emitEvent(): void {
   .event-pill--multi-day-end {
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
+
+    .event-pill--multi-day-middle,
+    .event-pill--multi-day-end {
+      min-height: 27px;
+    }
   }
 }
 
@@ -452,6 +476,13 @@ function emitEvent(): void {
   .event-pill--multi-day-end {
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
+  }
+
+  .event-pill--multi-day-middle,
+  .event-pill--multi-day-end {
+    min-height: 22px;
+    padding-left: 5px;
+    padding-right: 5px;
   }
 }
 </style>
