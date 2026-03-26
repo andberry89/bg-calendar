@@ -46,7 +46,12 @@
 import { computed } from 'vue';
 import CalendarDay from '@/features/calendar/components/display/CalendarDay.vue';
 import assignEvents from '@/features/calendar/utils/assignEvents';
-import type { AssignedCalendarEvent, CalendarEvent, CurrentDate } from '@/types/calendar';
+import type {
+  AssignedCalendarEvent,
+  CalendarEvent,
+  CalendarEventLaneSlot,
+  CurrentDate
+} from '@/types/calendar';
 
 const {
   currentDate,
@@ -180,6 +185,14 @@ const weekEvents = computed((): AssignedCalendarEvent[][][] => {
   });
 });
 
+function getEventKey(event: CalendarEvent): string {
+  return event.id ?? `${event.type}-${event.start}-${event.end}`;
+}
+
+function getEventRowSpan(event: AssignedCalendarEvent): number {
+  return event.class === 'auto-show' ? 2 : 1;
+}
+
 const weekRegularEventOrder = computed((): AssignedCalendarEvent[][] => {
   return weekEvents.value.map((week) => {
     const map = new Map<string, AssignedCalendarEvent>();
@@ -190,7 +203,7 @@ const weekRegularEventOrder = computed((): AssignedCalendarEvent[][] => {
           return;
         }
 
-        const key = event.id ?? `${event.type}-${event.start}-${event.end}`;
+        const key = getEventKey(event);
 
         if (!map.has(key)) {
           map.set(key, event);
@@ -202,13 +215,33 @@ const weekRegularEventOrder = computed((): AssignedCalendarEvent[][] => {
   });
 });
 
+const weekRegularEventLanePlan = computed(() => {
+  return weekRegularEventOrder.value.map((orderedEvents) => {
+    const laneIndexByKey = new Map<string, { startRow: number; spanRows: number }>();
+    let totalRows = 0;
+
+    orderedEvents.forEach((event) => {
+      const spanRows = getEventRowSpan(event);
+      laneIndexByKey.set(getEventKey(event), {
+        startRow: totalRows,
+        spanRows
+      });
+      totalRows += spanRows;
+    });
+
+    return {
+      laneIndexByKey,
+      totalRows
+    };
+  });
+});
+
 const orderedWeekEvents = computed((): AssignedCalendarEvent[][][] => {
   return weekEvents.value.map((week, weekIdx) => {
     const regularEventOrderIndex = new Map<string, number>();
 
     weekRegularEventOrder.value[weekIdx].forEach((event, index) => {
-      const key = event.id ?? `${event.type}-${event.start}-${event.end}`;
-      regularEventOrderIndex.set(key, index);
+      regularEventOrderIndex.set(getEventKey(event), index);
     });
 
     return week.map((dayEvents) => {
@@ -216,12 +249,9 @@ const orderedWeekEvents = computed((): AssignedCalendarEvent[][][] => {
       const regularEvents = dayEvents
         .filter((event) => event.type !== 'Holiday')
         .sort((a, b) => {
-          const keyA = a.id ?? `${a.type}-${a.start}-${a.end}`;
-          const keyB = b.id ?? `${b.type}-${b.start}-${b.end}`;
-
           return (
-            (regularEventOrderIndex.get(keyA) ?? Number.MAX_SAFE_INTEGER) -
-            (regularEventOrderIndex.get(keyB) ?? Number.MAX_SAFE_INTEGER)
+            (regularEventOrderIndex.get(getEventKey(a)) ?? Number.MAX_SAFE_INTEGER) -
+            (regularEventOrderIndex.get(getEventKey(b)) ?? Number.MAX_SAFE_INTEGER)
           );
         });
 
@@ -230,34 +260,62 @@ const orderedWeekEvents = computed((): AssignedCalendarEvent[][][] => {
   });
 });
 
-const weekRegularEventLaneSlots = computed((): (AssignedCalendarEvent | null)[][][] => {
+const weekRegularEventLaneSlots = computed((): CalendarEventLaneSlot[][][] => {
   return weekEvents.value.map((week, weekIdx) => {
-    const laneIndexByKey = new Map<string, number>();
-
-    weekRegularEventOrder.value[weekIdx].forEach((event, index) => {
-      const key = event.id ?? `${event.type}-${event.start}-${event.end}`;
-      laneIndexByKey.set(key, index);
-    });
+    const lanePlan = weekRegularEventLanePlan.value[weekIdx];
 
     return week.map((dayEvents) => {
-      const laneSlots: (AssignedCalendarEvent | null)[] = Array.from(
-        { length: weekRegularEventOrder.value[weekIdx].length },
-        () => null
-      );
+      const laneSlots: CalendarEventLaneSlot[] = Array.from({ length: lanePlan.totalRows }, () => ({
+        event: null,
+        spanRows: 1,
+        isReserved: false,
+        occupiedBySpan: false
+      }));
+
+      lanePlan.laneIndexByKey.forEach(({ startRow, spanRows }) => {
+        laneSlots[startRow] = {
+          event: null,
+          spanRows,
+          isReserved: false,
+          occupiedBySpan: false
+        };
+
+        for (let offset = 1; offset < spanRows; offset += 1) {
+          laneSlots[startRow + offset] = {
+            event: null,
+            spanRows: 1,
+            isReserved: true,
+            occupiedBySpan: false
+          };
+        }
+      });
 
       dayEvents.forEach((event) => {
         if (event.type === 'Holiday') {
           return;
         }
 
-        const key = event.id ?? `${event.type}-${event.start}-${event.end}`;
-        const laneIndex = laneIndexByKey.get(key);
+        const lanePosition = lanePlan.laneIndexByKey.get(getEventKey(event));
 
-        if (laneIndex === undefined) {
+        if (!lanePosition) {
           return;
         }
 
-        laneSlots[laneIndex] = event;
+        laneSlots[lanePosition.startRow] = {
+          event,
+          spanRows: lanePosition.spanRows,
+          isReserved: false,
+          occupiedBySpan: false
+        };
+
+        for (let offset = 1; offset < lanePosition.spanRows; offset += 1) {
+          laneSlots[lanePosition.startRow + offset] = {
+            event: null,
+            spanRows: 1,
+            isReserved: true,
+            occupiedBySpan: true
+          };
+        }
       });
 
       return laneSlots;

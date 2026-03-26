@@ -71,17 +71,18 @@
       </div>
 
       <template v-else>
-        <div class="regular-event-lanes">
+        <div class="regular-event-lanes" :style="regularEventLanesStyle">
           <div
-            v-for="(laneEvent, idx) in visibleRegularLaneSlots"
+            v-for="({ slot, rowIndex }, idx) in visibleRenderableRegularLaneSlots"
             :key="'regular-lane-' + idx"
             class="regular-event-lane"
+            :style="getLaneStyle(rowIndex, slot.spanRows)"
           >
             <CalendarEvent
-              v-if="laneEvent"
+              v-if="slot.event"
               class="regular-event"
-              :event="laneEvent"
-              @click="openEventModal(laneEvent)"
+              :event="slot.event"
+              @click="openEventModal(slot.event)"
               @update="updateEvents"
             />
             <div v-else class="regular-event-placeholder" aria-hidden="true" />
@@ -107,8 +108,8 @@ import CalendarEvent from '@/features/calendar/components/display/CalendarEvent.
 import EventModal from '@/features/calendar/components/modals/EventModal.vue';
 import DayModal from '@/features/calendar/components/modals/DayModal.vue';
 import type {
-  AssignedCalendarEvent,
   CalendarEvent as CalendarEventType,
+  CalendarEventLaneSlot,
   CurrentDate
 } from '@/types/calendar';
 
@@ -123,7 +124,7 @@ const props = withDefaults(
     currentDate: CurrentDate;
     month?: CalendarMonthOffset;
     events?: CalendarEventType[];
-    regularEventLaneSlots?: (AssignedCalendarEvent | CalendarEventType | null)[];
+    regularEventLaneSlots?: CalendarEventLaneSlot[];
     hasUnfilteredEvents?: boolean;
   }>(),
   {
@@ -212,40 +213,58 @@ const visibleRegularLaneCount = computed((): number => {
   return visibleRegularEventLimit.value;
 });
 
-const normalizedRegularEventLaneSlots = computed(
-  (): (AssignedCalendarEvent | CalendarEventType | null)[] => {
-    if (props.regularEventLaneSlots.length > 0) {
-      return props.regularEventLaneSlots;
-    }
-
-    return filteredEvents.value.map((event) => event);
+const normalizedRegularEventLaneSlots = computed((): CalendarEventLaneSlot[] => {
+  if (props.regularEventLaneSlots.length > 0) {
+    return props.regularEventLaneSlots;
   }
-);
 
-const visibleRegularLaneSlots = computed(
-  (): (AssignedCalendarEvent | CalendarEventType | null)[] => {
-    const visibleSlots = normalizedRegularEventLaneSlots.value.slice(
-      0,
-      visibleRegularLaneCount.value
-    );
+  return filteredEvents.value.map((event) => ({
+    event,
+    spanRows: event.class === 'auto-show' ? 2 : 1,
+    isReserved: false,
+    occupiedBySpan: false
+  }));
+});
 
-    if (visibleSlots.length === visibleRegularLaneCount.value) {
-      return visibleSlots;
-    }
+const visibleRegularLaneSlots = computed((): CalendarEventLaneSlot[] => {
+  const visibleRows = normalizedRegularEventLaneSlots.value.slice(0, visibleRegularLaneCount.value);
 
-    return [
-      ...visibleSlots,
-      ...Array.from({ length: visibleRegularLaneCount.value - visibleSlots.length }, () => null)
-    ];
+  if (visibleRows.length === visibleRegularLaneCount.value) {
+    return visibleRows;
   }
-);
+
+  return [
+    ...visibleRows,
+    ...Array.from({ length: visibleRegularLaneCount.value - visibleRows.length }, () => ({
+      event: null,
+      spanRows: 1,
+      isReserved: false,
+      occupiedBySpan: false
+    }))
+  ];
+});
 
 const visibleRegularEventCount = computed((): number => {
-  return visibleRegularLaneSlots.value.filter((event) => event !== null).length;
+  return visibleRegularLaneSlots.value.filter((slot) => slot.event !== null).length;
 });
 
 const hiddenEventCount = computed((): number => {
   return Math.max(filteredEvents.value.length - visibleRegularEventCount.value, 0);
+});
+
+const visibleRenderableRegularLaneSlots = computed(() => {
+  return visibleRegularLaneSlots.value
+    .map((slot, rowIndex) => ({
+      slot,
+      rowIndex
+    }))
+    .filter(({ slot }) => !slot.occupiedBySpan);
+});
+
+const regularEventLanesStyle = computed((): Record<string, string> => {
+  return {
+    gridTemplateRows: `repeat(${visibleRegularLaneCount.value}, var(--calendar-lane-row-height))`
+  };
 });
 
 const isFilteredEmptyDay = computed((): boolean => {
@@ -339,6 +358,12 @@ function openDayModal(): void {
   }
 
   showDayModal.value = true;
+}
+
+function getLaneStyle(rowIndex: number, spanRows: number): Record<string, string> {
+  return {
+    gridRow: `${rowIndex + 1} / span ${spanRows}`
+  };
 }
 
 function closeDayModal(): void {
@@ -512,8 +537,8 @@ function closeDayModal(): void {
 }
 
 .regular-event-lanes {
+  --calendar-lane-row-height: 38px;
   display: grid;
-  grid-auto-rows: min-content;
   align-content: start;
   gap: 0;
   min-height: 0;
@@ -551,21 +576,18 @@ function closeDayModal(): void {
   display: flex;
   align-items: stretch;
   width: 100%;
-  height: 38px;
-  min-height: 38px;
-  max-height: 38px;
-  overflow: hidden;
+  min-height: 0;
 }
 
 .regular-event {
   width: 100%;
+  height: 100%;
 }
 
 .regular-event-placeholder {
   width: 100%;
-  height: 38px;
-  min-height: 38px;
-  max-height: 38px;
+  height: 100%;
+  min-height: 0;
 }
 
 .more-events {
@@ -620,11 +642,8 @@ function closeDayModal(): void {
     font-size: 0.64rem;
   }
 
-  .regular-event-lane,
-  .regular-event-placeholder {
-    height: 34px;
-    min-height: 34px;
-    max-height: 34px;
+  .regular-event-lanes {
+    --calendar-lane-row-height: 34px;
   }
 }
 
@@ -697,11 +716,8 @@ function closeDayModal(): void {
     font-size: 0.52rem;
   }
 
-  .regular-event-lane,
-  .regular-event-placeholder {
-    height: 28px;
-    min-height: 28px;
-    max-height: 28px;
+  .regular-event-lanes {
+    --calendar-lane-row-height: 28px;
   }
 
   .more-events {
