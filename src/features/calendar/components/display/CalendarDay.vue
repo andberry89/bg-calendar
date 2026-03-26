@@ -41,22 +41,20 @@
       <span v-if="isFilteredEmptyDay" class="filtered-empty-note">Filtered</span>
     </div>
 
-    <div v-if="visibleHolidayChips.length > 0" class="holiday-strip">
+    <div v-if="visibleHolidayBadges.length > 0" class="date-badges">
       <div
-        v-for="(event, idx) in visibleHolidayChips"
-        :key="'holiday-' + idx"
-        class="holiday-chip"
+        v-for="(event, idx) in visibleHolidayBadges"
+        :key="'holiday-badge-' + idx"
+        class="date-badge"
         :class="{
-          'holiday-chip--half': event.closed === 'half',
-          'holiday-chip--full': event.closed === 'full',
-          'holiday-chip--open': event.closed === 'none' || event.closed === ''
+          'date-badge--half': event.closed === 'half',
+          'date-badge--open': event.closed === 'none' || event.closed === ''
         }"
       >
-        <span v-if="event.closed !== 'half' || !isMobile" class="holiday-chip__title">
+        <span class="date-badge__label">
           {{ event.details || event.type }}
         </span>
-        <span v-if="event.closed === 'half'" class="holiday-chip__meta">Early Close</span>
-        <span v-if="event.closed === 'full'" class="holiday-chip__meta">Office Closed</span>
+        <span v-if="event.closed === 'half'" class="date-badge__meta">Early Close</span>
       </div>
     </div>
 
@@ -68,14 +66,20 @@
     </div>
 
     <template v-else>
-      <CalendarEvent
-        v-for="(event, idx) in visibleRegularEvents"
-        :key="'event-' + idx"
-        class="regular-event"
-        :event="event"
-        @click="openEventModal(event)"
-        @update="updateEvents"
-      />
+      <div
+        v-for="(laneEvent, idx) in visibleRegularLaneSlots"
+        :key="'regular-lane-' + idx"
+        class="regular-event-lane"
+      >
+        <CalendarEvent
+          v-if="laneEvent"
+          class="regular-event"
+          :event="laneEvent"
+          @click="openEventModal(laneEvent)"
+          @update="updateEvents"
+        />
+        <div v-else class="regular-event-placeholder" aria-hidden="true" />
+      </div>
 
       <button
         v-if="hiddenEventCount > 0"
@@ -94,7 +98,11 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import CalendarEvent from '@/features/calendar/components/display/CalendarEvent.vue';
 import EventModal from '@/features/calendar/components/modals/EventModal.vue';
 import DayModal from '@/features/calendar/components/modals/DayModal.vue';
-import type { CalendarEvent as CalendarEventType, CurrentDate } from '@/types/calendar';
+import type {
+  AssignedCalendarEvent,
+  CalendarEvent as CalendarEventType,
+  CurrentDate
+} from '@/types/calendar';
 
 type CalendarMonthOffset = 'prev' | 'next';
 
@@ -107,11 +115,13 @@ const props = withDefaults(
     currentDate: CurrentDate;
     month?: CalendarMonthOffset;
     events?: CalendarEventType[];
+    regularEventLaneSlots?: (AssignedCalendarEvent | CalendarEventType | null)[];
     hasUnfilteredEvents?: boolean;
   }>(),
   {
     month: undefined,
     events: () => [],
+    regularEventLaneSlots: () => [],
     hasUnfilteredEvents: false
   }
 );
@@ -148,7 +158,7 @@ const eventGroups = computed(
 
 const holidays = computed((): CalendarEventType[] => eventGroups.value.holidays);
 
-const visibleHolidayChips = computed((): CalendarEventType[] => {
+const visibleHolidayBadges = computed((): CalendarEventType[] => {
   return holidays.value.filter((event) => event.closed !== 'full');
 });
 
@@ -174,22 +184,44 @@ const visibleRegularEventLimit = computed((): number => {
   return isMobile.value ? 2 : 3;
 });
 
-const visibleRegularEvents = computed((): CalendarEventType[] => {
-  const prioritizedEvents = [...filteredEvents.value].sort((a, b) => {
-    const aHasDisplay = 'display' in a && a.display;
-    const bHasDisplay = 'display' in b && b.display;
+const visibleRegularLaneCount = computed((): number => {
+  return visibleRegularEventLimit.value;
+});
 
-    const aPriority = !aHasDisplay || a.display.startsToday === true ? 0 : 1;
-    const bPriority = !bHasDisplay || b.display.startsToday === true ? 0 : 1;
+const normalizedRegularEventLaneSlots = computed(
+  (): (AssignedCalendarEvent | CalendarEventType | null)[] => {
+    if (props.regularEventLaneSlots.length > 0) {
+      return props.regularEventLaneSlots;
+    }
 
-    return aPriority - bPriority;
-  });
+    return filteredEvents.value.map((event) => event);
+  }
+);
 
-  return prioritizedEvents.slice(0, visibleRegularEventLimit.value);
+const visibleRegularLaneSlots = computed(
+  (): (AssignedCalendarEvent | CalendarEventType | null)[] => {
+    const visibleSlots = normalizedRegularEventLaneSlots.value.slice(
+      0,
+      visibleRegularLaneCount.value
+    );
+
+    if (visibleSlots.length === visibleRegularLaneCount.value) {
+      return visibleSlots;
+    }
+
+    return [
+      ...visibleSlots,
+      ...Array.from({ length: visibleRegularLaneCount.value - visibleSlots.length }, () => null)
+    ];
+  }
+);
+
+const visibleRegularEventCount = computed((): number => {
+  return visibleRegularLaneSlots.value.filter((event) => event !== null).length;
 });
 
 const hiddenEventCount = computed((): number => {
-  return Math.max(filteredEvents.value.length - visibleRegularEventLimit.value, 0);
+  return Math.max(filteredEvents.value.length - visibleRegularEventCount.value, 0);
 });
 
 const isFilteredEmptyDay = computed((): boolean => {
@@ -372,61 +404,53 @@ function closeDayModal(): void {
   opacity: 0.72;
 }
 
-.holiday-strip {
+.date-badges {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 4px;
   width: 100%;
-  margin: 0 0 2px;
+  margin: -2px 0 4px;
 }
 
-.holiday-chip {
-  display: flex;
-  flex-direction: column;
+.date-badge {
+  display: inline-flex;
   align-items: center;
   gap: 4px;
-  width: 100%;
-  padding: 8px 12px;
+  max-width: 100%;
+  min-width: 0;
+  padding: 2px 6px;
   border: 1px solid var(--holiday-open-border);
-  border-radius: 10px;
+  border-radius: 999px;
   background: var(--holiday-open-bg);
   color: var(--calendar-text);
-  text-align: center;
   box-sizing: border-box;
 }
 
-.holiday-chip--half {
+.date-badge--half {
   border-color: var(--holiday-halfday-border);
   background: var(--holiday-halfday-bg);
-  box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.25);
+  box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.18);
 }
 
-.holiday-chip--open {
-  padding-left: 8px;
-  padding-right: 8px;
-}
-
-.holiday-chip__title {
+.date-badge__label,
+.date-badge__meta {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 0.7rem;
-  font-weight: 500;
-  line-height: 1.2;
-  letter-spacing: 0.05em;
+  line-height: 1;
   text-transform: uppercase;
-  opacity: 0.95;
 }
 
-.holiday-chip__meta {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 0.7rem;
-  font-weight: 500;
-  line-height: 1.2;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+.date-badge__label {
+  font-size: 0.54rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.date-badge__meta {
+  font-size: 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   opacity: 0.9;
 }
 
@@ -458,6 +482,24 @@ function closeDayModal(): void {
   opacity: 0.88;
 }
 
+.regular-event-lane {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: 38px;
+  max-height: 38px;
+}
+
+.regular-event {
+  width: 100%;
+}
+
+.regular-event-placeholder {
+  width: 100%;
+  min-height: 38px;
+  max-height: 38px;
+}
+
 .more-events {
   display: inline-flex;
   align-items: center;
@@ -485,21 +527,27 @@ function closeDayModal(): void {
   }
 }
 @media (max-width: 900px) and (min-width: 641px) {
-  .holiday-chip {
-    padding: 8px 12px;
+  .date-badges {
     gap: 3px;
+    margin-bottom: 3px;
   }
 
-  .holiday-chip--open {
-    padding-left: 14px;
-    padding-right: 14px;
+  .date-badge {
+    padding: 2px 5px;
   }
 
-  .holiday-chip__title,
-  .holiday-chip__meta {
-    font-size: 0.64rem;
-    line-height: 1.1;
-    letter-spacing: 0.04em;
+  .date-badge__label {
+    font-size: 0.5rem;
+  }
+
+  .date-badge__meta {
+    font-size: 0.48rem;
+  }
+
+  .regular-event-lane,
+  .regular-event-placeholder {
+    min-height: 34px;
+    max-height: 34px;
   }
 }
 
@@ -528,55 +576,25 @@ function closeDayModal(): void {
     font-size: 0.48rem;
   }
 
-  .holiday-strip {
+  .date-badges {
     gap: 3px;
-    margin-bottom: 1px;
+    margin: -1px 0 3px;
   }
 
-  .holiday-chip {
-    align-items: center;
-    gap: 2px;
-    padding: 5px 6px;
-    border-radius: 8px;
-    text-align: center;
+  .date-badge {
+    gap: 3px;
+    padding: 2px 5px;
   }
 
-  .holiday-chip--half {
-    min-height: 32px;
-    justify-content: center;
-  }
-
-  .holiday-chip--open {
-    min-height: 32px;
-    justify-content: center;
-    padding-left: 8px;
-    padding-right: 8px;
-  }
-
-  .holiday-chip__title {
-    display: none;
+  .date-badge__label {
     max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 0.56rem;
-    line-height: 1.05;
-    letter-spacing: 0.04em;
+    font-size: 0.46rem;
+    letter-spacing: 0.03em;
   }
 
-  .holiday-chip--open .holiday-chip__title {
-    display: block;
-  }
-
-  .holiday-chip__meta {
-    overflow: visible;
-    text-overflow: unset;
-    white-space: normal;
-    font-size: 0.56rem;
-    line-height: 1.05;
-    word-break: normal;
-    overflow-wrap: break-word;
-    max-width: 100%;
+  .date-badge__meta {
+    font-size: 0.44rem;
+    letter-spacing: 0.03em;
   }
 
   .full-close-message {
@@ -590,6 +608,12 @@ function closeDayModal(): void {
 
   .full-close-message__detail {
     font-size: 0.52rem;
+  }
+
+  .regular-event-lane,
+  .regular-event-placeholder {
+    min-height: 28px;
+    max-height: 28px;
   }
 
   .more-events {

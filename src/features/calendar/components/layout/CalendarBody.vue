@@ -25,7 +25,8 @@
           @delete="deleteEvent($event)"
           :date="date"
           :currentDate="currentDate"
-          :events="weekEvents[wIdx][dIdx]"
+          :events="orderedWeekEvents[wIdx][dIdx]"
+          :regularEventLaneSlots="weekRegularEventLaneSlots[wIdx][dIdx]"
           :hasUnfilteredEvents="unfilteredEvents[date - 1]?.length > 0"
         />
       </template>
@@ -45,7 +46,7 @@
 import { computed } from 'vue';
 import CalendarDay from '@/features/calendar/components/display/CalendarDay.vue';
 import assignEvents from '@/features/calendar/utils/assignEvents';
-import type { CalendarEvent, CurrentDate } from '@/types/calendar';
+import type { AssignedCalendarEvent, CalendarEvent, CurrentDate } from '@/types/calendar';
 
 const {
   currentDate,
@@ -88,16 +89,16 @@ const nextMonthVisibleDays = computed((): number[] => {
   return Array.from({ length: 43 - (currentMonthDays + firstMonthDay.value) }, (_, idx) => idx + 1);
 });
 
-let cachedEvents: CalendarEvent[][] = [];
+let cachedEvents: AssignedCalendarEvent[][] = [];
 let cachedMonth = -1;
 let cachedMonthDays = -1;
 let cachedSourceEvents: CalendarEvent[] | null = null;
-let cachedUnfilteredEvents: CalendarEvent[][] = [];
+let cachedUnfilteredEvents: AssignedCalendarEvent[][] = [];
 let cachedUnfilteredMonth = -1;
 let cachedUnfilteredMonthDays = -1;
 let cachedUnfilteredSourceEvents: CalendarEvent[] | null = null;
 
-const events = computed((): CalendarEvent[][] => {
+const events = computed((): AssignedCalendarEvent[][] => {
   if (!currentMonthDays || !currentMonthEvents.length) {
     cachedEvents = [];
     cachedMonth = currentDate.month;
@@ -123,7 +124,7 @@ const events = computed((): CalendarEvent[][] => {
   return cachedEvents;
 });
 
-const unfilteredEvents = computed((): CalendarEvent[][] => {
+const unfilteredEvents = computed((): AssignedCalendarEvent[][] => {
   if (!currentMonthDays || !unfilteredCurrentMonthEvents.length) {
     cachedUnfilteredEvents = [];
     cachedUnfilteredMonth = currentDate.month;
@@ -173,9 +174,94 @@ const weeks = computed((): number[][] => {
   return rows;
 });
 
-const weekEvents = computed(() => {
+const weekEvents = computed((): AssignedCalendarEvent[][][] => {
   return weeks.value.map((week) => {
     return week.map((date) => events.value[date - 1] ?? []);
+  });
+});
+
+const weekRegularEventOrder = computed((): AssignedCalendarEvent[][] => {
+  return weekEvents.value.map((week) => {
+    const map = new Map<string, AssignedCalendarEvent>();
+
+    week.forEach((dayEvents) => {
+      dayEvents.forEach((event) => {
+        if (event.type === 'Holiday') {
+          return;
+        }
+
+        const key = event.id ?? `${event.type}-${event.start}-${event.end}`;
+
+        if (!map.has(key)) {
+          map.set(key, event);
+        }
+      });
+    });
+
+    return Array.from(map.values());
+  });
+});
+
+const orderedWeekEvents = computed((): AssignedCalendarEvent[][][] => {
+  return weekEvents.value.map((week, weekIdx) => {
+    const regularEventOrderIndex = new Map<string, number>();
+
+    weekRegularEventOrder.value[weekIdx].forEach((event, index) => {
+      const key = event.id ?? `${event.type}-${event.start}-${event.end}`;
+      regularEventOrderIndex.set(key, index);
+    });
+
+    return week.map((dayEvents) => {
+      const holidays = dayEvents.filter((event) => event.type === 'Holiday');
+      const regularEvents = dayEvents
+        .filter((event) => event.type !== 'Holiday')
+        .sort((a, b) => {
+          const keyA = a.id ?? `${a.type}-${a.start}-${a.end}`;
+          const keyB = b.id ?? `${b.type}-${b.start}-${b.end}`;
+
+          return (
+            (regularEventOrderIndex.get(keyA) ?? Number.MAX_SAFE_INTEGER) -
+            (regularEventOrderIndex.get(keyB) ?? Number.MAX_SAFE_INTEGER)
+          );
+        });
+
+      return [...holidays, ...regularEvents];
+    });
+  });
+});
+
+const weekRegularEventLaneSlots = computed((): (AssignedCalendarEvent | null)[][][] => {
+  return weekEvents.value.map((week, weekIdx) => {
+    const laneIndexByKey = new Map<string, number>();
+
+    weekRegularEventOrder.value[weekIdx].forEach((event, index) => {
+      const key = event.id ?? `${event.type}-${event.start}-${event.end}`;
+      laneIndexByKey.set(key, index);
+    });
+
+    return week.map((dayEvents) => {
+      const laneSlots: (AssignedCalendarEvent | null)[] = Array.from(
+        { length: weekRegularEventOrder.value[weekIdx].length },
+        () => null
+      );
+
+      dayEvents.forEach((event) => {
+        if (event.type === 'Holiday') {
+          return;
+        }
+
+        const key = event.id ?? `${event.type}-${event.start}-${event.end}`;
+        const laneIndex = laneIndexByKey.get(key);
+
+        if (laneIndex === undefined) {
+          return;
+        }
+
+        laneSlots[laneIndex] = event;
+      });
+
+      return laneSlots;
+    });
   });
 });
 
