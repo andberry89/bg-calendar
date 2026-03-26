@@ -110,7 +110,17 @@ const isMultiDayMiddle = computed((): boolean => {
 
 const leadStaff = computed((): StaffMember | undefined => event.staff[0]);
 
-const showAvatar = computed((): boolean => !isHoliday.value && Boolean(leadStaff.value));
+const showAvatar = computed((): boolean => {
+  if (isHoliday.value) {
+    return false;
+  }
+
+  if (event.class === 'auto-show' || event.class === 'cd-event') {
+    return false;
+  }
+
+  return Boolean(leadStaff.value);
+});
 
 const avatarSrc = computed((): string => {
   const staff = leadStaff.value;
@@ -159,7 +169,7 @@ const primaryText = computed((): string => {
     case 'auto-show':
       return 'Auto Show';
     case 'cd-event':
-      return 'C/D Event';
+      return event.details || 'C/D Event';
     case 'comp-day':
       return event.staff[0]?.initials ?? 'Staff';
     case 'holiday':
@@ -180,8 +190,6 @@ const secondaryText = computed((): string => {
     case 'sick-time':
       return 'Sick Time';
     case 'auto-show':
-      return event.details;
-    case 'cd-event':
       return event.details;
     case 'comp-day':
       return 'Comp Day';
