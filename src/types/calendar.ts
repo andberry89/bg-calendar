@@ -46,6 +46,16 @@ export interface CalendarEvent {
   type: EventType;
 }
 
+export interface AssignedCalendarEvent extends CalendarEvent {
+  display: {
+    startsToday: boolean;
+    endsToday: boolean;
+    isMultiDay: boolean;
+    spanIndex: number;
+    spanLength: number;
+  };
+}
+
 export type CalendarEventDocument = Omit<CalendarEvent, 'id'>;
 export type StaffDocument = Omit<Staff, 'id'>;
 export type NewCalendarEvent = CalendarEventDocument;

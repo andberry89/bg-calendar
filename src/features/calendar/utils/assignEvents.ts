@@ -1,11 +1,14 @@
-import type { CalendarEvent } from '@/types/calendar';
+import type { AssignedCalendarEvent, CalendarEvent } from '@/types/calendar';
 
 const assignEvents = (
   arr: CalendarEvent[],
   currentMonth: number,
   currentMonthDays: number
-): CalendarEvent[][] => {
-  const updatedEvents: CalendarEvent[][] = Array.from({ length: currentMonthDays }, () => []);
+): AssignedCalendarEvent[][] => {
+  const updatedEvents: AssignedCalendarEvent[][] = Array.from(
+    { length: currentMonthDays },
+    () => []
+  );
   const targetMonth = currentMonth + 1;
 
   for (const event of arr) {
@@ -24,8 +27,22 @@ const assignEvents = (
       }
     }
 
-    for (let i = startIdx; i <= endIdx; i += 1) {
-      updatedEvents[i].push(event);
+    const boundedStartIdx = Math.max(startIdx, 0);
+    const boundedEndIdx = Math.min(endIdx, currentMonthDays - 1);
+    const spanLength = boundedEndIdx - boundedStartIdx + 1;
+    const isMultiDay = spanLength > 1;
+
+    for (let i = boundedStartIdx; i <= boundedEndIdx; i += 1) {
+      updatedEvents[i].push({
+        ...event,
+        display: {
+          startsToday: i === boundedStartIdx,
+          endsToday: i === boundedEndIdx,
+          isMultiDay,
+          spanIndex: i - boundedStartIdx,
+          spanLength
+        }
+      });
     }
   }
 
