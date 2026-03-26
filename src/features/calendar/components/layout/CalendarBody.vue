@@ -14,19 +14,21 @@
         :currentDate="currentDate"
         month="prev"
       />
-      <CalendarDay
-        dayClass="day"
-        v-for="(date, idx) in currentMonthVisibleDays"
-        :class="{ active: date === currentDate.date }"
-        @click="updateDate(date)"
-        @update="updateEvents"
-        @delete="deleteEvent($event)"
-        :key="'day' + idx"
-        :date="date"
-        :currentDate="currentDate"
-        :events="events[date - 1]"
-        :hasUnfilteredEvents="unfilteredEvents[date - 1]?.length > 0"
-      />
+      <template v-for="(week, wIdx) in weeks" :key="'week-' + wIdx">
+        <CalendarDay
+          dayClass="day"
+          v-for="(date, dIdx) in week"
+          :key="'day' + wIdx + '-' + dIdx"
+          :class="{ active: date === currentDate.date }"
+          @click="updateDate(date)"
+          @update="updateEvents"
+          @delete="deleteEvent($event)"
+          :date="date"
+          :currentDate="currentDate"
+          :events="events[date - 1]"
+          :hasUnfilteredEvents="unfilteredEvents[date - 1]?.length > 0"
+        />
+      </template>
       <CalendarDay
         dayClass="day-hidden"
         v-for="(date, idx) in nextMonthVisibleDays"
@@ -149,6 +151,26 @@ const unfilteredEvents = computed((): CalendarEvent[][] => {
   cachedUnfilteredSourceEvents = unfilteredCurrentMonthEvents;
 
   return cachedUnfilteredEvents;
+});
+
+const weeks = computed((): number[][] => {
+  const days = currentMonthVisibleDays.value;
+  const rows: number[][] = [];
+
+  let currentWeek: number[] = [];
+
+  for (let i = 0; i < days.length; i += 1) {
+    currentWeek.push(days[i]);
+
+    const isEndOfWeek = (i + firstMonthDay.value) % 7 === 0;
+
+    if (isEndOfWeek || i === days.length - 1) {
+      rows.push(currentWeek);
+      currentWeek = [];
+    }
+  }
+
+  return rows;
 });
 
 const dataReady = computed((): boolean => {
