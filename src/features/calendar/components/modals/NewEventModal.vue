@@ -201,19 +201,18 @@ function closeForm(): void {
   font:
     400 1rem/1 'Arial',
     sans-serif;
-  text-shadow: none;
   color: var(--black);
+  text-shadow: none;
 }
 
 .new-event-modal {
   position: relative;
   width: min(560px, calc(100vw - 24px));
   max-width: 560px;
-  background-color: var(--light-gray);
-  color: var(--black);
-  border-radius: 12px;
-  padding: 16px;
   box-sizing: border-box;
+  padding: 18px;
+  color: var(--calendar-text);
+  background: transparent;
 }
 
 .new-event-modal__header {
@@ -221,43 +220,86 @@ function closeForm(): void {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
+  margin: -2px -2px 14px;
+  padding: 0 0 12px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.28);
 }
 
 .new-event-modal__title {
   margin: 0;
+  color: #0f172a;
   font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
 }
 
 .new-event-modal__close {
-  border: 1px solid var(--black);
-  background-color: var(--white);
-  color: var(--black);
-  border-radius: 8px;
-  padding: 4px 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0;
+  border: 1px solid rgba(51, 65, 85, 0.22);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(241, 245, 249, 0.92) 100%);
+  color: #0f172a;
   font-size: 1rem;
+  line-height: 1;
+  box-shadow:
+    0 6px 14px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
   cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: rgba(37, 99, 235, 0.3);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(239, 246, 255, 0.96) 100%);
+    box-shadow:
+      0 10px 20px rgba(15, 23, 42, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  }
 }
 
 .new-event-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
   label {
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
+    color: #334155;
     font-size: 0.75rem;
     font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
 
   .event-reminder {
-    font-size: 0.75rem;
-    padding: 8px 10px;
-    border-radius: 8px;
-    background-color: var(--ocean-lt-blue);
-    color: var(--dark-gray);
+    padding: 10px 12px;
+    border: 1px solid rgba(37, 99, 235, 0.18);
+    border-radius: 12px;
+    background: linear-gradient(
+      180deg,
+      rgba(239, 246, 255, 0.92) 0%,
+      rgba(224, 242, 254, 0.86) 100%
+    );
+    color: #0f172a;
+    font-size: 0.8rem;
+    line-height: 1.35;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.66);
 
     a {
       margin-left: 6px;
-      font-weight: 600;
-      color: var(--ocean-dark-blue);
+      color: #1d4ed8;
+      font-weight: 700;
       text-decoration: underline;
     }
   }
@@ -265,51 +307,65 @@ function closeForm(): void {
   input,
   select {
     width: 100%;
-    min-height: 36px;
+    min-height: 38px;
     margin: 0;
     box-sizing: border-box;
-    padding: 6px 8px;
-    border: 1px solid var(--ocean-slate-blue);
-    border-radius: 6px;
-    background-color: var(--white);
-    color: var(--black);
+    padding: 8px 10px;
+    border: 1px solid rgba(148, 163, 184, 0.55);
+    border-radius: 10px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.98) 0%,
+      rgba(248, 250, 252, 0.96) 100%
+    );
+    color: #0f172a;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.72),
+      0 1px 2px rgba(15, 23, 42, 0.04);
     font:
       400 0.95rem/1.2 'Arial',
       sans-serif;
   }
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 
   .holiday-options {
-    margin-bottom: 8px;
-    background-color: var(--ocean-md-blue);
+    padding: 10px 12px;
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.9) 0%, rgba(45, 212, 191, 0.82) 100%);
     color: var(--white);
-    padding: 8px;
-    border-radius: 8px;
+    box-shadow:
+      0 12px 24px rgba(37, 99, 235, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
 
     .office-closure-label {
       display: block;
-      margin-bottom: 6px;
-      font-size: 14px;
+      margin-bottom: 8px;
+      font-size: 0.8rem;
       font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
     }
 
     label {
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 0.85rem;
-      font-weight: 400;
       margin-bottom: 4px;
+      color: var(--white);
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 0;
+      text-transform: none;
     }
 
     input {
       width: auto;
       margin: 0;
+      box-shadow: none;
       cursor: pointer;
     }
   }
+
   .details-div {
     display: flex;
     flex-direction: column;
@@ -335,10 +391,10 @@ function closeForm(): void {
   ul {
     display: grid;
     gap: 8px;
+    margin: 0;
     padding: 0;
     list-style: none;
-    margin: 0;
-    max-height: 220px;
+    max-height: min(420px, calc(100vh - 360px));
     overflow-y: auto;
   }
 
@@ -346,16 +402,26 @@ function closeForm(): void {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 10px;
-    border: 1px solid var(--ocean-slate-blue);
-    border-radius: 8px;
-    background-color: var(--white);
+    padding: 9px 10px;
+    border: 1px solid rgba(148, 163, 184, 0.34);
+    border-radius: 12px;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.96) 0%,
+      rgba(248, 250, 252, 0.92) 100%
+    );
+    box-shadow:
+      0 8px 18px rgba(15, 23, 42, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.74);
 
     label {
       display: inline;
       margin-bottom: 0;
+      color: #0f172a;
       font-size: 0.9rem;
-      font-weight: 400;
+      font-weight: 500;
+      letter-spacing: 0;
+      text-transform: none;
     }
 
     input {
@@ -363,6 +429,7 @@ function closeForm(): void {
       min-height: auto;
       margin: 0;
       padding: 0;
+      box-shadow: none;
     }
   }
 
@@ -373,45 +440,60 @@ function closeForm(): void {
 
   .err-msg {
     padding: 10px 12px;
-    border: 1px solid var(--red);
-    border-radius: 8px;
-    background-color: var(--white);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    border-radius: 12px;
+    background: linear-gradient(
+      180deg,
+      rgba(254, 242, 242, 0.98) 0%,
+      rgba(254, 226, 226, 0.9) 100%
+    );
+    color: #b91c1c;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
     font:
-      700 12px/1.3 'Arial',
+      700 12px/1.35 'Arial',
       sans-serif;
-    color: var(--red);
 
     ul {
-      font-weight: 400;
-      list-style: disc;
       margin-top: 6px;
       margin-left: 18px;
+      list-style: disc;
       max-height: none;
       overflow: visible;
+      font-weight: 400;
     }
   }
 }
 
 @media (max-width: 640px) {
   .new-event-modal {
-    padding: 12px;
+    padding: 14px;
+  }
+
+  .new-event-modal__header {
+    margin-bottom: 12px;
+    padding-bottom: 10px;
   }
 
   .new-event-form {
-    gap: 10px;
+    gap: 12px;
 
     .date-fields {
       grid-template-columns: 1fr;
       gap: 10px;
     }
+
     input,
     select {
-      min-height: 34px;
+      min-height: 36px;
       font-size: 0.9rem;
     }
 
+    ul {
+      max-height: 220px;
+    }
+
     li {
-      padding: 7px 9px;
+      padding: 8px 9px;
     }
   }
 }

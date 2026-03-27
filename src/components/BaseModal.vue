@@ -92,13 +92,15 @@ onBeforeUnmount((): void => {
   z-index: 1;
   width: auto;
   max-width: min(95vw, 720px);
-  max-height: calc(100vh - 40px);
+  max-height: calc(100vh - 24px);
   outline: none;
+  display: flex;
 }
 
 .base-modal__surface {
   position: relative;
-  overflow: hidden;
+  overflow: auto;
+  max-height: inherit;
   border: 1px solid rgba(148, 163, 184, 0.28);
   border-radius: 20px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 250, 252, 0.96) 100%);
