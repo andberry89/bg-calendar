@@ -222,7 +222,6 @@ function closeForm(): void {
   gap: 12px;
   margin: -2px -2px 14px;
   padding: 0 0 12px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.28);
 }
 
 .new-event-modal__title {

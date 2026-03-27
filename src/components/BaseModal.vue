@@ -114,10 +114,10 @@ onBeforeUnmount((): void => {
   content: '';
   position: absolute;
   inset: 0 0 auto 0;
-  height: 96px;
+  height: 56px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 100%),
-    linear-gradient(135deg, rgba(37, 99, 235, 0.18) 0%, rgba(45, 212, 191, 0.14) 100%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 100%),
+    linear-gradient(135deg, rgba(37, 99, 235, 0.14) 0%, rgba(45, 212, 191, 0.1) 100%);
   pointer-events: none;
 }
 
@@ -151,7 +151,7 @@ onBeforeUnmount((): void => {
   }
 
   .base-modal__surface::before {
-    height: 72px;
+    height: 44px;
   }
 }
 </style>
