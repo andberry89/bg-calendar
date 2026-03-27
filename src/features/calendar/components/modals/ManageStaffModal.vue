@@ -2,7 +2,7 @@
   <div class="manage-staff">
     <button type="button" class="manage-staff-button" @click="openModal">Manage Staff</button>
 
-    <BaseModal v-if="showModal" @update="closeModal">
+    <BaseModal v-if="showModal" @update="closeModal" @close="closeModal">
       <section class="manage-staff-modal">
         <header class="manage-staff-modal__header">
           <h2>Manage Staff</h2>
@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import BaseModal from '@//components/BaseModal.vue';
+import BaseModal from '@/components/BaseModal.vue';
 import EditStaff from '@/features/calendar/components/EditStaff.vue';
 import type { Staff, StaffUpdatePayload } from '@/types/calendar';
 
