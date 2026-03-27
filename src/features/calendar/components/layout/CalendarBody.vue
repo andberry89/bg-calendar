@@ -589,8 +589,14 @@ function getWeekSpanningSegmentStyle(segment: CalendarWeekSpanningSegment): {
 }
 
 function openWeekSpanEventModal(segment: CalendarWeekSpanningSegment, weekIdx: number): void {
+  const fullEvent = currentMonthEvents.find((e) => getEventKey(e) === getEventKey(segment.event));
+
+  if (!fullEvent) {
+    return;
+  }
+
   selectedWeekSpanEvent.value = {
-    event: segment.event,
+    event: fullEvent,
     day: weeks.value[weekIdx][segment.startDayIndex]?.date ?? 1,
     weekIdx
   };
