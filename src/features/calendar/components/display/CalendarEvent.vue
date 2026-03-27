@@ -14,14 +14,18 @@
         {
           'event-pill--holiday': isHoliday,
           'event-pill--multi-day': isMultiDay,
-          'event-pill--multi-day-single': isMultiDaySingle,
-          'event-pill--multi-day-start': isMultiDayStart,
-          'event-pill--multi-day-middle': isMultiDayMiddle,
-          'event-pill--multi-day-end': isMultiDayEnd
+          [`event-pill--shape-${pillShape}`]: true
         }
       ]"
     >
-      <span v-if="showAvatar" class="event-pill__avatar">
+      <span
+        v-if="showAvatar"
+        class="event-pill__avatar"
+        :class="{
+          'event-pill__avatar--large': isSingleDay,
+          'event-pill__avatar--xlarge': isSingleDay
+        }"
+      >
         <img
           v-if="avatarSrc"
           class="event-pill__avatar-image"
@@ -88,6 +92,7 @@ const eventTypeBorderByClass: Partial<Record<CalendarEvent['class'], string>> = 
 };
 
 type StaffMember = Staff;
+type EventPillShape = 'default' | 'single' | 'start' | 'middle' | 'end';
 
 const isHoliday = computed((): boolean => event.class === 'holiday');
 
@@ -99,20 +104,27 @@ const isMultiDay = computed((): boolean => {
   return isAssignedEvent.value && event.display.isMultiDay === true;
 });
 
-const isMultiDaySingle = computed((): boolean => {
-  return isMultiDay.value && event.display.startsToday === true && event.display.endsToday === true;
-});
+const pillShape = computed((): EventPillShape => {
+  if (!isMultiDay.value) {
+    return 'default';
+  }
 
-const isMultiDayStart = computed((): boolean => {
-  return isMultiDay.value && event.display.startsToday === true && event.display.endsToday !== true;
-});
+  const startsToday = event.display.startsToday === true;
+  const endsToday = event.display.endsToday === true;
 
-const isMultiDayEnd = computed((): boolean => {
-  return isMultiDay.value && event.display.startsToday !== true && event.display.endsToday === true;
-});
+  if (startsToday && endsToday) {
+    return 'single';
+  }
 
-const isMultiDayMiddle = computed((): boolean => {
-  return isMultiDay.value && event.display.startsToday !== true && event.display.endsToday !== true;
+  if (startsToday) {
+    return 'start';
+  }
+
+  if (endsToday) {
+    return 'end';
+  }
+
+  return 'middle';
 });
 
 const leadStaff = computed((): StaffMember | undefined => event.staff[0]);
@@ -163,22 +175,39 @@ const avatarFallback = computed((): string => {
   return 'ST';
 });
 
+function getStaffDisplayName(): string {
+  const staff = event.staff?.[0];
+
+  if (!staff) {
+    return 'Staff';
+  }
+
+  const firstName =
+    (staff as Staff & { firstName?: string }).firstName?.trim() || staff.shortName?.trim() || '';
+
+  const lastName = staff.lastName?.trim() || '';
+  const lastInitial = lastName[0]?.toUpperCase() ?? '';
+
+  if (!firstName) {
+    return 'Staff';
+  }
+
+  return lastInitial ? `${firstName} ${lastInitial}.` : firstName;
+}
+
 const primaryText = computed((): string => {
   switch (event.class) {
     case 'birthday':
-      return `${event.staff[0]?.shortName ?? 'Team'} Birthday`;
+      return `${getStaffDisplayName()} Birthday`;
     case 'press-trip':
-      return event.staff[0]?.initials ?? 'Staff';
     case 'vacation':
-      return event.staff[0]?.initials ?? 'Staff';
     case 'sick-time':
-      return event.staff[0]?.initials ?? 'Staff';
+    case 'comp-day':
+      return getStaffDisplayName();
     case 'auto-show':
       return 'Auto Show';
     case 'cd-event':
       return event.details || 'C/D Event';
-    case 'comp-day':
-      return event.staff[0]?.initials ?? 'Staff';
     case 'holiday':
       return event.details || event.type;
     default:
@@ -217,6 +246,14 @@ const eventColorVar = computed((): string => {
   return config ? `var(${config.colorVar})` : 'var(--calendar-border-strong)';
 });
 
+const isSingleDay = computed((): boolean => {
+  if (!isAssignedEvent.value) {
+    return true;
+  }
+
+  return event.display.isMultiDay !== true;
+});
+
 const eventStyle = computed(
   (): Record<string, string> => ({
     '--event-pill-color': eventColorVar.value,
@@ -240,12 +277,12 @@ function emitEvent(): void {
 
 .event-pill {
   display: flex;
-  align-items: center;
-  gap: 5px;
+  align-items: stretch;
+  gap: 2px;
   min-width: 0;
   width: 100%;
-  margin: 3px 0;
-  padding: 6px 8px;
+  margin: 2px 0;
+  padding: 4px 4px;
   border: 1px solid var(--event-pill-border);
   border-radius: 10px;
   background: var(--event-pill-bg);
@@ -268,22 +305,35 @@ function emitEvent(): void {
   width: 8px;
   height: 8px;
   flex: 0 0 8px;
+  align-self: center;
   border-radius: 999px;
   background: var(--event-pill-color);
 }
 
 .event-pill__avatar {
-  width: 16px;
-  height: 16px;
-  flex: 0 0 16px;
-  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+  display: flex;
   align-items: center;
-  align-self: center;
   justify-content: center;
+  align-self: center;
   overflow: hidden;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--event-pill-color) 14%, white 86%);
+  background: color-mix(in srgb, var(--event-pill-color) 4%, white 96%);
   color: var(--event-pill-color);
+}
+
+.event-pill__avatar--large {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+}
+
+.event-pill__avatar--xlarge {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
 }
 
 .event-pill__avatar-image {
@@ -294,27 +344,34 @@ function emitEvent(): void {
 }
 
 .event-pill__avatar-fallback {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  height: 100%;
   font:
-    700 0.48rem/1 Arial,
+    700 0.62rem/1 Arial,
     sans-serif;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.01em;
   text-transform: uppercase;
 }
 
 .event-pill__content {
   display: flex;
-  align-items: center;
-  gap: 5px;
-  min-width: 0;
   flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 1px;
+  min-width: 0;
+  min-height: 0;
 }
 
 .event-pill__primary,
 .event-pill__secondary {
+  display: block;
   min-width: 0;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1.1;
@@ -334,34 +391,28 @@ function emitEvent(): void {
     600 0.68rem/1.1 Arial,
     sans-serif;
 }
-
 .event-pill--auto-show {
   flex-direction: column;
   align-items: flex-start;
   gap: 2px;
 }
 
-.event-pill--auto-show .event-pill__primary {
-  white-space: nowrap;
-}
-
-.event-pill--auto-show .event-pill__secondary {
-  white-space: nowrap;
-  max-width: 100%;
-}
-
-.event-pill--auto-show .event-pill__dot {
-  display: none;
+.event-pill--auto-show .event-pill__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
 }
 
 .event-pill--auto-show .event-pill__primary,
 .event-pill--auto-show .event-pill__secondary {
   display: block;
+  max-width: 100%;
   white-space: nowrap;
 }
 
-.event-pill--auto-show .event-pill__secondary {
-  max-width: 100%;
+.event-pill--auto-show .event-pill__dot {
+  display: none;
 }
 
 .event-pill--holiday {
@@ -375,56 +426,56 @@ function emitEvent(): void {
   color: inherit;
 }
 
-.event-pill--multi-day {
-  border-radius: 0;
-}
-
-.event-pill--multi-day-single {
+.event-pill--shape-default {
   border-radius: 10px;
 }
 
-.event-pill--multi-day-start {
+.event-pill--multi-day.event-pill--shape-single {
+  border-radius: 10px;
+}
+
+.event-pill--multi-day.event-pill--shape-start {
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
 
-.event-pill--multi-day-end {
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-}
-
-.event-pill--multi-day-middle {
+.event-pill--multi-day.event-pill--shape-middle {
+  border-radius: 0;
   padding-left: 6px;
   padding-right: 6px;
 }
 
-.event-pill--multi-day.event-pill--auto-show {
-  border-radius: 0;
-}
-
-.event-pill--multi-day.event-pill--auto-show.event-pill--multi-day-single {
-  border-radius: 10px;
-}
-
-.event-pill--multi-day.event-pill--auto-show.event-pill--multi-day-start {
-  border-top-left-radius: 10px;
-  border-bottom-left-radius: 10px;
-}
-
-.event-pill--multi-day.event-pill--auto-show.event-pill--multi-day-end {
+.event-pill--multi-day.event-pill--shape-end {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
   border-top-right-radius: 10px;
   border-bottom-right-radius: 10px;
 }
 
-.event-pill--holiday .event-pill__primary,
-.event-pill--holiday .event-pill__secondary {
-  color: inherit;
-}
-
 @media (max-width: 900px) {
   .event-pill {
-    padding: 5px 6px;
+    padding: 3px 4px;
     border-radius: 8px;
+  }
+
+  .event-pill__avatar {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+  }
+
+  .event-pill__avatar--large {
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+  }
+
+  .event-pill__avatar--xlarge {
+    width: 25px;
+    height: 25px;
+    flex: 0 0 25px;
   }
 
   .event-pill__primary {
@@ -435,20 +486,20 @@ function emitEvent(): void {
     font-size: 0.62rem;
   }
 
-  .event-pill--multi-day {
-    border-radius: 0;
-  }
-
-  .event-pill--multi-day-single {
+  .event-pill--shape-default {
     border-radius: 8px;
   }
 
-  .event-pill--multi-day-start {
+  .event-pill--multi-day.event-pill--shape-single {
+    border-radius: 8px;
+  }
+
+  .event-pill--multi-day.event-pill--shape-start {
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
   }
 
-  .event-pill--multi-day-end {
+  .event-pill--multi-day.event-pill--shape-end {
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
   }
@@ -456,9 +507,9 @@ function emitEvent(): void {
 
 @media (max-width: 640px) {
   .event-pill {
-    gap: 5px;
-    margin: 2px 0;
-    padding: 4px 5px;
+    gap: 2px;
+    margin: 1px 0;
+    padding: 2px 3px;
   }
 
   .event-pill__dot {
@@ -477,20 +528,20 @@ function emitEvent(): void {
     font-size: 0.58rem;
   }
 
-  .event-pill--multi-day {
-    border-radius: 0;
-  }
-
-  .event-pill--multi-day-single {
+  .event-pill--shape-default {
     border-radius: 8px;
   }
 
-  .event-pill--multi-day-start {
+  .event-pill--multi-day.event-pill--shape-single {
+    border-radius: 8px;
+  }
+
+  .event-pill--multi-day.event-pill--shape-start {
     border-top-left-radius: 8px;
     border-bottom-left-radius: 8px;
   }
 
-  .event-pill--multi-day-end {
+  .event-pill--multi-day.event-pill--shape-end {
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
   }
