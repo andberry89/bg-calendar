@@ -2,7 +2,7 @@
   <div class="new-event-container">
     <Button @click="openForm">New Event</Button>
 
-    <BaseModal v-if="showForm" @update="closeForm">
+    <BaseModal v-if="showForm" @update="closeForm" @close="closeForm">
       <div class="new-event-modal">
         <div class="new-event-modal__header">
           <h3 class="new-event-modal__title">New Event</h3>
