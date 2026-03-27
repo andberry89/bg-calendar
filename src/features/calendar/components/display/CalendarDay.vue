@@ -253,12 +253,8 @@ const visibleRegularLaneSlots = computed((): CalendarEventLaneSlot[] => {
   ];
 });
 
-const visibleRegularEventCount = computed((): number => {
-  return visibleRegularLaneSlots.value.filter((slot) => slot.event !== null).length;
-});
-
-const hiddenEventCount = computed((): number => {
-  return Math.max(filteredEvents.value.length - visibleRegularEventCount.value, 0);
+const renderableRegularLaneSlots = computed((): CalendarEventLaneSlot[] => {
+  return normalizedRegularEventLaneSlots.value.filter((slot) => !slot.occupiedBySpan);
 });
 
 const visibleRenderableRegularLaneSlots = computed(() => {
@@ -268,6 +264,18 @@ const visibleRenderableRegularLaneSlots = computed(() => {
       rowIndex
     }))
     .filter(({ slot }) => !slot.occupiedBySpan);
+});
+
+const visibleRegularEventCount = computed((): number => {
+  return visibleRenderableRegularLaneSlots.value.filter(({ slot }) => slot.event !== null).length;
+});
+
+const hiddenEventCount = computed((): number => {
+  const totalRenderableRegularEventCount = renderableRegularLaneSlots.value.filter(
+    (slot) => slot.event !== null
+  ).length;
+
+  return Math.max(totalRenderableRegularEventCount - visibleRegularEventCount.value, 0);
 });
 
 const regularEventLanesStyle = computed((): Record<string, string> => {

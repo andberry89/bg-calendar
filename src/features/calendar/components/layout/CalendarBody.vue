@@ -223,8 +223,8 @@ function getEventKey(event: CalendarEventType): string {
   return event.id ?? `${event.type}-${event.start}-${event.end}`;
 }
 
-function getEventRowSpan(event: AssignedCalendarEvent): number {
-  return event.class === 'auto-show' ? 2 : 1;
+function getEventRowSpan(_event: AssignedCalendarEvent): number {
+  return 1;
 }
 
 const weekRegularEventOrder = computed((): AssignedCalendarEvent[][] => {
