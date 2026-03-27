@@ -34,17 +34,10 @@
               v-for="segment in weekSpanningSegments[wIdx]"
               :key="getEventKey(segment.event)"
               class="calendar-week-span"
-              :class="{
-                'calendar-week-span--start': segment.event.display?.startsToday,
-                'calendar-week-span--end': segment.event.display?.endsToday,
-                'calendar-week-span--middle':
-                  !segment.event.display?.startsToday && !segment.event.display?.endsToday
-              }"
+              :class="getWeekSpanningSegmentClasses(segment)"
               :style="getWeekSpanningSegmentStyle(segment)"
             >
-              <span class="calendar-week-span__label">
-                {{ segment.event.title || segment.event.details }}
-              </span>
+              <CalendarEvent :event="segment.event" />
             </div>
           </div>
         </div>
@@ -56,10 +49,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import CalendarDay from '@/features/calendar/components/display/CalendarDay.vue';
+import CalendarEvent from '@/features/calendar/components/display/CalendarEvent.vue';
 import assignEvents from '@/features/calendar/utils/assignEvents';
 import type {
   AssignedCalendarEvent,
-  CalendarEvent,
+  CalendarEvent as CalendarEventType,
   CalendarEventLaneSlot,
   CurrentDate
 } from '@/types/calendar';
@@ -69,11 +63,17 @@ type CalendarWeekCell = {
   month: 'prev' | 'current' | 'next';
 };
 
+type CalendarWeekSegmentState = 'single' | 'start' | 'middle' | 'end';
+
 type CalendarWeekSpanningSegment = {
   event: AssignedCalendarEvent;
   laneIndex: number;
   startDayIndex: number;
   endDayIndex: number;
+  state: CalendarWeekSegmentState;
+  isClippedLeft: boolean;
+  isClippedRight: boolean;
+  isFullCloseStart: boolean;
 };
 
 const {
@@ -86,13 +86,13 @@ const {
   currentDate: CurrentDate;
   prevMonthDays: number;
   currentMonthDays: number;
-  currentMonthEvents: CalendarEvent[];
-  unfilteredCurrentMonthEvents: CalendarEvent[];
+  currentMonthEvents: CalendarEventType[];
+  unfilteredCurrentMonthEvents: CalendarEventType[];
 }>();
 
 const emit = defineEmits<{
   (e: 'date', value: CurrentDate): void;
-  (e: 'delete', value: CalendarEvent): void;
+  (e: 'delete', value: CalendarEventType): void;
 }>();
 
 const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'] as const;
@@ -120,11 +120,11 @@ const nextMonthVisibleDays = computed((): number[] => {
 let cachedEvents: AssignedCalendarEvent[][] = [];
 let cachedMonth = -1;
 let cachedMonthDays = -1;
-let cachedSourceEvents: CalendarEvent[] | null = null;
-let cachedUnfilteredEvents: AssignedCalendarEvent[][] = [];
+let cachedSourceEvents: CalendarEventType[] | null = null;
+let cachedUnfilteredSourceEvents: CalendarEventType[] | null = null;
 let cachedUnfilteredMonth = -1;
 let cachedUnfilteredMonthDays = -1;
-let cachedUnfilteredSourceEvents: CalendarEvent[] | null = null;
+let cachedUnfilteredEvents: AssignedCalendarEvent[][] = [];
 
 const events = computed((): AssignedCalendarEvent[][] => {
   if (!currentMonthDays || !currentMonthEvents.length) {
@@ -219,7 +219,7 @@ const weekEvents = computed((): AssignedCalendarEvent[][][] => {
   });
 });
 
-function getEventKey(event: CalendarEvent): string {
+function getEventKey(event: CalendarEventType): string {
   return event.id ?? `${event.type}-${event.start}-${event.end}`;
 }
 
@@ -357,6 +357,70 @@ const weekRegularEventLaneSlots = computed((): CalendarEventLaneSlot[][][] => {
   });
 });
 
+function getWeekSegmentState(startsInView: boolean, endsInView: boolean): CalendarWeekSegmentState {
+  if (startsInView && endsInView) {
+    return 'single';
+  }
+
+  if (startsInView) {
+    return 'start';
+  }
+
+  if (endsInView) {
+    return 'end';
+  }
+
+  return 'middle';
+}
+
+function isFullCloseStart(weekIdx: number, dayIdx: number): boolean {
+  return (
+    weeks.value[weekIdx][dayIdx]?.month === 'current' &&
+    orderedWeekEvents.value[weekIdx][dayIdx]?.some(
+      (event) => event.type === 'Holiday' && event.closed === 'full'
+    ) === true
+  );
+}
+
+function getDateParts(value: string | number | Date): { year: number; month: number; day: number } {
+  if (value instanceof Date) {
+    return {
+      year: value.getFullYear(),
+      month: value.getMonth(),
+      day: value.getDate()
+    };
+  }
+
+  if (typeof value === 'string') {
+    const dateOnlyMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+
+    if (dateOnlyMatch) {
+      return {
+        year: Number(dateOnlyMatch[1]),
+        month: Number(dateOnlyMatch[2]) - 1,
+        day: Number(dateOnlyMatch[3])
+      };
+    }
+  }
+
+  const parsed = new Date(value);
+
+  return {
+    year: parsed.getFullYear(),
+    month: parsed.getMonth(),
+    day: parsed.getDate()
+  };
+}
+
+function getDateKey(value: string | number | Date): string {
+  const { year, month, day } = getDateParts(value);
+  return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+}
+
+function getVisibleCellDateKey(cell: CalendarWeekCell): string {
+  return getDateKey(new Date(currentDate.year, currentDate.month, cell.date));
+}
+
 const weekSpanningSegments = computed((): CalendarWeekSpanningSegment[][] => {
   return weeks.value.map((week, weekIdx) => {
     const lanePlan = weekRegularEventLanePlan.value[weekIdx];
@@ -373,44 +437,76 @@ const weekSpanningSegments = computed((): CalendarWeekSpanningSegment[][] => {
         return;
       }
 
-      let startDayIndex = -1;
-      let endDayIndex = -1;
-
-      week.forEach((cell, dayIdx) => {
+      const visibleDayIndices = week.reduce<number[]>((indices, cell, dayIdx) => {
         if (cell.month !== 'current') {
-          return;
+          return indices;
         }
 
         const hasEvent = weekEvents.value[weekIdx][dayIdx].some(
           (dayEvent) => getEventKey(dayEvent) === getEventKey(event)
         );
 
-        if (!hasEvent) {
-          return;
+        if (hasEvent) {
+          indices.push(dayIdx);
         }
 
-        if (startDayIndex === -1) {
-          startDayIndex = dayIdx;
-        }
+        return indices;
+      }, []);
 
-        endDayIndex = dayIdx;
-      });
-
-      if (startDayIndex === -1 || endDayIndex === -1) {
+      if (!visibleDayIndices.length) {
         return;
       }
 
+      const startDayIndex = visibleDayIndices[0];
+      const endDayIndex = visibleDayIndices[visibleDayIndices.length - 1];
+
+      const startBoundaryEvent = weekEvents.value[weekIdx][startDayIndex].find(
+        (dayEvent) => getEventKey(dayEvent) === getEventKey(event)
+      );
+      const endBoundaryEvent = weekEvents.value[weekIdx][endDayIndex].find(
+        (dayEvent) => getEventKey(dayEvent) === getEventKey(event)
+      );
+
+      if (!startBoundaryEvent || !endBoundaryEvent) {
+        return;
+      }
+
+      const visibleStartDateKey = getVisibleCellDateKey(week[startDayIndex]);
+      const visibleEndDateKey = getVisibleCellDateKey(week[endDayIndex]);
+      const eventStartDateKey = getDateKey(event.start);
+      const eventEndDateKey = getDateKey(event.end);
+
+      const startsInView = eventStartDateKey === visibleStartDateKey;
+      const endsInView = eventEndDateKey === visibleEndDateKey;
+      const isClippedLeft = eventStartDateKey < visibleStartDateKey;
+      const isClippedRight = eventEndDateKey > visibleEndDateKey;
+
       segments.push({
-        event,
+        event: startBoundaryEvent,
         laneIndex: lane.startRow,
         startDayIndex,
-        endDayIndex
+        endDayIndex,
+        state: getWeekSegmentState(startsInView, endsInView),
+        isClippedLeft,
+        isClippedRight,
+        isFullCloseStart: isFullCloseStart(weekIdx, startDayIndex)
       });
     });
 
     return segments;
   });
 });
+
+function getWeekSpanningSegmentClasses(
+  segment: CalendarWeekSpanningSegment
+): Record<string, boolean> {
+  return {
+    [`calendar-week-span--${segment.state}`]: true,
+    'calendar-week-span--clipped-left': segment.isClippedLeft,
+    'calendar-week-span--clipped-right': segment.isClippedRight,
+    'calendar-week-span--full-close-start': segment.isFullCloseStart
+  };
+}
 
 function getWeekSpanningSegmentStyle(segment: CalendarWeekSpanningSegment): {
   gridColumn: string;
@@ -426,7 +522,7 @@ const dataReady = computed((): boolean => {
   return currentMonthDays > 0;
 });
 
-function deleteEvent(event: CalendarEvent): void {
+function deleteEvent(event: CalendarEventType): void {
   emit('delete', event);
 }
 
@@ -493,7 +589,7 @@ function updateEvents(): void {
 .calendar-week {
   --calendar-span-top-offset: 44px;
   --calendar-span-row-height: 38px;
-  --calendar-span-side-inset: 6px;
+  --calendar-span-side-inset: 1px;
 
   position: relative;
   display: grid;
@@ -517,36 +613,96 @@ function updateEvents(): void {
 
 .calendar-week-span {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   min-width: 0;
-  margin-inline: var(--calendar-span-side-inset);
-  padding: 0 8px;
-  border: 1px solid color-mix(in srgb, var(--ocean-dark-blue) 70%, black 30%);
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--ocean-md-blue) 84%, white 16%);
-  color: var(--white);
+  min-height: 0;
+  padding-inline: 1px;
   box-sizing: border-box;
   overflow: hidden;
 }
 
-.calendar-week-span--middle {
-  border-radius: 10px;
+.calendar-week-span :deep(.event-container) {
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
-.calendar-week-span__label {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 0.72rem;
-  font-weight: 700;
-  line-height: 1.1;
+.calendar-week-span :deep(.event-pill) {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 4px 4px;
+  gap: 3px;
+  border-color: color-mix(in srgb, var(--event-pill-border) 78%, transparent 22%);
+  background: color-mix(in srgb, var(--event-pill-bg) 100%, white 0%);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.12) inset,
+    0 1px 2px rgba(15, 23, 42, 0.1);
+  border-radius: 10px !important;
+}
+
+.calendar-week-span--clipped-left :deep(.event-pill) {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+.calendar-week-span--clipped-right :deep(.event-pill) {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.calendar-week-span--full-close-start :deep(.event-pill) {
+  border-color: rgba(15, 23, 42, 0.55);
+  background: color-mix(in srgb, var(--event-pill-bg) 72%, white 28%);
+  box-shadow:
+    0 0 0 1px rgba(15, 23, 42, 0.24),
+    0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+}
+
+.calendar-week-span--full-close-start :deep(.event-pill__primary),
+.calendar-week-span--full-close-start :deep(.event-pill__secondary) {
+  color: #0f172a;
+}
+
+.calendar-week-span :deep(.event-pill__primary),
+.calendar-week-span :deep(.event-pill__secondary) {
+  text-shadow: none;
+}
+
+.calendar-week-span :deep(.event-pill__avatar) {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+}
+
+.calendar-week-span :deep(.event-pill__avatar-fallback) {
+  font-size: 0.68rem;
 }
 
 @media (max-width: 900px) and (min-width: 641px) {
   .calendar-week {
     --calendar-span-top-offset: 40px;
     --calendar-span-row-height: 34px;
+  }
+
+  .calendar-week-span :deep(.event-pill) {
+    border-radius: 8px !important;
+  }
+
+  .calendar-week-span--clipped-left :deep(.event-pill) {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+  }
+
+  .calendar-week-span--clipped-right :deep(.event-pill) {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+
+  .calendar-week-span :deep(.event-pill__avatar) {
+    width: 26px;
+    height: 26px;
+    flex: 0 0 26px;
   }
 }
 
@@ -564,7 +720,7 @@ function updateEvents(): void {
   .calendar-week {
     --calendar-span-top-offset: 33px;
     --calendar-span-row-height: 28px;
-    --calendar-span-side-inset: 4px;
+    --calendar-span-side-inset: 1px;
 
     gap: 6px 2px;
   }
@@ -574,11 +730,27 @@ function updateEvents(): void {
   }
 
   .calendar-week-span {
-    padding: 0 6px;
+    padding-inline: 1px;
   }
 
-  .calendar-week-span__label {
-    font-size: 0.58rem;
+  .calendar-week-span :deep(.event-pill) {
+    border-radius: 8px !important;
+  }
+
+  .calendar-week-span--clipped-left :deep(.event-pill) {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+  }
+
+  .calendar-week-span--clipped-right :deep(.event-pill) {
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+  }
+
+  .calendar-week-span :deep(.event-pill__avatar) {
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
   }
 
   .weekdays {

@@ -215,7 +215,16 @@ const visibleRegularLaneCount = computed((): number => {
 
 const normalizedRegularEventLaneSlots = computed((): CalendarEventLaneSlot[] => {
   if (props.regularEventLaneSlots.length > 0) {
-    return props.regularEventLaneSlots;
+    return props.regularEventLaneSlots.map((slot) => {
+      if (!slot.event?.display?.isMultiDay) {
+        return slot;
+      }
+
+      return {
+        ...slot,
+        event: null
+      };
+    });
   }
 
   return filteredEvents.value.map((event) => ({

@@ -14,6 +14,7 @@
         {
           'event-pill--holiday': isHoliday,
           'event-pill--multi-day': isMultiDay,
+          'event-pill--multi-day-single': isMultiDaySingle,
           'event-pill--multi-day-start': isMultiDayStart,
           'event-pill--multi-day-middle': isMultiDayMiddle,
           'event-pill--multi-day-end': isMultiDayEnd
@@ -30,8 +31,10 @@
         <span v-else class="event-pill__avatar-fallback">{{ avatarFallback }}</span>
       </span>
       <span v-else-if="!isHoliday" class="event-pill__dot" />
-      <span class="event-pill__primary">{{ primaryText }}</span>
-      <span v-if="secondaryText" class="event-pill__secondary">{{ secondaryText }}</span>
+      <span class="event-pill__content">
+        <span class="event-pill__primary">{{ primaryText }}</span>
+        <span v-if="secondaryText" class="event-pill__secondary">{{ secondaryText }}</span>
+      </span>
     </div>
   </div>
 </template>
@@ -96,16 +99,20 @@ const isMultiDay = computed((): boolean => {
   return isAssignedEvent.value && event.display.isMultiDay === true;
 });
 
+const isMultiDaySingle = computed((): boolean => {
+  return isMultiDay.value && event.display.startsToday === true && event.display.endsToday === true;
+});
+
 const isMultiDayStart = computed((): boolean => {
-  return isMultiDay.value && event.display.startsToday === true;
+  return isMultiDay.value && event.display.startsToday === true && event.display.endsToday !== true;
 });
 
 const isMultiDayEnd = computed((): boolean => {
-  return isMultiDay.value && event.display.endsToday === true;
+  return isMultiDay.value && event.display.startsToday !== true && event.display.endsToday === true;
 });
 
 const isMultiDayMiddle = computed((): boolean => {
-  return isMultiDay.value && !isMultiDayStart.value && !isMultiDayEnd.value;
+  return isMultiDay.value && event.display.startsToday !== true && event.display.endsToday !== true;
 });
 
 const leadStaff = computed((): StaffMember | undefined => event.staff[0]);
@@ -271,12 +278,12 @@ function emitEvent(): void {
   flex: 0 0 16px;
   display: inline-flex;
   align-items: center;
+  align-self: center;
   justify-content: center;
   overflow: hidden;
   border-radius: 999px;
   background: color-mix(in srgb, var(--event-pill-color) 14%, white 86%);
   color: var(--event-pill-color);
-  transform: translateY(0.5px);
 }
 
 .event-pill__avatar-image {
@@ -295,6 +302,14 @@ function emitEvent(): void {
     sans-serif;
   letter-spacing: 0.01em;
   text-transform: uppercase;
+}
+
+.event-pill__content {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .event-pill__primary,
@@ -364,6 +379,10 @@ function emitEvent(): void {
   border-radius: 0;
 }
 
+.event-pill--multi-day-single {
+  border-radius: 10px;
+}
+
 .event-pill--multi-day-start {
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
@@ -381,6 +400,10 @@ function emitEvent(): void {
 
 .event-pill--multi-day.event-pill--auto-show {
   border-radius: 0;
+}
+
+.event-pill--multi-day.event-pill--auto-show.event-pill--multi-day-single {
+  border-radius: 10px;
 }
 
 .event-pill--multi-day.event-pill--auto-show.event-pill--multi-day-start {
@@ -414,6 +437,10 @@ function emitEvent(): void {
 
   .event-pill--multi-day {
     border-radius: 0;
+  }
+
+  .event-pill--multi-day-single {
+    border-radius: 8px;
   }
 
   .event-pill--multi-day-start {
@@ -452,6 +479,10 @@ function emitEvent(): void {
 
   .event-pill--multi-day {
     border-radius: 0;
+  }
+
+  .event-pill--multi-day-single {
+    border-radius: 8px;
   }
 
   .event-pill--multi-day-start {
