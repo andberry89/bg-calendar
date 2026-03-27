@@ -39,8 +39,29 @@
               class="calendar-week-span"
               :class="getWeekSpanningSegmentClasses(segment)"
               :style="getWeekSpanningSegmentStyle(segment)"
+              role="button"
+              tabindex="0"
+              @click.stop="openWeekSpanEventModal(segment, wIdx)"
+              @keydown.enter.stop.prevent="openWeekSpanEventModal(segment, wIdx)"
+              @keydown.space.stop.prevent="openWeekSpanEventModal(segment, wIdx)"
             >
               <CalendarEvent :event="segment.event" />
+            </div>
+
+            <div
+              v-if="selectedWeekSpanEvent && selectedWeekSpanEvent.weekIdx === wIdx"
+              class="calendar-week-span-modal"
+              @click.stop
+              @mousedown.stop
+              @pointerdown.stop
+              @keydown.stop
+            >
+              <EventModal
+                :day="selectedWeekSpanEvent.day"
+                :event="selectedWeekSpanEvent.event"
+                @update="closeWeekSpanEventModal"
+                @delete="deleteWeekSpanEvent"
+              />
             </div>
           </div>
         </div>
@@ -50,9 +71,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import CalendarDay from '@/features/calendar/components/display/CalendarDay.vue';
 import CalendarEvent from '@/features/calendar/components/display/CalendarEvent.vue';
+import EventModal from '@/features/calendar/components/modals/EventModal.vue';
 import assignEvents from '@/features/calendar/utils/assignEvents';
 import type {
   AssignedCalendarEvent,
@@ -79,6 +101,12 @@ type CalendarWeekSpanningSegment = {
   isFullCloseStart: boolean;
 };
 
+type SelectedWeekSpanEvent = {
+  event: CalendarEventType;
+  day: number;
+  weekIdx: number;
+};
+
 const {
   currentDate,
   prevMonthDays,
@@ -99,6 +127,8 @@ const emit = defineEmits<{
 }>();
 
 const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'] as const;
+
+const selectedWeekSpanEvent = ref<SelectedWeekSpanEvent | null>(null);
 
 const firstMonthDay = computed((): number => {
   const firstDay = new Date(currentDate.year, currentDate.month, 1).getDay();
@@ -558,6 +588,23 @@ function getWeekSpanningSegmentStyle(segment: CalendarWeekSpanningSegment): {
   };
 }
 
+function openWeekSpanEventModal(segment: CalendarWeekSpanningSegment, weekIdx: number): void {
+  selectedWeekSpanEvent.value = {
+    event: segment.event,
+    day: weeks.value[weekIdx][segment.startDayIndex]?.date ?? 1,
+    weekIdx
+  };
+}
+
+function closeWeekSpanEventModal(): void {
+  selectedWeekSpanEvent.value = null;
+}
+
+function deleteWeekSpanEvent(event: CalendarEventType): void {
+  closeWeekSpanEventModal();
+  deleteEvent(event);
+}
+
 const dataReady = computed((): boolean => {
   return currentMonthDays > 0;
 });
@@ -659,6 +706,25 @@ function updateEvents(): void {
   padding-inline: 1px;
   box-sizing: border-box;
   overflow: hidden;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.calendar-week-span:focus-visible {
+  outline: 2px solid var(--ocean-lt-blue);
+  outline-offset: 1px;
+  border-radius: 10px;
+}
+
+.calendar-week-span-modal {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.calendar-week-span-modal :deep(.event-modal) {
+  pointer-events: auto;
 }
 
 .calendar-week-span :deep(.event-container) {
