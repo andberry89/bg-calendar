@@ -272,9 +272,17 @@ const visibleRenderableRegularLaneSlots = computed(() => {
 
 const regularEventLanesStyle = computed((): Record<string, string> => {
   return {
-    gridTemplateRows: `repeat(${visibleRegularLaneCount.value}, var(--calendar-lane-row-height))`
+    gridTemplateRows: `repeat(${visibleRegularLaneCount.value}, var(--calendar-lane-row-height))`,
+    width: '100%'
   };
 });
+
+function getLaneStyle(rowIndex: number, spanRows: number): Record<string, string> {
+  return {
+    gridRow: `${rowIndex + 1} / span ${spanRows}`,
+    width: '100%'
+  };
+}
 
 const isFilteredEmptyDay = computed((): boolean => {
   return props.dayClass === 'day' && props.hasUnfilteredEvents && allEvents.value.length === 0;
@@ -367,12 +375,6 @@ function openDayModal(): void {
   }
 
   showDayModal.value = true;
-}
-
-function getLaneStyle(rowIndex: number, spanRows: number): Record<string, string> {
-  return {
-    gridRow: `${rowIndex + 1} / span ${spanRows}`
-  };
 }
 
 function closeDayModal(): void {
@@ -539,9 +541,12 @@ function closeDayModal(): void {
 }
 
 .day-body {
+  --calendar-day-event-side-inset: 1px;
+
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   min-height: 0;
+  min-width: 0;
   overflow: hidden;
 }
 
@@ -550,7 +555,11 @@ function closeDayModal(): void {
   display: grid;
   align-content: start;
   gap: 0;
+  width: 100%;
+  min-width: 0;
   min-height: 0;
+  padding-inline: var(--calendar-day-event-side-inset);
+  box-sizing: border-box;
 }
 
 .full-close-message {
@@ -584,17 +593,22 @@ function closeDayModal(): void {
 .regular-event-lane {
   display: flex;
   align-items: stretch;
+  justify-content: stretch;
   width: 100%;
+  min-width: 0;
   min-height: 0;
+  box-sizing: border-box;
 }
 
 .regular-event {
   width: 100%;
+  min-width: 0;
   height: 100%;
 }
 
 .regular-event-placeholder {
   width: 100%;
+  min-width: 0;
   height: 100%;
   min-height: 0;
 }
