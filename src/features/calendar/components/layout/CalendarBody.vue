@@ -71,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import CalendarDay from '@/features/calendar/components/display/CalendarDay.vue';
 import CalendarEvent from '@/features/calendar/components/display/CalendarEvent.vue';
 import EventModal from '@/features/calendar/components/modals/EventModal.vue';
@@ -129,6 +129,7 @@ const emit = defineEmits<{
 const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'] as const;
 
 const selectedWeekSpanEvent = ref<SelectedWeekSpanEvent | null>(null);
+const viewportWidth = ref<number>(window.innerWidth);
 
 const firstMonthDay = computed((): number => {
   const firstDay = new Date(currentDate.year, currentDate.month, 1).getDay();
@@ -454,7 +455,9 @@ function getVisibleCellDateKey(cell: CalendarWeekCell): string {
   return getDateKey(new Date(currentDate.year, currentDate.month, cell.date));
 }
 
-const MAX_VISIBLE_WEEK_SPAN_ROWS = 3;
+const maxVisibleWeekSpanRows = computed((): number => {
+  return viewportWidth.value <= 640 ? 2 : 3;
+});
 
 const weekSpanningSegments = computed((): CalendarWeekSpanningSegment[][] => {
   return weeks.value.map((week, weekIdx) => {
@@ -468,7 +471,7 @@ const weekSpanningSegments = computed((): CalendarWeekSpanningSegment[][] => {
 
       const lane = lanePlan.laneIndexByKey.get(getEventKey(event));
 
-      if (!lane || lane.startRow >= MAX_VISIBLE_WEEK_SPAN_ROWS) {
+      if (!lane || lane.startRow >= maxVisibleWeekSpanRows.value) {
         return;
       }
 
@@ -544,7 +547,7 @@ const hiddenWeekSpanningEventCounts = computed((): number[][] => {
 
       const lane = lanePlan.laneIndexByKey.get(getEventKey(event));
 
-      if (!lane || lane.startRow < MAX_VISIBLE_WEEK_SPAN_ROWS) {
+      if (!lane || lane.startRow < maxVisibleWeekSpanRows.value) {
         return;
       }
 
@@ -613,6 +616,19 @@ function deleteWeekSpanEvent(event: CalendarEventType): void {
 
 const dataReady = computed((): boolean => {
   return currentMonthDays > 0;
+});
+
+function updateViewportWidth(): void {
+  viewportWidth.value = window.innerWidth;
+}
+
+onMounted(() => {
+  updateViewportWidth();
+  window.addEventListener('resize', updateViewportWidth);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateViewportWidth);
 });
 
 function deleteEvent(event: CalendarEventType): void {
