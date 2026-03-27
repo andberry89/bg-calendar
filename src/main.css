@@ -1,43 +1,14 @@
 :root {
-  --black: rgb(0, 0, 0); /* #000 */
-  --dark-gray: rgb(34, 34, 34); /* #222 */
-  --light-gray: rgb(239, 239, 239); /* #efefef */
-  --red: rgb(212, 53, 65); /* #d43541 */
-  --slate-green: rgb(42, 76, 80); /* #2a4c50 */
-  --white: rgb(255, 255, 255); /* #fff */
-
-  /* Ocean theme */
-  --ocean-dark-blue: rgb(39, 76, 119); /* #274c77 */
-  --ocean-md-blue: rgb(96, 150, 186); /* #6096ba */
-  --ocean-lt-blue: rgb(163, 206, 241); /* #a3cef1 */
-  --ocean-gray: rgb(231, 236, 239); /* #e7ecef */
-  --ocean-slate-blue: rgb(116, 136, 149); /* #748895 */
-  --ocean-dark-gray: rgb(139, 140, 137); /* #8b8c89 */
-  --ocean-red: rgb(174, 32, 18); /* #ae2012 */
-  --ocean-yellow: rgb(245, 188, 27); /* #f5bc1b */
-  --ocean-birthday: rgb(148, 210, 189); /* #94d2bd */
-  --ocean-cd-event: rgb(186, 96, 105); /* #ba6069 */
-  --ocean-press-trip: rgb(132, 96, 186); /* #8460ba */
-  --ocean-auto-show: rgb(150, 186, 96); /* #96ba60 */
-  --ocean-off: rgb(186, 132, 96); /* #ba8460 */
-  --ocean-event-detail: rgb(186, 96, 105); /* #ba6069 */
-  --ocean-comp-day: rgb(96, 186, 150); /* balanced teal */
+  --black: rgb(0, 0, 0);
+  --dark-gray: rgb(34, 34, 34);
+  --light-gray: rgb(239, 239, 239);
+  --red: rgb(212, 53, 65);
+  --slate-green: rgb(42, 76, 80);
+  --white: rgb(255, 255, 255);
 
   --md-tran-black: rgba(0, 0, 0, 0.5);
   --lt-tran-black: rgba(0, 0, 0, 0.7);
-}
 
-body {
-  margin: 0;
-  background-color: var(--ocean-gray);
-  color: var(--dark-gray);
-}
-
-#app {
-  min-height: 100vh;
-}
-
-:root {
   --layout-gap-sm: 10px;
   --layout-gap-md: 15px;
   --layout-gap-lg: 20px;
@@ -45,6 +16,6 @@ body {
   --layout-radius-sm: 10px;
   --layout-shell-max-width: 1600px;
   --layout-shell-padding: 16px;
-  --layout-panel-bg: var(--ocean-dark-blue);
+  --layout-panel-bg: var(--calendar-header-gradient-jan);
   --layout-panel-overlay: var(--lt-tran-black);
 }

@@ -8,6 +8,8 @@
           type="button"
           class="staff-filter"
           :class="{ active: isStaffSelected(member.id) }"
+          :style="getStaffColorStyle(member.id)"
+          :title="member.shortName"
           @click="toggleStaff(member.id)"
         >
           <span class="staff-avatar">
@@ -25,17 +27,16 @@
           :key="type"
           type="button"
           class="type-pill"
-          :class="[
-            getEventClass(type),
-            {
-              active: isTypeSelected(type),
-              inactive: hasActiveTypeFilter && !isTypeSelected(type),
-              dimmed: !hasActiveTypeFilter
-            }
-          ]"
+          :class="{
+            active: isTypeSelected(type),
+            inactive: hasActiveTypeFilter && !isTypeSelected(type),
+            dimmed: !hasActiveTypeFilter
+          }"
+          :style="getTypePillStyle(type)"
           @click="toggleType(type)"
         >
-          {{ type }}
+          <span class="type-pill-dot" />
+          <span>{{ type }}</span>
         </button>
 
         <button type="button" class="reset-button" :disabled="!hasActiveFilters" @click="reset">
@@ -48,8 +49,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import {
+  getPersonColorKeyByIndex,
+  getPersonColorStyle
+} from '@/features/calendar/utils/colorTokens';
+import { getEventTypeConfig } from '@/features/calendar/utils/eventTypeConfig';
 import type { EventFilters } from '@/features/calendar/utils/filterEvents';
-import type { EventClass, EventType, Staff } from '@/types/calendar';
+import type { EventType, Staff } from '@/types/calendar';
 
 const props = defineProps<{
   staff: Staff[];
@@ -74,15 +80,6 @@ const images = import.meta.glob('@/assets/staff/*.{jpg,png}', {
   import: 'default'
 }) as Record<string, string>;
 
-const eventClassByType: Record<Exclude<EventType, 'Holiday' | 'Birthday'>, EventClass> = {
-  Vacation: 'vacation',
-  'Sick Time': 'sick-time',
-  'Press Trip': 'press-trip',
-  'Auto Show': 'auto-show',
-  'C/D Event': 'cd-event',
-  'Comp Day': 'comp-day'
-};
-
 const hasActiveFilters = computed((): boolean => {
   return props.filters.types.length > 0 || props.filters.staffIds.length > 0;
 });
@@ -90,6 +87,14 @@ const hasActiveFilters = computed((): boolean => {
 const hasActiveTypeFilter = computed((): boolean => {
   return props.filters.types.length > 0;
 });
+
+const staffColorKeyById = computed(
+  (): Record<string, ReturnType<typeof getPersonColorKeyByIndex>> => {
+    return Object.fromEntries(
+      props.staff.map((member, index) => [member.id, getPersonColorKeyByIndex(index)])
+    );
+  }
+);
 
 function imgUrl(name: string): string {
   return (
@@ -99,8 +104,20 @@ function imgUrl(name: string): string {
   );
 }
 
-function getEventClass(type: Exclude<EventType, 'Holiday' | 'Birthday'>): EventClass {
-  return eventClassByType[type];
+function getTypePillStyle(
+  type: Exclude<EventType, 'Holiday' | 'Birthday'>
+): Record<string, string> {
+  const config = getEventTypeConfig(type);
+
+  return {
+    '--type-pill-color': config ? `var(${config.colorVar})` : 'rgba(255, 255, 255, 0.9)'
+  };
+}
+
+function getStaffColorStyle(staffId: string): Record<string, string> {
+  const key = staffColorKeyById.value[staffId] ?? getPersonColorKeyByIndex(0);
+
+  return getPersonColorStyle(key);
 }
 
 function isStaffSelected(id: string): boolean {
@@ -163,7 +180,7 @@ function reset(): void {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
 }
 
@@ -174,9 +191,8 @@ function reset(): void {
   border: 0;
   padding: 0;
   background: transparent;
-  color: var(--white);
+  color: rgba(248, 250, 252, 0.96);
   cursor: pointer;
-  text-shadow: none;
 }
 
 .staff-avatar {
@@ -187,18 +203,27 @@ function reset(): void {
   height: 48px;
   flex: 0 0 48px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.45);
+  border: 2px solid color-mix(in srgb, var(--person-color-base) 72%, white 28%);
   border-radius: 999px;
-  background-color: rgba(0, 0, 0, 0.22);
+  background: linear-gradient(
+    var(--person-color-angle),
+    var(--person-color-gradient-start),
+    var(--person-color-gradient-end)
+  );
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.08),
+    0 10px 24px rgba(15, 23, 42, 0.22);
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease,
-    transform 0.2s ease;
+    transform 0.2s ease,
+    filter 0.2s ease;
 
   img {
     display: block;
-    width: 100%;
-    height: 100%;
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+    border-radius: 999px;
     object-fit: cover;
   }
 }
@@ -212,8 +237,9 @@ function reset(): void {
   overflow: hidden;
   opacity: 0;
   white-space: nowrap;
+  color: rgba(248, 250, 252, 0.92);
   font:
-    600 0.72rem/1 Arial,
+    700 0.74rem/1 Arial,
     sans-serif;
   letter-spacing: 0.01em;
   transition:
@@ -227,7 +253,7 @@ function reset(): void {
 .staff-filter:focus-visible .staff-label,
 .staff-filter.active .staff-label {
   max-width: 96px;
-  margin-left: 6px;
+  margin-left: 8px;
   padding: 0 10px 0 0;
   opacity: 1;
 }
@@ -235,8 +261,12 @@ function reset(): void {
 .staff-filter:hover .staff-avatar,
 .staff-filter:focus-visible .staff-avatar,
 .staff-filter.active .staff-avatar {
-  border-color: var(--white);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.14);
+  border-color: color-mix(in srgb, var(--person-color-base) 88%, white 12%);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--person-color-tint) 70%, rgba(255, 255, 255, 0.12) 30%),
+    0 14px 28px rgba(15, 23, 42, 0.24);
+  transform: translateY(-1px) scale(1.02);
+  filter: saturate(1.05);
 }
 
 .staff-filter:focus-visible {
@@ -253,102 +283,83 @@ function reset(): void {
 }
 
 .type-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   flex: 0 0 auto;
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 999px;
-  padding: 4px 10px;
-  color: var(--dark-gray);
+  padding: 5px 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(248, 250, 252, 0.92);
   font:
     600 0.72rem/1 Arial,
     sans-serif;
-  text-shadow: none;
   cursor: pointer;
   transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    opacity 0.2s ease,
-    background-color 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease;
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    opacity 0.16s ease,
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease;
+}
+
+.type-pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--type-pill-color);
+  flex: 0 0 8px;
 }
 
 .type-pill:hover {
   transform: translateY(-1px);
+  background: color-mix(in srgb, var(--type-pill-color) 12%, white 88%);
+  color: rgba(15, 23, 42, 0.92);
 }
 
 .type-pill.dimmed {
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 .type-pill.inactive {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.78);
-  box-shadow: none;
+  opacity: 0.55;
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .type-pill.active {
   opacity: 1;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.22);
-}
-
-.type-pill.inactive.auto-show,
-.type-pill.inactive.cd-event,
-.type-pill.inactive.vacation,
-.type-pill.inactive.sick-time,
-.type-pill.inactive.press-trip {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.auto-show {
-  background-color: var(--ocean-auto-show);
-}
-
-.cd-event {
-  background-color: var(--ocean-cd-event);
-}
-
-.vacation {
-  background-color: var(--ocean-off);
-  opacity: 0.85;
-}
-
-.sick-time {
-  background-color: var(--ocean-yellow);
-}
-
-.press-trip {
-  background-color: var(--ocean-press-trip);
-}
-
-.comp-day {
-  background-color: var(--ocean-comp-day);
+  background: color-mix(in srgb, var(--type-pill-color) 18%, white 82%);
+  border-color: color-mix(in srgb, var(--type-pill-color) 40%, white 60%);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--type-pill-color) 20%, transparent);
+  color: rgba(15, 23, 42, 0.94);
 }
 
 .reset-button {
   flex: 0 0 auto;
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.45);
   border-radius: 999px;
-  padding: 4px 10px;
-  background: transparent;
-  color: var(--white);
+  padding: 5px 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(248, 250, 252, 0.9);
   font:
     600 0.72rem/1 Arial,
     sans-serif;
-  text-shadow: none;
   cursor: pointer;
+  backdrop-filter: blur(6px);
   transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease;
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    opacity 0.18s ease;
 }
 
 .reset-button:hover:not(:disabled) {
-  background-color: var(--ocean-lt-blue);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .reset-button:disabled {
-  border-color: rgba(255, 255, 255, 0.24);
-  color: rgba(255, 255, 255, 0.5);
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
@@ -394,9 +405,9 @@ function reset(): void {
   }
 
   .staff-avatar {
-    width: 30px;
-    height: 30px;
-    flex-basis: 30px;
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
   }
 
   .staff-filter:hover .staff-label,
@@ -413,6 +424,12 @@ function reset(): void {
   .type-pill,
   .reset-button {
     font-size: 0.68rem;
+  }
+
+  .type-pill-dot {
+    width: 7px;
+    height: 7px;
+    flex-basis: 7px;
   }
 }
 </style>

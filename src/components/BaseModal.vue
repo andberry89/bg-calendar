@@ -1,10 +1,12 @@
 <template>
-  <div class="base-modal">
-    <div class="base-modal__content">
-      <slot></slot>
+  <Teleport to="body">
+    <div class="base-modal">
+      <div class="base-modal__overlay" @click.self="emit('update')"></div>
+      <div class="base-modal__content">
+        <slot></slot>
+      </div>
     </div>
-    <div class="base-modal__overlay" @click.self="emit('update')"></div>
-  </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -29,29 +31,26 @@ onBeforeUnmount((): void => {
 <style lang="scss" scoped>
 .base-modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  height: 100%;
-  width: 100%;
+  inset: 0;
   display: flex;
   align-items: center;
-  justify-content: space-around;
-  z-index: 4;
+  justify-content: center;
+  z-index: 9999;
 
   .base-modal__overlay {
     position: absolute;
+    inset: 0;
     background-color: var(--black);
     opacity: 0.75;
-    width: 100%;
-    height: 100%;
   }
 
   .base-modal__content {
+    position: relative;
+    z-index: 1;
     display: inline-block;
-    z-index: 5;
-    max-height: 90%;
+    max-height: 90vh;
+    max-width: 95vw;
     overflow-y: auto;
-    max-width: 95%;
   }
 }
 </style>

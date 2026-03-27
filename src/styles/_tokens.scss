@@ -1,10 +1,96 @@
 :root {
+  /* Core neutrals */
   --color-text: #1f2937;
+  --color-text-muted: #4b5563;
   --color-background: #ffffff;
+  --color-surface: #f8fafc;
+  --color-surface-elevated: #ffffff;
   --color-border: #d1d5db;
+  --color-border-subtle: #e5e7eb;
   --color-primary: #2563eb;
   --color-danger: #dc2626;
 
+  /* Calendar neutrals */
+  --calendar-bg: #f6f8fb;
+  --calendar-surface: #ffffff;
+  --calendar-surface-muted: #eef3f8;
+  --calendar-border: #d8e1ea;
+  --calendar-border-strong: #b8c5d3;
+  --calendar-text: #1f2937;
+  --calendar-text-muted: #526071;
+  --calendar-shadow-soft: 0 8px 24px rgba(31, 41, 55, 0.08);
+
+  /* Person identity colors */
+  --person-1-base: #2f4ed8;
+  --person-1-gradient-start: #2f4ed8;
+  --person-1-gradient-end: #5b7cfa;
+  --person-1-tint: rgba(47, 78, 216, 0.16);
+  --person-1-gradient-angle: 135deg;
+
+  --person-2-base: #0ca678;
+  --person-2-gradient-start: #0ca678;
+  --person-2-gradient-end: #2dd4bf;
+  --person-2-tint: rgba(12, 166, 120, 0.16);
+  --person-2-gradient-angle: 120deg;
+
+  --person-3-base: #f59f00;
+  --person-3-gradient-start: #f59f00;
+  --person-3-gradient-end: #ffd43b;
+  --person-3-tint: rgba(245, 159, 0, 0.18);
+  --person-3-gradient-angle: 140deg;
+
+  --person-4-base: #5f3dc4;
+  --person-4-gradient-start: #5f3dc4;
+  --person-4-gradient-end: #9775fa;
+  --person-4-tint: rgba(95, 61, 196, 0.16);
+  --person-4-gradient-angle: 125deg;
+
+  --person-5-base: #e03131;
+  --person-5-gradient-start: #e03131;
+  --person-5-gradient-end: #ff6b6b;
+  --person-5-tint: rgba(224, 49, 49, 0.16);
+  --person-5-gradient-angle: 130deg;
+
+  --person-6-base: #74b816;
+  --person-6-gradient-start: #74b816;
+  --person-6-gradient-end: #bef264;
+  --person-6-tint: rgba(116, 184, 22, 0.16);
+  --person-6-gradient-angle: 145deg;
+
+  /* Event type colors */
+  --event-type-vacation: #16a34a;
+  --event-type-sick-time: #ef4444;
+  --event-type-holiday: #c0841a;
+  --event-type-press-trip: #2563eb;
+  --event-type-auto-show: #ea580c;
+  --event-type-birthday: #db2777;
+  --event-type-cd-event: #7c3aed;
+  --event-type-comp-day: #0f766e;
+
+  /* Holiday and office status colors */
+  --holiday-open-bg: rgba(192, 132, 26, 0.12);
+  --holiday-open-border: rgba(192, 132, 26, 0.3);
+  --holiday-halfday-bg: rgba(245, 158, 11, 0.16);
+  --holiday-halfday-border: rgba(217, 119, 6, 0.36);
+  --holiday-closed-bg: #334155;
+  --holiday-closed-surface: #475569;
+  --holiday-closed-text: #f8fafc;
+
+  /* Header accent system */
+  --calendar-header-gradient-jan: linear-gradient(135deg, #224c88 0%, #5b7cfa 100%);
+  --calendar-header-gradient-feb: linear-gradient(135deg, #7c3aed 0%, #ec4899 100%);
+  --calendar-header-gradient-mar: linear-gradient(135deg, #0f766e 0%, #2dd4bf 100%);
+  --calendar-header-gradient-apr: linear-gradient(135deg, #2563eb 0%, #38bdf8 100%);
+  --calendar-header-gradient-may: linear-gradient(135deg, #0ca678 0%, #84cc16 100%);
+  --calendar-header-gradient-jun: linear-gradient(135deg, #0284c7 0%, #2dd4bf 100%);
+  --calendar-header-gradient-jul: linear-gradient(135deg, #ea580c 0%, #f59f00 100%);
+  --calendar-header-gradient-aug: linear-gradient(135deg, #d97706 0%, #facc15 100%);
+  --calendar-header-gradient-sep: linear-gradient(135deg, #b45309 0%, #f59e0b 100%);
+  --calendar-header-gradient-oct: linear-gradient(135deg, #c2410c 0%, #ef4444 100%);
+  --calendar-header-gradient-nov: linear-gradient(135deg, #7c2d12 0%, #d97706 100%);
+  --calendar-header-gradient-dec: linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%);
+
+  /* Spacing and radius tokens */
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
   --spacing-md: 1rem;
@@ -14,4 +100,6 @@
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-pill: 9999px;
 }
