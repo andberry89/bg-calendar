@@ -1,8 +1,15 @@
 <template>
   <Teleport to="body">
-    <div class="base-modal">
-      <div class="base-modal__overlay" @click.self="emit('update')"></div>
-      <div class="base-modal__content">
+    <div class="base-modal" @keydown.esc.prevent="requestClose">
+      <div class="base-modal__overlay" @click="requestClose"></div>
+      <div
+        ref="contentRef"
+        class="base-modal__content"
+        role="dialog"
+        aria-modal="true"
+        tabindex="-1"
+        @click.stop
+      >
         <slot></slot>
       </div>
     </div>
@@ -10,21 +17,50 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted } from 'vue';
+import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 
 const emit = defineEmits<{
+  (e: 'close'): void;
   (e: 'update'): void;
 }>();
 
-let originalBodyOverflow = '';
+const contentRef = ref<HTMLElement | null>(null);
 
-onMounted((): void => {
+let originalBodyOverflow = '';
+let originalActiveElement: Element | null = null;
+
+function requestClose(): void {
+  emit('close');
+  emit('update');
+}
+
+function handleKeydown(event: KeyboardEvent): void {
+  if (event.key !== 'Escape') {
+    return;
+  }
+
+  event.preventDefault();
+  requestClose();
+}
+
+onMounted(async (): Promise<void> => {
   originalBodyOverflow = document.body.style.overflow;
+  originalActiveElement = document.activeElement;
+
   document.body.style.overflow = 'hidden';
+  document.addEventListener('keydown', handleKeydown);
+
+  await nextTick();
+  contentRef.value?.focus();
 });
 
 onBeforeUnmount((): void => {
   document.body.style.overflow = originalBodyOverflow;
+  document.removeEventListener('keydown', handleKeydown);
+
+  if (originalActiveElement instanceof HTMLElement) {
+    originalActiveElement.focus();
+  }
 });
 </script>
 
@@ -51,6 +87,7 @@ onBeforeUnmount((): void => {
     max-height: 90vh;
     max-width: 95vw;
     overflow-y: auto;
+    outline: none;
   }
 }
 </style>
