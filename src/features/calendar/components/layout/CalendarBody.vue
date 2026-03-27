@@ -57,7 +57,7 @@
               @keydown.stop
             >
               <EventModal
-                :day="selectedWeekSpanEvent.day"
+                :day="selectedWeekSpanEvent.anchorDay"
                 :event="selectedWeekSpanEvent.event"
                 @update="closeWeekSpanEventModal"
                 @delete="deleteWeekSpanEvent"
@@ -104,6 +104,7 @@ type CalendarWeekSpanningSegment = {
 type SelectedWeekSpanEvent = {
   event: CalendarEventType;
   day: number;
+  anchorDay: number;
   weekIdx: number;
 };
 
@@ -598,9 +599,12 @@ function openWeekSpanEventModal(segment: CalendarWeekSpanningSegment, weekIdx: n
     return;
   }
 
+  const anchorDayIndex = segment.startDayIndex >= 4 ? segment.endDayIndex : segment.startDayIndex;
+
   selectedWeekSpanEvent.value = {
     event: fullEvent,
     day: weeks.value[weekIdx][segment.startDayIndex]?.date ?? 1,
+    anchorDay: weeks.value[weekIdx][anchorDayIndex]?.date ?? 1,
     weekIdx
   };
 }
