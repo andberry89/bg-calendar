@@ -5,6 +5,7 @@
         {{ weekday }}
       </div>
     </div>
+
     <div class="date" v-if="dataReady">
       <template v-for="(week, wIdx) in weeks" :key="'week-' + wIdx">
         <div class="calendar-week">
@@ -27,6 +28,25 @@
               cell.month === 'current' ? unfilteredEvents[cell.date - 1]?.length > 0 : false
             "
           />
+
+          <div class="calendar-week-spans">
+            <div
+              v-for="segment in weekSpanningSegments[wIdx]"
+              :key="getEventKey(segment.event)"
+              class="calendar-week-span"
+              :class="{
+                'calendar-week-span--start': segment.event.display?.startsToday,
+                'calendar-week-span--end': segment.event.display?.endsToday,
+                'calendar-week-span--middle':
+                  !segment.event.display?.startsToday && !segment.event.display?.endsToday
+              }"
+              :style="getWeekSpanningSegmentStyle(segment)"
+            >
+              <span class="calendar-week-span__label">
+                {{ segment.event.title || segment.event.details }}
+              </span>
+            </div>
+          </div>
         </div>
       </template>
     </div>
@@ -47,6 +67,13 @@ import type {
 type CalendarWeekCell = {
   date: number;
   month: 'prev' | 'current' | 'next';
+};
+
+type CalendarWeekSpanningSegment = {
+  event: AssignedCalendarEvent;
+  laneIndex: number;
+  startDayIndex: number;
+  endDayIndex: number;
 };
 
 const {
@@ -330,6 +357,71 @@ const weekRegularEventLaneSlots = computed((): CalendarEventLaneSlot[][][] => {
   });
 });
 
+const weekSpanningSegments = computed((): CalendarWeekSpanningSegment[][] => {
+  return weeks.value.map((week, weekIdx) => {
+    const lanePlan = weekRegularEventLanePlan.value[weekIdx];
+    const segments: CalendarWeekSpanningSegment[] = [];
+
+    weekRegularEventOrder.value[weekIdx].forEach((event) => {
+      if (!event.display?.isMultiDay) {
+        return;
+      }
+
+      const lane = lanePlan.laneIndexByKey.get(getEventKey(event));
+
+      if (!lane) {
+        return;
+      }
+
+      let startDayIndex = -1;
+      let endDayIndex = -1;
+
+      week.forEach((cell, dayIdx) => {
+        if (cell.month !== 'current') {
+          return;
+        }
+
+        const hasEvent = weekEvents.value[weekIdx][dayIdx].some(
+          (dayEvent) => getEventKey(dayEvent) === getEventKey(event)
+        );
+
+        if (!hasEvent) {
+          return;
+        }
+
+        if (startDayIndex === -1) {
+          startDayIndex = dayIdx;
+        }
+
+        endDayIndex = dayIdx;
+      });
+
+      if (startDayIndex === -1 || endDayIndex === -1) {
+        return;
+      }
+
+      segments.push({
+        event,
+        laneIndex: lane.startRow,
+        startDayIndex,
+        endDayIndex
+      });
+    });
+
+    return segments;
+  });
+});
+
+function getWeekSpanningSegmentStyle(segment: CalendarWeekSpanningSegment): {
+  gridColumn: string;
+  gridRow: string;
+} {
+  return {
+    gridColumn: `${segment.startDayIndex + 1} / ${segment.endDayIndex + 2}`,
+    gridRow: `${segment.laneIndex + 1} / span ${getEventRowSpan(segment.event)}`
+  };
+}
+
 const dataReady = computed((): boolean => {
   return currentMonthDays > 0;
 });
@@ -399,9 +491,63 @@ function updateEvents(): void {
 }
 
 .calendar-week {
+  --calendar-span-top-offset: 44px;
+  --calendar-span-row-height: 38px;
+  --calendar-span-side-inset: 6px;
+
+  position: relative;
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 10px 2px;
+}
+
+.calendar-week-spans {
+  position: absolute;
+  top: var(--calendar-span-top-offset);
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-auto-rows: var(--calendar-span-row-height);
+  column-gap: 2px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.calendar-week-span {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  margin-inline: var(--calendar-span-side-inset);
+  padding: 0 8px;
+  border: 1px solid color-mix(in srgb, var(--ocean-dark-blue) 70%, black 30%);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ocean-md-blue) 84%, white 16%);
+  color: var(--white);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.calendar-week-span--middle {
+  border-radius: 10px;
+}
+
+.calendar-week-span__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+@media (max-width: 900px) and (min-width: 641px) {
+  .calendar-week {
+    --calendar-span-top-offset: 40px;
+    --calendar-span-row-height: 34px;
+  }
 }
 
 @media (max-width: 900px) {
@@ -415,17 +561,33 @@ function updateEvents(): void {
 }
 
 @media (max-width: 640px) {
-  .weekdays,
   .calendar-week {
+    --calendar-span-top-offset: 33px;
+    --calendar-span-row-height: 28px;
+    --calendar-span-side-inset: 4px;
+
     gap: 6px 2px;
+  }
+
+  .calendar-week-spans {
+    column-gap: 2px;
+  }
+
+  .calendar-week-span {
+    padding: 0 6px;
+  }
+
+  .calendar-week-span__label {
+    font-size: 0.58rem;
+  }
+
+  .weekdays {
+    gap: 6px 2px;
+    font-size: 0.95rem;
   }
 
   .date {
     gap: 6px 0;
-  }
-
-  .weekdays {
-    font-size: 0.95rem;
   }
 }
 </style>
