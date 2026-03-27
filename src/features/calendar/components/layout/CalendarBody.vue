@@ -27,6 +27,9 @@
             :hasUnfilteredEvents="
               cell.month === 'current' ? unfilteredEvents[cell.date - 1]?.length > 0 : false
             "
+            :hiddenSpanningEventCount="
+              cell.month === 'current' ? hiddenWeekSpanningEventCounts[wIdx][dIdx] : 0
+            "
           />
 
           <div class="calendar-week-spans">
@@ -496,6 +499,41 @@ const weekSpanningSegments = computed((): CalendarWeekSpanningSegment[][] => {
     });
 
     return segments;
+  });
+});
+
+const hiddenWeekSpanningEventCounts = computed((): number[][] => {
+  return weeks.value.map((week, weekIdx) => {
+    const hiddenCounts = Array.from({ length: week.length }, () => 0);
+    const lanePlan = weekRegularEventLanePlan.value[weekIdx];
+
+    weekRegularEventOrder.value[weekIdx].forEach((event) => {
+      if (!event.display?.isMultiDay) {
+        return;
+      }
+
+      const lane = lanePlan.laneIndexByKey.get(getEventKey(event));
+
+      if (!lane || lane.startRow < MAX_VISIBLE_WEEK_SPAN_ROWS) {
+        return;
+      }
+
+      week.forEach((cell, dayIdx) => {
+        if (cell.month !== 'current') {
+          return;
+        }
+
+        const hasEvent = weekEvents.value[weekIdx][dayIdx].some(
+          (dayEvent) => getEventKey(dayEvent) === getEventKey(event)
+        );
+
+        if (hasEvent) {
+          hiddenCounts[dayIdx] += 1;
+        }
+      });
+    });
+
+    return hiddenCounts;
   });
 });
 

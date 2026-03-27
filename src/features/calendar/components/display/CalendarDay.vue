@@ -126,12 +126,14 @@ const props = withDefaults(
     events?: CalendarEventType[];
     regularEventLaneSlots?: CalendarEventLaneSlot[];
     hasUnfilteredEvents?: boolean;
+    hiddenSpanningEventCount?: number;
   }>(),
   {
     month: undefined,
     events: () => [],
     regularEventLaneSlots: () => [],
-    hasUnfilteredEvents: false
+    hasUnfilteredEvents: false,
+    hiddenSpanningEventCount: 0
   }
 );
 
@@ -275,7 +277,12 @@ const hiddenEventCount = computed((): number => {
     (slot) => slot.event !== null
   ).length;
 
-  return Math.max(totalRenderableRegularEventCount - visibleRegularEventCount.value, 0);
+  const hiddenRegularEventCount = Math.max(
+    totalRenderableRegularEventCount - visibleRegularEventCount.value,
+    0
+  );
+
+  return hiddenRegularEventCount + props.hiddenSpanningEventCount;
 });
 
 const regularEventLanesStyle = computed((): Record<string, string> => {
