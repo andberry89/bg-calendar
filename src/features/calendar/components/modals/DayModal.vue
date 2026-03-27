@@ -158,14 +158,13 @@ function getEventLabel(event: CalendarEvent): string {
   position: relative;
   width: min(560px, calc(100vw - 24px));
   max-width: 560px;
-  background-color: var(--light-gray);
-  color: var(--black);
-  border-radius: 12px;
-  padding: 16px;
+  padding: 18px;
+  box-sizing: border-box;
+  background: transparent;
+  color: var(--calendar-text);
   font:
     400 0.95rem/1.3 'Arial',
     sans-serif;
-  box-sizing: border-box;
 }
 
 .day-modal__header {
@@ -173,28 +172,56 @@ function getEventLabel(event: CalendarEvent): string {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
+  margin: -2px -2px 14px;
+  padding: 0 0 12px;
 }
 
 .day-modal__title {
   margin: 0;
+  color: #0f172a;
   font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
 }
 
 .day-modal__close {
-  border: 1px solid var(--black);
-  background-color: var(--white);
-  color: var(--black);
-  border-radius: 8px;
-  padding: 4px 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0;
+  border: 1px solid rgba(51, 65, 85, 0.22);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(241, 245, 249, 0.92) 100%);
+  color: #0f172a;
   font-size: 1rem;
+  line-height: 1;
+  box-shadow:
+    0 6px 14px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
   cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: rgba(37, 99, 235, 0.3);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(239, 246, 255, 0.96) 100%);
+    box-shadow:
+      0 10px 20px rgba(15, 23, 42, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  }
 }
 
 .day-modal__content {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 240px;
-  gap: 12px;
+  gap: 14px;
   align-items: start;
   width: 100%;
 }
@@ -211,13 +238,30 @@ function getEventLabel(event: CalendarEvent): string {
   align-items: flex-start;
   gap: 4px;
   width: 100%;
-  text-align: left;
   padding: 10px 12px;
-  border: 1px solid var(--ocean-slate-blue);
-  border-radius: 8px;
-  background-color: var(--white);
-  color: var(--black);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.94) 100%);
+  color: #0f172a;
+  text-align: left;
+  box-shadow:
+    0 8px 18px rgba(15, 23, 42, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
   cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease,
+    box-shadow 0.16s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: rgba(37, 99, 235, 0.28);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(239, 246, 255, 0.96) 100%);
+    box-shadow:
+      0 12px 22px rgba(15, 23, 42, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  }
 }
 
 .day-modal__event-type {
@@ -226,14 +270,17 @@ function getEventLabel(event: CalendarEvent): string {
 
 .day-modal__event-dates {
   font-size: 0.85rem;
-  color: var(--dark-gray);
+  color: var(--calendar-text-muted);
 }
 
 .day-modal__details {
-  border: 1px solid var(--ocean-slate-blue);
-  border-radius: 8px;
-  background-color: var(--white);
   padding: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.94) 100%);
+  box-shadow:
+    0 8px 18px rgba(15, 23, 42, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
 }
 
 .day-modal__details--empty {
@@ -241,7 +288,7 @@ function getEventLabel(event: CalendarEvent): string {
   align-items: center;
   justify-content: center;
   text-align: center;
-  color: var(--dark-gray);
+  color: var(--calendar-text-muted);
   opacity: 0.7;
   font-size: 0.9rem;
   min-height: 120px;
@@ -259,27 +306,27 @@ function getEventLabel(event: CalendarEvent): string {
 .day-modal__details-title {
   margin: 0;
   font-size: 1rem;
+  color: #0f172a;
 }
 
 .day-modal__details-close {
-  border: 1px solid var(--black);
-  background-color: var(--white);
-  color: var(--black);
-  border-radius: 6px;
-  padding: 2px 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  min-height: 30px;
+  padding: 0;
+  border: 1px solid rgba(51, 65, 85, 0.22);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(241, 245, 249, 0.92) 100%);
+  color: #0f172a;
   cursor: pointer;
 }
 
 .day-modal__details-dates {
   margin-bottom: 8px;
   font-size: 0.85rem;
-  color: var(--dark-gray);
-}
-
-.day-modal__details-staff {
-  p {
-    margin: 0 0 4px;
-  }
+  color: var(--calendar-text-muted);
 }
 
 .day-modal__details-actions {
@@ -291,18 +338,19 @@ function getEventLabel(event: CalendarEvent): string {
 .day-modal__delete {
   border: 0;
   background: transparent;
-  color: var(--ocean-event-detail);
+  color: #dc2626;
+  font-weight: 600;
   cursor: pointer;
-  padding: 0;
 }
 
 .day-modal__empty {
   margin: 0;
+  color: var(--calendar-text-muted);
 }
 
 @media (max-width: 640px) {
   .day-modal {
-    padding: 12px;
+    padding: 14px;
   }
 
   .day-modal__content {
@@ -310,7 +358,7 @@ function getEventLabel(event: CalendarEvent): string {
   }
 
   .day-modal__event {
-    padding: 8px 10px;
+    padding: 9px 10px;
   }
 }
 </style>
