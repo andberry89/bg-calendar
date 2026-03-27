@@ -1,5 +1,5 @@
 <template>
-  <BaseModal @update="closeDayModal">
+  <BaseModal @update="closeDayModal" @close="closeDayModal">
     <div class="day-modal">
       <div class="day-modal__header">
         <h3 class="day-modal__title">{{ title }}</h3>
