@@ -421,6 +421,8 @@ function getVisibleCellDateKey(cell: CalendarWeekCell): string {
   return getDateKey(new Date(currentDate.year, currentDate.month, cell.date));
 }
 
+const MAX_VISIBLE_WEEK_SPAN_ROWS = 3;
+
 const weekSpanningSegments = computed((): CalendarWeekSpanningSegment[][] => {
   return weeks.value.map((week, weekIdx) => {
     const lanePlan = weekRegularEventLanePlan.value[weekIdx];
@@ -433,7 +435,7 @@ const weekSpanningSegments = computed((): CalendarWeekSpanningSegment[][] => {
 
       const lane = lanePlan.laneIndexByKey.get(getEventKey(event));
 
-      if (!lane) {
+      if (!lane || lane.startRow >= MAX_VISIBLE_WEEK_SPAN_ROWS) {
         return;
       }
 
