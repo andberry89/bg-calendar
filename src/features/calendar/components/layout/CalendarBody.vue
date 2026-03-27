@@ -764,16 +764,32 @@ function updateEvents(): void {
 }
 
 .calendar-week-span--full-close-start :deep(.event-pill) {
-  border-color: rgba(15, 23, 42, 0.55);
-  background: color-mix(in srgb, var(--event-pill-bg) 72%, white 28%);
+  border-color: rgba(15, 23, 42, 0.68);
+  background: color-mix(in srgb, var(--event-pill-bg) 48%, white 52%);
   box-shadow:
-    0 0 0 1px rgba(15, 23, 42, 0.24),
-    0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+    0 0 0 1px rgba(15, 23, 42, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.42) inset,
+    0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
-.calendar-week-span--full-close-start :deep(.event-pill__primary),
-.calendar-week-span--full-close-start :deep(.event-pill__secondary) {
+.calendar-week-span--full-close-start :deep(.event-pill__primary) {
   color: #0f172a;
+  font-weight: 700;
+}
+
+.calendar-week-span--full-close-start :deep(.event-pill__secondary) {
+  color: rgba(15, 23, 42, 0.82);
+  font-weight: 600;
+}
+
+.calendar-week-span--full-close-start :deep(.event-pill__avatar) {
+  background: rgba(255, 255, 255, 0.72);
+  color: #0f172a;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.18) inset;
+}
+
+.calendar-week-span--full-close-start :deep(.event-pill__avatar-fallback) {
+  color: inherit;
 }
 
 .calendar-week-span :deep(.event-pill__primary),
