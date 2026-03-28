@@ -486,8 +486,9 @@ function getStaffColorStyle(_staffId: string): Record<string, string> {
 
 .day-modal__details-identity {
   display: flex;
-  align-items: center;
-  gap: 14px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
   margin-bottom: 12px;
 }
 
@@ -514,10 +515,14 @@ function getStaffColorStyle(_staffId: string): Record<string, string> {
 }
 
 .day-modal__details-staff-summary {
-  color: #334155;
-  font-size: 1rem;
+  color: #0f172a;
+  font-size: 1.05rem;
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.2;
+}
+
+.day-modal__details-avatars {
+  margin-bottom: 2px;
 }
 
 .day-modal__details-title {
