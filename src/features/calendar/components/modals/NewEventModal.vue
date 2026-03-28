@@ -434,7 +434,36 @@ function closeForm(): void {
 
   .submit-event-button {
     align-self: flex-start;
+    min-height: 36px;
+    padding: 8px 14px;
+    border: 1px solid rgba(37, 99, 235, 0.3);
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.94) 0%, rgba(45, 212, 191, 0.82) 100%);
+    color: #f8fafc;
+    font:
+      600 0.8rem/1 Arial,
+      sans-serif;
+    box-shadow: 0 12px 22px rgba(37, 99, 235, 0.16);
+    cursor: pointer;
+    transition:
+      transform 0.16s ease,
+      box-shadow 0.16s ease,
+      border-color 0.16s ease,
+      background 0.16s ease;
     margin-top: 4px;
+
+    &:hover {
+      transform: translateY(-1px);
+      border-color: rgba(29, 78, 216, 0.44);
+      background: linear-gradient(
+        135deg,
+        rgba(29, 78, 216, 0.98) 0%,
+        rgba(20, 184, 166, 0.88) 100%
+      );
+      box-shadow:
+        0 14px 26px rgba(37, 99, 235, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    }
   }
 
   .err-msg {
@@ -494,6 +523,11 @@ function closeForm(): void {
     li {
       padding: 8px 9px;
     }
+  }
+  .submit-event-button {
+    min-height: 34px;
+    padding: 7px 12px;
+    font-size: 0.74rem;
   }
 }
 </style>
