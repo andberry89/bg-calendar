@@ -165,15 +165,31 @@ function deleteEvent(): void {
   justify-content: center;
   min-width: 34px;
   min-height: 34px;
+  padding: 0;
   border: 1px solid rgba(51, 65, 85, 0.22);
   border-radius: 999px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(241, 245, 249, 0.92) 100%);
   color: #0f172a;
   font-size: 1rem;
+  line-height: 1;
   box-shadow:
     0 6px 14px rgba(15, 23, 42, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.72);
   cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: rgba(37, 99, 235, 0.3);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(239, 246, 255, 0.96) 100%);
+    box-shadow:
+      0 10px 20px rgba(15, 23, 42, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  }
 }
 
 .event-header {
@@ -186,8 +202,9 @@ function deleteEvent(): void {
 
 .event-header__identity {
   display: flex;
-  align-items: center;
-  gap: 18px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
   min-width: 0;
 }
 
@@ -195,6 +212,7 @@ function deleteEvent(): void {
   display: inline-flex;
   align-items: center;
   flex: 0 0 auto;
+  min-width: 0;
 }
 
 .event-header__avatar {
@@ -204,8 +222,8 @@ function deleteEvent(): void {
   width: 64px;
   height: 64px;
   margin-left: -14px;
-  border-radius: 999px;
   overflow: hidden;
+  border-radius: 999px;
   background: linear-gradient(
     var(--person-color-angle),
     var(--person-color-gradient-start),
@@ -221,6 +239,7 @@ function deleteEvent(): void {
   }
 
   img {
+    display: block;
     width: calc(100% - 6px);
     height: calc(100% - 6px);
     border-radius: 999px;
@@ -229,18 +248,19 @@ function deleteEvent(): void {
 }
 
 .event-header__avatar--more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: linear-gradient(180deg, rgba(51, 65, 85, 0.92) 0%, rgba(71, 85, 105, 0.9) 100%);
   color: #f8fafc;
   font-size: 0.95rem;
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  line-height: 1;
 }
 
 .event-header__staff {
   color: #0f172a;
-  font-size: 1.12rem;
+  font-size: 1.08rem;
   font-weight: 700;
   line-height: 1.2;
 }
@@ -249,11 +269,17 @@ function deleteEvent(): void {
   color: #0f172a;
   font-size: 1.18rem;
   font-weight: 700;
+  line-height: 1.2;
+}
+
+.event-type {
+  font-weight: 700;
 }
 
 .event-dates {
   color: var(--calendar-text-muted);
   font-size: 0.95rem;
+  line-height: 1.3;
 }
 
 .event-options {
@@ -266,14 +292,30 @@ function deleteEvent(): void {
   border: 0;
   background: transparent;
   color: #dc2626;
+  font: inherit;
   font-weight: 600;
   cursor: pointer;
+  transition: color 0.16s ease;
+
+  &:hover {
+    color: #b91c1c;
+  }
 }
 
 @media (max-width: 640px) {
   .event-modal {
+    width: min(380px, calc(100vw - 16px));
+    max-width: calc(100vw - 16px);
+    min-height: 0;
     padding: 22px 14px 14px;
     gap: 16px;
+  }
+
+  .close-btn {
+    top: 4px;
+    right: 16px;
+    min-width: 36px;
+    min-height: 36px;
   }
 
   .event-header {
@@ -282,13 +324,18 @@ function deleteEvent(): void {
   }
 
   .event-header__identity {
-    gap: 12px;
+    gap: 8px;
+  }
+
+  .event-header__avatars {
+    min-width: 0;
   }
 
   .event-header__avatar {
     width: 54px;
     height: 54px;
     margin-left: -12px;
+    flex-basis: 54px;
 
     img {
       width: calc(100% - 5px);
@@ -297,7 +344,16 @@ function deleteEvent(): void {
   }
 
   .event-header__staff {
-    font-size: 0.92rem;
+    font-size: 0.98rem;
+    line-height: 1.2;
+  }
+
+  .event-name {
+    font-size: 1.06rem;
+  }
+
+  .event-dates {
+    font-size: 0.88rem;
   }
 }
 </style>
