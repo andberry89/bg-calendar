@@ -10,7 +10,9 @@
         tabindex="-1"
         @click.stop
       >
-        <slot></slot>
+        <div class="base-modal__surface">
+          <slot></slot>
+        </div>
       </div>
     </div>
   </Teleport>
@@ -68,26 +70,79 @@ onBeforeUnmount((): void => {
 .base-modal {
   position: fixed;
   inset: 0;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  padding: 20px;
+  box-sizing: border-box;
+}
 
-  .base-modal__overlay {
-    position: absolute;
-    inset: 0;
-    background-color: var(--black);
-    opacity: 0.75;
+.base-modal__overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top, rgba(96, 165, 250, 0.12) 0%, rgba(96, 165, 250, 0) 34%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.38) 0%, rgba(15, 23, 42, 0.64) 100%);
+  backdrop-filter: blur(10px);
+}
+
+.base-modal__content {
+  position: relative;
+  z-index: 1;
+  width: auto;
+  max-width: min(95vw, 720px);
+  max-height: calc(100vh - 24px);
+  outline: none;
+  display: flex;
+}
+
+.base-modal__surface {
+  position: relative;
+  overflow: auto;
+  max-height: inherit;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 250, 252, 0.96) 100%);
+  box-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.28),
+    0 10px 24px rgba(15, 23, 42, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.base-modal__surface::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 56px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 100%),
+    linear-gradient(135deg, rgba(37, 99, 235, 0.14) 0%, rgba(45, 212, 191, 0.1) 100%);
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .base-modal {
+    padding: 12px;
+    align-items: center;
   }
 
   .base-modal__content {
-    position: relative;
-    z-index: 1;
-    display: inline-block;
-    max-height: 90vh;
-    max-width: 95vw;
-    overflow-y: auto;
-    outline: none;
+    width: 100%;
+    max-width: calc(100vw - 24px);
+    max-height: calc(100vh - 24px);
+  }
+
+  .base-modal__surface {
+    border-radius: 16px;
+    box-shadow:
+      0 18px 40px rgba(15, 23, 42, 0.26),
+      0 8px 18px rgba(15, 23, 42, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.64);
+  }
+
+  .base-modal__surface::before {
+    height: 44px;
   }
 }
 </style>

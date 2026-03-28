@@ -15,31 +15,81 @@
             type="button"
             @click="selectEvent(calendarEvent)"
           >
-            <span class="day-modal__event-type">
-              {{ getEventLabel(calendarEvent) }}
-            </span>
-            <span class="day-modal__event-dates">
-              {{ getEventDates(calendarEvent) }}
-            </span>
+            <div class="day-modal__event-main">
+              <span v-if="calendarEvent.staff.length > 0" class="day-modal__event-staff-text">
+                {{ getEventStaffSummary(calendarEvent) }}
+              </span>
+              <span class="day-modal__event-type">
+                {{ getEventLabel(calendarEvent) }}
+              </span>
+              <span class="day-modal__event-dates">
+                {{ formatEventDates(calendarEvent) }}
+              </span>
+            </div>
+
+            <div
+              v-if="calendarEvent.staff.length > 0"
+              class="day-modal__event-aside"
+              aria-hidden="true"
+            >
+              <span
+                v-for="person in getVisibleStaff(calendarEvent)"
+                :key="person.id"
+                class="day-modal__event-avatar"
+                :style="getStaffColorStyle(person.id)"
+              >
+                <img :src="imgUrl(person.lastName)" :alt="person.shortName" />
+              </span>
+              <span
+                v-if="getRemainingStaffCount(calendarEvent) > 0"
+                class="day-modal__event-avatar day-modal__event-avatar--more"
+              >
+                +{{ getRemainingStaffCount(calendarEvent) }}
+              </span>
+            </div>
           </button>
         </div>
 
         <div v-if="selectedEvent" class="day-modal__details">
           <div class="day-modal__details-header">
-            <h4 class="day-modal__details-title">
-              {{ selectedEvent.class === 'cd-event' ? selectedEvent.details : selectedEvent.type }}
-              {{ selectedEvent.class === 'birthday' ? '🎂' : '' }}
-            </h4>
             <button class="day-modal__details-close" type="button" @click="clearSelectedEvent">
               ×
             </button>
           </div>
 
-          <div class="day-modal__details-dates">
-            {{ getEventDates(selectedEvent) }}
+          <div class="day-modal__details-identity" v-if="selectedEvent.staff.length > 0">
+            <div class="day-modal__details-avatars" aria-hidden="true">
+              <span
+                v-for="person in getVisibleStaff(selectedEvent)"
+                :key="person.id"
+                class="day-modal__details-avatar"
+                :style="getStaffColorStyle(person.id)"
+              >
+                <img :src="imgUrl(person.lastName)" :alt="person.shortName" />
+              </span>
+              <span
+                v-if="getRemainingStaffCount(selectedEvent) > 0"
+                class="day-modal__details-avatar day-modal__details-avatar--more"
+              >
+                +{{ getRemainingStaffCount(selectedEvent) }}
+              </span>
+            </div>
+
+            <div class="day-modal__details-staff-summary">
+              {{ getEventStaffSummary(selectedEvent) }}
+            </div>
           </div>
 
-          <div v-if="selectedEvent.staff.length > 0" class="day-modal__details-staff">
+          <h4 class="day-modal__details-title">
+            {{ selectedEvent.class === 'cd-event' ? selectedEvent.details : selectedEvent.type }}
+            {{ selectedEvent.class === 'birthday' ? '🎂' : '' }}
+          </h4>
+
+          <div class="day-modal__details-dates">
+            {{ formatEventDates(selectedEvent) }}
+          </div>
+
+          <div v-if="selectedEvent.staff.length > 1" class="day-modal__details-staff-list">
             <p v-for="person in selectedEvent.staff" :key="person.lastName">
               {{ person.shortName }}
             </p>
@@ -51,6 +101,7 @@
             </button>
           </div>
         </div>
+
         <div v-else class="day-modal__details day-modal__details--empty">
           <p>Click an event to view full details</p>
         </div>
@@ -65,7 +116,16 @@
 import { computed, ref } from 'vue';
 import { format } from 'date-fns';
 import BaseModal from '@/components/BaseModal.vue';
-import type { CalendarEvent, CurrentDate } from '@/types/calendar';
+import {
+  getPersonColorKeyByIndex,
+  getPersonColorStyle
+} from '@/features/calendar/utils/colorTokens';
+import type { CalendarEvent, CurrentDate, Staff } from '@/types/calendar';
+
+const images = import.meta.glob('@/assets/staff/*.{jpg,png}', {
+  eager: true,
+  import: 'default'
+}) as Record<string, string>;
 
 const props = defineProps<{
   currentDate: CurrentDate;
@@ -106,15 +166,21 @@ function deleteEvent(event: CalendarEvent): void {
   closeDayModal();
 }
 
-function getEventDates(event: CalendarEvent): string {
-  const start = format(new Date(event.start.replace(/-/g, '/')), 'MM/dd/yyyy');
+function formatEventDates(event: CalendarEvent): string {
+  const start = new Date(event.start.replace(/-/g, '/'));
+  const end = new Date(event.end.replace(/-/g, '/'));
+  const sameDay = event.start === event.end;
+  const sameYear = start.getFullYear() === end.getFullYear();
 
-  if (event.start === event.end) {
-    return start;
+  if (sameDay) {
+    return format(start, 'MMM d, yyyy');
   }
 
-  const end = format(new Date(event.end.replace(/-/g, '/')), 'MM/dd/yyyy');
-  return `${start} - ${end}`;
+  if (sameYear) {
+    return `${format(start, 'MMM d')} - ${format(end, 'MMM d, yyyy')}`;
+  }
+
+  return `${format(start, 'MMM d, yyyy')} - ${format(end, 'MMM d, yyyy')}`;
 }
 
 function getEventLabel(event: CalendarEvent): string {
@@ -123,15 +189,15 @@ function getEventLabel(event: CalendarEvent): string {
   }
 
   if (event.class === 'press-trip') {
-    return `${event.staff[0].initials} Press Trip`;
+    return 'Press Trip';
   }
 
   if (event.class === 'vacation') {
-    return `${event.staff[0].initials} Off (PTO)`;
+    return 'Vacation';
   }
 
   if (event.class === 'sick-time') {
-    return `${event.staff[0].initials} Sick Time`;
+    return 'Sick Time';
   }
 
   if (event.class === 'auto-show') {
@@ -151,21 +217,57 @@ function getEventLabel(event: CalendarEvent): string {
 
   return event.type;
 }
+
+function getEventStaffSummary(event: CalendarEvent): string {
+  const [firstStaff] = event.staff;
+
+  if (!firstStaff) {
+    return '';
+  }
+
+  const baseName = `${firstStaff.firstName} ${firstStaff.lastName.charAt(0)}.`;
+
+  if (event.staff.length === 1) {
+    return baseName;
+  }
+
+  return `${baseName} (+${event.staff.length - 1} more)`;
+}
+
+function getVisibleStaff(event: CalendarEvent): Staff[] {
+  return event.staff.slice(0, 3);
+}
+
+function getRemainingStaffCount(event: CalendarEvent): number {
+  return Math.max(event.staff.length - getVisibleStaff(event).length, 0);
+}
+
+function imgUrl(name: string): string {
+  return (
+    images[`/src/assets/staff/${name}.jpg`] ||
+    images[`/src/assets/staff/${name}.png`] ||
+    images['/src/assets/staff/user.png']
+  );
+}
+
+function getStaffColorStyle(_staffId: string): Record<string, string> {
+  const key = getPersonColorKeyByIndex(0);
+  return getPersonColorStyle(key);
+}
 </script>
 
 <style lang="scss" scoped>
 .day-modal {
   position: relative;
-  width: min(560px, calc(100vw - 24px));
-  max-width: 560px;
-  background-color: var(--light-gray);
-  color: var(--black);
-  border-radius: 12px;
-  padding: 16px;
+  width: min(680px, calc(100vw - 24px));
+  max-width: 680px;
+  padding: 18px;
+  box-sizing: border-box;
+  background: transparent;
+  color: var(--calendar-text);
   font:
     400 0.95rem/1.3 'Arial',
     sans-serif;
-  box-sizing: border-box;
 }
 
 .day-modal__header {
@@ -173,28 +275,56 @@ function getEventLabel(event: CalendarEvent): string {
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
+  margin: -2px -2px 14px;
+  padding: 0 0 12px;
 }
 
 .day-modal__title {
   margin: 0;
+  color: #0f172a;
   font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
 }
 
 .day-modal__close {
-  border: 1px solid var(--black);
-  background-color: var(--white);
-  color: var(--black);
-  border-radius: 8px;
-  padding: 4px 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0;
+  border: 1px solid rgba(51, 65, 85, 0.22);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(241, 245, 249, 0.92) 100%);
+  color: #0f172a;
   font-size: 1rem;
+  line-height: 1;
+  box-shadow:
+    0 6px 14px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
   cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: rgba(37, 99, 235, 0.3);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(239, 246, 255, 0.96) 100%);
+    box-shadow:
+      0 10px 20px rgba(15, 23, 42, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  }
 }
 
 .day-modal__content {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 240px;
-  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) 290px;
+  gap: 14px;
   align-items: start;
   width: 100%;
 }
@@ -207,78 +337,218 @@ function getEventLabel(event: CalendarEvent): string {
 
 .day-modal__event {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.94) 100%);
+  color: #0f172a;
   text-align: left;
-  padding: 10px 12px;
-  border: 1px solid var(--ocean-slate-blue);
-  border-radius: 8px;
-  background-color: var(--white);
-  color: var(--black);
+  box-shadow:
+    0 8px 18px rgba(15, 23, 42, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
   cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease,
+    box-shadow 0.16s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: rgba(37, 99, 235, 0.28);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(239, 246, 255, 0.96) 100%);
+    box-shadow:
+      0 12px 22px rgba(15, 23, 42, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  }
+}
+
+.day-modal__event-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.day-modal__event-staff-text {
+  color: #334155;
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .day-modal__event-type {
+  color: #0f172a;
+  font-size: 0.98rem;
   font-weight: 700;
+  line-height: 1.25;
 }
 
 .day-modal__event-dates {
-  font-size: 0.85rem;
-  color: var(--dark-gray);
+  color: var(--calendar-text-muted);
+  font-size: 0.84rem;
+  line-height: 1.2;
+}
+
+.day-modal__event-aside {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.day-modal__event-avatar,
+.day-modal__details-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  margin-left: -10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: linear-gradient(
+    var(--person-color-angle),
+    var(--person-color-gradient-start),
+    var(--person-color-gradient-end)
+  );
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.12),
+    0 10px 20px rgba(15, 23, 42, 0.14);
+  flex: 0 0 42px;
+
+  &:first-child {
+    margin-left: 0;
+  }
+
+  img {
+    display: block;
+    width: calc(100% - 5px);
+    height: calc(100% - 5px);
+    border-radius: 999px;
+    object-fit: cover;
+  }
+}
+
+.day-modal__event-avatar--more,
+.day-modal__details-avatar--more {
+  background: linear-gradient(180deg, rgba(51, 65, 85, 0.92) 0%, rgba(71, 85, 105, 0.9) 100%);
+  color: #f8fafc;
+  font-size: 0.74rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .day-modal__details {
-  border: 1px solid var(--ocean-slate-blue);
-  border-radius: 8px;
-  background-color: var(--white);
-  padding: 12px;
+  padding: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.94) 100%);
+  box-shadow:
+    0 8px 18px rgba(15, 23, 42, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
 }
 
 .day-modal__details--empty {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 160px;
   text-align: center;
-  color: var(--dark-gray);
+  color: var(--calendar-text-muted);
   opacity: 0.7;
   font-size: 0.9rem;
-  min-height: 120px;
   border-style: dashed;
 }
 
 .day-modal__details-header {
   display: flex;
-  align-items: start;
-  justify-content: space-between;
-  gap: 8px;
+  justify-content: flex-end;
   margin-bottom: 8px;
-}
-
-.day-modal__details-title {
-  margin: 0;
-  font-size: 1rem;
 }
 
 .day-modal__details-close {
-  border: 1px solid var(--black);
-  background-color: var(--white);
-  color: var(--black);
-  border-radius: 6px;
-  padding: 2px 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  min-height: 30px;
+  padding: 0;
+  border: 1px solid rgba(51, 65, 85, 0.22);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(241, 245, 249, 0.92) 100%);
+  color: #0f172a;
   cursor: pointer;
 }
 
-.day-modal__details-dates {
-  margin-bottom: 8px;
-  font-size: 0.85rem;
-  color: var(--dark-gray);
+.day-modal__details-identity {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
-.day-modal__details-staff {
+.day-modal__details-avatars {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.day-modal__details-avatar {
+  width: 54px;
+  height: 54px;
+  margin-left: -12px;
+  flex-basis: 54px;
+
+  img {
+    width: calc(100% - 6px);
+    height: calc(100% - 6px);
+  }
+}
+
+.day-modal__details-avatar--more {
+  font-size: 0.9rem;
+}
+
+.day-modal__details-staff-summary {
+  color: #0f172a;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.day-modal__details-avatars {
+  margin-bottom: 2px;
+}
+
+.day-modal__details-title {
+  margin: 0 0 8px;
+  color: #0f172a;
+  font-size: 1.08rem;
+  line-height: 1.2;
+}
+
+.day-modal__details-dates {
+  margin-bottom: 10px;
+  color: var(--calendar-text-muted);
+  font-size: 0.92rem;
+  line-height: 1.3;
+}
+
+.day-modal__details-staff-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+
   p {
-    margin: 0 0 4px;
+    margin: 0;
+    color: var(--calendar-text-muted);
+    font-size: 0.88rem;
   }
 }
 
@@ -291,18 +561,19 @@ function getEventLabel(event: CalendarEvent): string {
 .day-modal__delete {
   border: 0;
   background: transparent;
-  color: var(--ocean-event-detail);
+  color: #dc2626;
+  font-weight: 600;
   cursor: pointer;
-  padding: 0;
 }
 
 .day-modal__empty {
   margin: 0;
+  color: var(--calendar-text-muted);
 }
 
 @media (max-width: 640px) {
   .day-modal {
-    padding: 12px;
+    padding: 14px;
   }
 
   .day-modal__content {
@@ -310,7 +581,21 @@ function getEventLabel(event: CalendarEvent): string {
   }
 
   .day-modal__event {
-    padding: 8px 10px;
+    padding: 10px 12px;
+  }
+
+  .day-modal__event-avatar,
+  .day-modal__details-avatar {
+    width: 38px;
+    height: 38px;
+    margin-left: -9px;
+    flex-basis: 38px;
+  }
+
+  .day-modal__details-avatar {
+    width: 46px;
+    height: 46px;
+    flex-basis: 46px;
   }
 }
 </style>

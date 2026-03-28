@@ -6,21 +6,39 @@
       </button>
 
       <div class="event-header">
+        <div class="event-header__identity" v-if="event.staff.length > 0">
+          <div class="event-header__avatars" aria-hidden="true">
+            <span
+              v-for="person in visibleStaff"
+              :key="person.id"
+              class="event-header__avatar"
+              :style="getStaffColorStyle(person.id)"
+            >
+              <img :src="imgUrl(person.lastName)" :alt="person.shortName" />
+            </span>
+
+            <span
+              v-if="remainingStaffCount > 0"
+              class="event-header__avatar event-header__avatar--more"
+            >
+              +{{ remainingStaffCount }}
+            </span>
+          </div>
+
+          <div class="event-header__staff">
+            {{ staffSummary }}
+          </div>
+        </div>
+
         <div class="event-name">
-          <span class="event-type"
-            >{{ event.class === 'cd-event' ? event.details : event.type }}
-            {{ event.class === 'birthday' ? '🎂' : '' }}</span
-          >
+          <span class="event-type">
+            {{ event.class === 'cd-event' ? event.details : event.type }}
+            {{ event.class === 'birthday' ? '🎂' : '' }}
+          </span>
         </div>
 
         <div class="event-dates">
           {{ eventDates }}
-        </div>
-
-        <div class="event-staff" v-if="event.staff.length > 0">
-          <p v-for="person in event.staff" :key="person.lastName">
-            {{ person.shortName }}
-          </p>
         </div>
       </div>
 
@@ -35,7 +53,16 @@
 import { computed } from 'vue';
 import { format } from 'date-fns';
 import BaseModal from '@/components/BaseModal.vue';
-import type { CalendarEvent } from '@/types/calendar';
+import {
+  getPersonColorKeyByIndex,
+  getPersonColorStyle
+} from '@/features/calendar/utils/colorTokens';
+import type { CalendarEvent, Staff } from '@/types/calendar';
+
+const images = import.meta.glob('@/assets/staff/*.{jpg,png}', {
+  eager: true,
+  import: 'default'
+}) as Record<string, string>;
 
 const { event } = defineProps<{
   day: number;
@@ -47,19 +74,59 @@ const emit = defineEmits<{
   (e: 'delete', value: CalendarEvent): void;
 }>();
 
-const eventDates = computed((): string => {
-  const startDate = new Date(event.start.replace(/-/g, '/'));
-  const start = format(startDate, 'MM/dd/yyyy');
+const visibleStaff = computed((): Staff[] => event.staff.slice(0, 3));
 
-  if (event.start === event.end) {
-    return start;
+const remainingStaffCount = computed((): number => {
+  return Math.max(event.staff.length - visibleStaff.value.length, 0);
+});
+
+const staffSummary = computed((): string => {
+  const [firstStaff] = event.staff;
+
+  if (!firstStaff) {
+    return '';
   }
 
-  const endDate = new Date(event.end.replace(/-/g, '/'));
-  const end = format(endDate, 'MM/dd/yyyy');
+  const baseName = `${firstStaff.firstName} ${firstStaff.lastName.charAt(0)}.`;
 
-  return start + ' - ' + end;
+  if (event.staff.length === 1) {
+    return baseName;
+  }
+
+  return `${baseName} (+${event.staff.length - 1} more)`;
 });
+
+const eventDates = computed((): string => {
+  const startDate = new Date(event.start.replace(/-/g, '/'));
+  const endDate = new Date(event.end.replace(/-/g, '/'));
+  const sameDay = event.start === event.end;
+  const sameYear = startDate.getFullYear() === endDate.getFullYear();
+
+  if (sameDay) {
+    return format(startDate, 'MMM d, yyyy');
+  }
+
+  if (sameYear) {
+    return `${format(startDate, 'MMM d')} - ${format(endDate, 'MMM d, yyyy')}`;
+  }
+
+  return `${format(startDate, 'MMM d, yyyy')} - ${format(endDate, 'MMM d, yyyy')}`;
+});
+
+function imgUrl(name: string): string {
+  return (
+    images[`/src/assets/staff/${name}.jpg`] ||
+    images[`/src/assets/staff/${name}.png`] ||
+    images['/src/assets/staff/user.png']
+  );
+}
+
+function getStaffColorStyle(staffId: string): Record<string, string> {
+  const index = event.staff.findIndex((person) => person.id === staffId);
+  const key = getPersonColorKeyByIndex(index >= 0 ? index : 0);
+
+  return getPersonColorStyle(key);
+}
 
 function closeModal(): void {
   emit('update');
@@ -73,143 +140,220 @@ function deleteEvent(): void {
 <style lang="scss" scoped>
 .event-modal {
   position: relative;
-  width: min(275px, calc(100vw - 24px));
+  width: min(380px, calc(100vw - 24px));
   max-width: calc(100vw - 24px);
-  min-height: 140px;
+  min-height: 200px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 12px 10px 8px;
-  border: 1px solid var(--black);
-  border-radius: 8px;
-  background-color: var(--light-gray);
-  color: var(--black);
+  gap: 18px;
+  padding: 26px 18px 18px;
+  background: transparent;
+  color: var(--calendar-text);
   text-align: left;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
   font:
     400 0.95rem/1.35 'Arial',
     sans-serif;
+}
 
-  .close-btn {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 32px;
-    min-height: 32px;
-    padding: 0;
-    border: 1px solid var(--black);
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0;
+  border: 1px solid rgba(51, 65, 85, 0.22);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(241, 245, 249, 0.92) 100%);
+  color: #0f172a;
+  font-size: 1rem;
+  line-height: 1;
+  box-shadow:
+    0 6px 14px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: rgba(37, 99, 235, 0.3);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(239, 246, 255, 0.96) 100%);
+    box-shadow:
+      0 10px 20px rgba(15, 23, 42, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.82);
+  }
+}
+
+.event-header {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 36px;
+  padding-right: 46px;
+}
+
+.event-header__identity {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.event-header__avatars {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.event-header__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  margin-left: -14px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: linear-gradient(
+    var(--person-color-angle),
+    var(--person-color-gradient-start),
+    var(--person-color-gradient-end)
+  );
+  box-shadow:
+    0 0 0 4px rgba(255, 255, 255, 0.1),
+    0 14px 28px rgba(15, 23, 42, 0.18);
+  flex: 0 0 64px;
+
+  &:first-child {
+    margin-left: 0;
+  }
+
+  img {
+    display: block;
+    width: calc(100% - 6px);
+    height: calc(100% - 6px);
     border-radius: 999px;
-    background-color: var(--ocean-event-detail);
-    color: var(--black);
-    line-height: 1;
-    font: inherit;
-    cursor: pointer;
-    transition: 0.2s;
-
-    &:hover {
-      background-color: var(--white);
-      border-color: var(--black);
-      color: var(--black);
-    }
+    object-fit: cover;
   }
+}
 
-  .event-header {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding-right: 34px;
+.event-header__avatar--more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, rgba(51, 65, 85, 0.92) 0%, rgba(71, 85, 105, 0.9) 100%);
+  color: #f8fafc;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1;
+}
 
-    .event-name {
-      border-bottom: 1px solid var(--black);
-      font-size: 1.05rem;
-      font-weight: 700;
+.event-header__staff {
+  color: #0f172a;
+  font-size: 1.08rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
 
-      .event-type {
-        font-weight: 400;
-      }
-    }
+.event-name {
+  color: #0f172a;
+  font-size: 1.18rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
 
-    .event-staff {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+.event-type {
+  font-weight: 700;
+}
 
-      p {
-        margin: 0;
-      }
-    }
-  }
+.event-dates {
+  color: var(--calendar-text-muted);
+  font-size: 0.95rem;
+  line-height: 1.3;
+}
 
-  .event-options {
-    margin-top: auto;
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: flex-end;
-    padding-top: 10px;
-    border-top: 1px solid rgba(0, 0, 0, 0.12);
-    font-size: 0.8rem;
-  }
+.event-options {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+}
 
-  .delete-btn {
-    min-height: 32px;
-    padding: 6px 10px;
-    border: 1px solid var(--black);
-    border-radius: 8px;
-    background-color: var(--white);
-    color: var(--black);
-    font: inherit;
-    cursor: pointer;
-    transition: 0.2s;
+.delete-btn {
+  border: 0;
+  background: transparent;
+  color: #dc2626;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.16s ease;
 
-    &:hover {
-      color: var(--ocean-event-detail);
-      border-color: var(--ocean-event-detail);
-    }
+  &:hover {
+    color: #b91c1c;
   }
 }
 
 @media (max-width: 640px) {
   .event-modal {
-    width: min(320px, calc(100vw - 16px));
+    width: min(380px, calc(100vw - 16px));
     max-width: calc(100vw - 16px);
-    max-height: min(420px, calc(100vh - 24px));
-    margin: 0;
-    padding: 12px 10px 10px;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-gutter: stable;
-    -webkit-overflow-scrolling: touch;
-    font-size: 0.85rem;
+    min-height: 0;
+    padding: 22px 14px 14px;
+    gap: 16px;
   }
 
-  .event-modal .close-btn {
-    top: 6px;
-    right: 6px;
+  .close-btn {
+    top: 4px;
+    right: 16px;
     min-width: 36px;
     min-height: 36px;
   }
 
-  .event-modal .delete-btn {
-    min-height: 36px;
-    padding: 8px 12px;
+  .event-header {
+    padding-top: 24px;
+    padding-right: 44px;
   }
 
-  .event-modal .event-header {
-    padding-right: 38px;
+  .event-header__identity {
+    gap: 8px;
+  }
 
-    .event-name {
-      font-size: 1rem;
-      line-height: 1.4;
+  .event-header__avatars {
+    min-width: 0;
+  }
+
+  .event-header__avatar {
+    width: 54px;
+    height: 54px;
+    margin-left: -12px;
+    flex-basis: 54px;
+
+    img {
+      width: calc(100% - 5px);
+      height: calc(100% - 5px);
     }
   }
 
-  .event-modal .event-options {
-    margin-top: 8px;
-    font-size: 0.8rem;
+  .event-header__staff {
+    font-size: 0.98rem;
+    line-height: 1.2;
+  }
+
+  .event-name {
+    font-size: 1.06rem;
+  }
+
+  .event-dates {
+    font-size: 0.88rem;
   }
 }
 </style>
