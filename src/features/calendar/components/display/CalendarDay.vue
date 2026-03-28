@@ -186,7 +186,15 @@ const holidayBadgeLabel = computed((): string => {
     return '';
   }
 
-  return primaryHolidayBadge.value.closed === 'half' ? 'Early Close' : 'Holiday';
+  if (primaryHolidayBadge.value.closed === 'half') {
+    return 'Early Close';
+  }
+
+  if (primaryHolidayBadge.value.closed === 'none' || primaryHolidayBadge.value.closed === '') {
+    return primaryHolidayBadge.value.details || 'Holiday';
+  }
+
+  return 'Holiday';
 });
 
 const filteredEvents = computed((): CalendarEventType[] => eventGroups.value.regularEvents);
@@ -481,6 +489,33 @@ function closeDayModal(): void {
   line-height: 1;
 }
 
+.date-text--interactive .date-text__day {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.date-text--interactive .date-text__day::after {
+  content: '↗';
+  display: inline-block;
+  color: #2563eb;
+  font-size: 0.7rem;
+  font-weight: 800;
+  line-height: 1;
+  opacity: 0.75;
+  transform: translateY(-1px);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    color 0.15s ease;
+}
+
+.date-text--interactive:hover .date-text__day::after {
+  opacity: 1;
+  transform: translateY(-1px) scale(1.1);
+  color: #1d4ed8;
+}
+
 .date-text--interactive {
   cursor: pointer;
 }
@@ -763,6 +798,10 @@ function closeDayModal(): void {
     padding: 3px 6px;
     font-size: 0.58rem;
     visibility: visible;
+  }
+  .date-text--interactive .date-text__day::after {
+    font-size: 0.58rem;
+    opacity: 0.85;
   }
 }
 </style>
