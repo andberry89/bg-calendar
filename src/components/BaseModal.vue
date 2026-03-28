@@ -121,15 +121,6 @@ onBeforeUnmount((): void => {
   pointer-events: none;
 }
 
-.base-modal__surface::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.32);
-  pointer-events: none;
-}
-
 @media (max-width: 640px) {
   .base-modal {
     padding: 12px;
