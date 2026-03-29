@@ -89,6 +89,13 @@
             {{ formatEventDates(selectedEvent) }}
           </div>
 
+          <div
+            v-if="selectedEvent.details && selectedEvent.class !== 'cd-event'"
+            class="day-modal__details-copy"
+          >
+            {{ selectedEvent.details }}
+          </div>
+
           <div v-if="selectedEvent.staff.length > 1" class="day-modal__details-staff-list">
             <p v-for="person in selectedEvent.staff" :key="person.lastName">
               {{ person.shortName }}
@@ -537,6 +544,14 @@ function getStaffColorStyle(_staffId: string): Record<string, string> {
   color: var(--calendar-text-muted);
   font-size: 0.92rem;
   line-height: 1.3;
+}
+
+.day-modal__details-copy {
+  margin-bottom: 12px;
+  color: var(--calendar-text);
+  font-size: 0.92rem;
+  line-height: 1.4;
+  white-space: pre-line;
 }
 
 .day-modal__details-staff-list {

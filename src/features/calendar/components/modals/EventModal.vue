@@ -30,19 +30,25 @@
           </div>
         </div>
 
-        <div class="event-name">
-          <span class="event-type">
-            {{ event.class === 'cd-event' ? event.details : event.type }}
-            {{ event.class === 'birthday' ? '🎂' : '' }}
-          </span>
+        <div class="event-meta">
+          <div class="event-name">
+            <span class="event-type">
+              {{ event.class === 'cd-event' ? event.details : event.type }}
+              {{ event.class === 'birthday' ? '🎂' : '' }}
+            </span>
+          </div>
+
+          <div class="event-dates">
+            {{ eventDates }}
+          </div>
         </div>
 
-        <div class="event-dates">
-          {{ eventDates }}
+        <div v-if="event.details && event.class !== 'cd-event'" class="event-details">
+          {{ event.details }}
         </div>
       </div>
 
-      <div v-if="event.staff.length > 0" class="event-staff-list">
+      <div v-if="event.staff.length > 1" class="event-staff-list">
         <div class="event-staff-list__label">Staff</div>
         <ul class="event-staff-list__items">
           <li v-for="person in event.staff" :key="person.id" class="event-staff-list__item">
@@ -274,6 +280,23 @@ function deleteEvent(): void {
   line-height: 1.2;
 }
 
+.event-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.event-meta .event-name {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.event-meta .event-dates {
+  flex: 0 0 auto;
+  text-align: right;
+}
+
 .event-name {
   color: #0f172a;
   font-size: 1.18rem;
@@ -289,6 +312,13 @@ function deleteEvent(): void {
   color: var(--calendar-text-muted);
   font-size: 0.95rem;
   line-height: 1.3;
+}
+
+.event-details {
+  color: var(--calendar-text);
+  font-size: 0.95rem;
+  line-height: 1.4;
+  white-space: pre-line;
 }
 
 .event-staff-list {
@@ -396,6 +426,19 @@ function deleteEvent(): void {
 
   .event-staff-list__item {
     font-size: 0.92rem;
+  }
+
+  .event-details {
+    font-size: 0.9rem;
+  }
+
+  .event-meta {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .event-meta .event-dates {
+    text-align: left;
   }
 }
 </style>
