@@ -42,6 +42,15 @@
         </div>
       </div>
 
+      <div v-if="event.staff.length > 0" class="event-staff-list">
+        <div class="event-staff-list__label">Staff</div>
+        <ul class="event-staff-list__items">
+          <li v-for="person in event.staff" :key="person.id" class="event-staff-list__item">
+            {{ person.firstName }} {{ person.lastName }}
+          </li>
+        </ul>
+      </div>
+
       <div class="event-options">
         <button class="delete-btn" type="button" @click="deleteEvent">Delete Event ✘</button>
       </div>
@@ -282,6 +291,35 @@ function deleteEvent(): void {
   line-height: 1.3;
 }
 
+.event-staff-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.event-staff-list__label {
+  color: var(--calendar-text-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.event-staff-list__items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.event-staff-list__item {
+  color: #0f172a;
+  font-size: 0.96rem;
+  line-height: 1.3;
+}
+
 .event-options {
   margin-top: auto;
   display: flex;
@@ -354,6 +392,10 @@ function deleteEvent(): void {
 
   .event-dates {
     font-size: 0.88rem;
+  }
+
+  .event-staff-list__item {
+    font-size: 0.92rem;
   }
 }
 </style>
