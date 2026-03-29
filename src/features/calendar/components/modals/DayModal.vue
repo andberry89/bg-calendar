@@ -97,9 +97,11 @@
           </div>
 
           <div v-if="selectedEvent.staff.length > 1" class="day-modal__details-staff-list">
-            <p v-for="person in selectedEvent.staff" :key="person.lastName">
-              {{ person.shortName }}
-            </p>
+            <ul class="day-modal__details-staff-items">
+              <li v-for="person in selectedEvent.staff" :key="person.lastName">
+                {{ person.shortName }}
+              </li>
+            </ul>
           </div>
 
           <div class="day-modal__details-actions">
@@ -555,16 +557,22 @@ function getStaffColorStyle(_staffId: string): Record<string, string> {
 }
 
 .day-modal__details-staff-list {
+  margin-bottom: 12px;
+}
+
+.day-modal__details-staff-items {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  margin-bottom: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 
-  p {
-    margin: 0;
-    color: var(--calendar-text-muted);
-    font-size: 0.88rem;
-  }
+.day-modal__details-staff-items li {
+  margin: 0;
+  color: var(--calendar-text-muted);
+  font-size: 0.88rem;
 }
 
 .day-modal__details-actions {
