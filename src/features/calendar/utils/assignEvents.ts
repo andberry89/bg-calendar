@@ -1,49 +1,48 @@
 import type { AssignedCalendarEvent, CalendarEvent } from '@/types/calendar';
 
+const toDate = (value: string): Date => {
+  const [year, month, day] = value.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+
 const assignEvents = (
   arr: CalendarEvent[],
   currentMonth: number,
-  currentMonthDays: number
+  currentMonthDays: number,
+  currentYear: number
 ): AssignedCalendarEvent[][] => {
   const updatedEvents: AssignedCalendarEvent[][] = Array.from(
     { length: currentMonthDays },
     () => []
   );
-  const targetMonth = currentMonth + 1;
+
+  const visibleMonthStart = new Date(currentYear, currentMonth, 1);
+  const visibleMonthEnd = new Date(currentYear, currentMonth, currentMonthDays);
 
   for (const event of arr) {
-    const startMonth = Number(event.start.slice(5, 7));
-    const endMonth = Number(event.end.slice(5, 7));
-    const actualStartIdx = Number(event.start.slice(8, 10)) - 1;
-    const actualEndIdx = Number(event.end.slice(8, 10)) - 1;
+    const eventStart = toDate(event.start);
+    const eventEnd = toDate(event.end);
 
-    let boundedStartIdx = actualStartIdx;
-    let boundedEndIdx = actualEndIdx;
+    const visibleStart = eventStart > visibleMonthStart ? eventStart : visibleMonthStart;
+    const visibleEnd = eventEnd < visibleMonthEnd ? eventEnd : visibleMonthEnd;
 
-    if (startMonth !== endMonth) {
-      if (startMonth < targetMonth) {
-        boundedStartIdx = 0;
-      }
-
-      if (targetMonth < endMonth) {
-        boundedEndIdx = currentMonthDays - 1;
-      }
+    if (visibleStart > visibleEnd) {
+      continue;
     }
 
-    boundedStartIdx = Math.max(boundedStartIdx, 0);
-    boundedEndIdx = Math.min(boundedEndIdx, currentMonthDays - 1);
-
+    const boundedStartIdx = visibleStart.getDate() - 1;
+    const boundedEndIdx = visibleEnd.getDate() - 1;
     const isMultiDay = event.start !== event.end;
     const visibleSpanLength = boundedEndIdx - boundedStartIdx + 1;
-    const startsInCurrentMonth = startMonth === targetMonth;
-    const endsInCurrentMonth = endMonth === targetMonth;
 
     for (let i = boundedStartIdx; i <= boundedEndIdx; i += 1) {
+      const currentDay = new Date(currentYear, currentMonth, i + 1);
+
       updatedEvents[i].push({
         ...event,
         display: {
-          startsToday: startsInCurrentMonth && i === actualStartIdx,
-          endsToday: endsInCurrentMonth && i === actualEndIdx,
+          startsToday: currentDay.getTime() === eventStart.getTime(),
+          endsToday: currentDay.getTime() === eventEnd.getTime(),
           isMultiDay,
           spanIndex: i - boundedStartIdx,
           spanLength: visibleSpanLength

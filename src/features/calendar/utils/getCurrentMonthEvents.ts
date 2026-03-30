@@ -1,5 +1,10 @@
 import type { CalendarEvent, CurrentDate, EventsByYear } from '@/types/calendar';
 
+const toDate = (value: string): Date => {
+  const [year, month, day] = value.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+
 export const getCurrentMonthEvents = (
   sortedEvents: EventsByYear,
   currentDate: CurrentDate
@@ -10,22 +15,15 @@ export const getCurrentMonthEvents = (
     return [];
   }
 
-  const targetMonth = currentDate.month;
-  const monthEvents: { event: CalendarEvent; startTime: number }[] = [];
+  const monthStart = new Date(currentDate.year, currentDate.month, 1);
+  const monthEnd = new Date(currentDate.year, currentDate.month + 1, 0);
 
-  for (const eventItem of currentYearEvents) {
-    const startMonth = Number(eventItem.start.slice(5, 7)) - 1;
-    const endMonth = Number(eventItem.end.slice(5, 7)) - 1;
+  return currentYearEvents
+    .filter((event) => {
+      const eventStart = toDate(event.start);
+      const eventEnd = toDate(event.end);
 
-    if (targetMonth === startMonth || targetMonth === endMonth) {
-      monthEvents.push({
-        event: eventItem,
-        startTime: Date.parse(eventItem.start)
-      });
-    }
-  }
-
-  monthEvents.sort((a, b) => a.startTime - b.startTime);
-
-  return monthEvents.map(({ event }) => event);
+      return eventStart <= monthEnd && eventEnd >= monthStart;
+    })
+    .sort((a, b) => toDate(a.start).getTime() - toDate(b.start).getTime());
 };

@@ -179,7 +179,12 @@ const events = computed((): AssignedCalendarEvent[][] => {
     return cachedEvents;
   }
 
-  cachedEvents = assignEvents(currentMonthEvents, currentDate.month, currentMonthDays);
+  cachedEvents = assignEvents(
+    currentMonthEvents,
+    currentDate.month,
+    currentMonthDays,
+    currentDate.year
+  );
   cachedMonth = currentDate.month;
   cachedMonthDays = currentMonthDays;
   cachedSourceEvents = currentMonthEvents;
@@ -208,7 +213,8 @@ const unfilteredEvents = computed((): AssignedCalendarEvent[][] => {
   cachedUnfilteredEvents = assignEvents(
     unfilteredCurrentMonthEvents,
     currentDate.month,
-    currentMonthDays
+    currentMonthDays,
+    currentDate.year
   );
   cachedUnfilteredMonth = currentDate.month;
   cachedUnfilteredMonthDays = currentMonthDays;
