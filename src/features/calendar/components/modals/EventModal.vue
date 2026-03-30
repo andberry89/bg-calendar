@@ -58,14 +58,25 @@
       </div>
 
       <div class="event-options">
-        <button class="delete-btn" type="button" @click="deleteEvent">Delete Event ✘</button>
+        <div v-if="isConfirmingDelete" class="delete-confirmation">
+          <p class="delete-confirmation-text">Delete this event?</p>
+
+          <div class="delete-confirmation-actions">
+            <button class="cancel-btn" type="button" @click="cancelDelete">Cancel</button>
+            <button class="delete-btn" type="button" @click="confirmDelete">Delete</button>
+          </div>
+        </div>
+
+        <button v-else class="delete-btn" type="button" @click="startDeleteConfirmation">
+          Delete Event ✘
+        </button>
       </div>
     </div>
   </BaseModal>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { format } from 'date-fns';
 import BaseModal from '@/components/BaseModal.vue';
 import {
@@ -88,6 +99,8 @@ const emit = defineEmits<{
   (e: 'update'): void;
   (e: 'delete', value: CalendarEvent): void;
 }>();
+
+const isConfirmingDelete = ref(false);
 
 const visibleStaff = computed((): Staff[] => event.staff.slice(0, 3));
 
@@ -144,10 +157,19 @@ function getStaffColorStyle(staffId: string): Record<string, string> {
 }
 
 function closeModal(): void {
+  isConfirmingDelete.value = false;
   emit('update');
 }
 
-function deleteEvent(): void {
+function startDeleteConfirmation(): void {
+  isConfirmingDelete.value = true;
+}
+
+function cancelDelete(): void {
+  isConfirmingDelete.value = false;
+}
+
+function confirmDelete(): void {
   emit('delete', event);
 }
 </script>
@@ -356,6 +378,67 @@ function deleteEvent(): void {
   justify-content: flex-end;
 }
 
+.delete-confirmation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 260px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 14px 16px;
+  border: 1px solid rgba(239, 68, 68, 0.22);
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(254, 242, 242, 0.96) 0%, rgba(255, 255, 255, 0.94) 100%);
+  box-shadow:
+    0 10px 24px rgba(127, 29, 29, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.delete-confirmation-text {
+  margin: 0;
+  color: #7f1d1d;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.delete-confirmation-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.cancel-btn {
+  flex: 1 1 0;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(148, 163, 184, 0.32);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #334155;
+  font: inherit;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    background 0.16s ease,
+    color 0.16s ease,
+    transform 0.16s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: rgba(100, 116, 139, 0.4);
+    background: rgba(248, 250, 252, 1);
+    color: #0f172a;
+  }
+}
+
 .delete-btn {
   border: 0;
   background: transparent;
@@ -367,6 +450,31 @@ function deleteEvent(): void {
 
   &:hover {
     color: #b91c1c;
+  }
+}
+
+.delete-confirmation-actions .delete-btn {
+  flex: 1 1 0;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(220, 38, 38, 0.96) 0%, rgba(185, 28, 28, 0.96) 100%);
+  color: #fff;
+  font-weight: 700;
+  line-height: 1;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    background 0.16s ease,
+    border-color 0.16s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    color: #fff;
+    border-color: rgba(185, 28, 28, 0.32);
+    background: linear-gradient(180deg, rgba(239, 68, 68, 0.98) 0%, rgba(220, 38, 38, 0.98) 100%);
+    box-shadow: 0 8px 18px rgba(185, 28, 28, 0.18);
   }
 }
 
@@ -439,6 +547,15 @@ function deleteEvent(): void {
 
   .event-meta .event-dates {
     text-align: left;
+  }
+
+  .delete-confirmation {
+    max-width: none;
+    width: 100%;
+  }
+
+  .delete-confirmation-actions {
+    width: 100%;
   }
 }
 </style>
