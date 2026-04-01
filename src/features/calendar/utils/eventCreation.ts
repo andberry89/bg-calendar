@@ -27,11 +27,19 @@ const eventClassByType: Record<EventType, EventClass> = {
   Birthday: 'birthday'
 };
 
+function hasEventType(type: DraftCalendarEventInput['type']): type is EventType {
+  return type !== '';
+}
+
 export function getEventClass(type: EventType): EventClass {
   return eventClassByType[type];
 }
 
 export function createNewCalendarEvent(event: DraftCalendarEventInput): NewCalendarEvent {
+  if (!hasEventType(event.type)) {
+    throw new Error('Cannot create calendar event without a valid event type.');
+  }
+
   return {
     ...event,
     closed: event.type === 'Holiday' ? event.closed || 'none' : 'none',
