@@ -604,7 +604,7 @@ function closeDayModal(): void {
   --calendar-lane-row-height: 38px;
   display: grid;
   align-content: start;
-  gap: 0;
+  gap: 1px;
   width: 100%;
   min-width: 0;
   min-height: 0;
