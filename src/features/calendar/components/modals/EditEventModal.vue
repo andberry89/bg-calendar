@@ -1,9 +1,9 @@
 <template>
-  <BaseModal @update="closeModal" @close="closeModal">
+  <BaseModal @update="cancelModal" @close="cancelModal">
     <div class="edit-event-modal">
       <div class="edit-event-modal__header">
         <h3 class="edit-event-modal__title">Edit Event</h3>
-        <button class="edit-event-modal__close" type="button" @click="closeModal">×</button>
+        <button class="edit-event-modal__close" type="button" @click="cancelModal">×</button>
       </div>
 
       <EventForm
@@ -11,7 +11,7 @@
         :staff="staffStore.staff"
         submit-label="Save Changes"
         @submit="handleSubmit"
-        @cancel="closeModal"
+        @cancel="cancelModal"
       />
     </div>
   </BaseModal>
@@ -31,7 +31,8 @@ const { event } = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: 'update'): void;
+  (e: 'cancel'): void;
+  (e: 'saved'): void;
 }>();
 
 const eventsStore = useEventsStore();
@@ -62,11 +63,11 @@ async function handleSubmit(updatedEvent: NewCalendarEvent): Promise<void> {
     return;
   }
 
-  closeModal();
+  emit('saved');
 }
 
-function closeModal(): void {
-  emit('update');
+function cancelModal(): void {
+  emit('cancel');
 }
 </script>
 

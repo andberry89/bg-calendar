@@ -67,11 +67,21 @@
           </div>
         </div>
 
-        <button v-else class="delete-btn" type="button" @click="startDeleteConfirmation">
-          Delete Event ✘
-        </button>
+        <div v-else class="event-actions">
+          <button class="edit-btn" type="button" @click="openEditModal">Edit Event</button>
+
+          <button class="delete-btn" type="button" @click="startDeleteConfirmation">
+            Delete Event ✘
+          </button>
+        </div>
       </div>
     </div>
+    <EditEventModal
+      v-if="showEditModal"
+      :event="event"
+      @cancel="cancelEditModal"
+      @saved="saveEditModal"
+    />
   </BaseModal>
 </template>
 
@@ -79,6 +89,7 @@
 import { computed, ref } from 'vue';
 import { format } from 'date-fns';
 import BaseModal from '@/components/BaseModal.vue';
+import EditEventModal from '@/features/calendar/components/modals/EditEventModal.vue';
 import { getPersonColorStyle } from '@/features/calendar/utils/colorTokens';
 import { getStaffAvatarUrl } from '@/features/calendar/utils/staffAvatars';
 import type { CalendarEvent, Staff } from '@/types/calendar';
@@ -97,6 +108,7 @@ const emit = defineEmits<{
 const staffStore = useStaffStore();
 
 const isConfirmingDelete = ref(false);
+const showEditModal = ref(false);
 
 const visibleStaff = computed((): Staff[] => event.staff.slice(0, 3));
 
@@ -153,6 +165,19 @@ function getStaffColorStyle(staffId: string): Record<string, string> {
 
 function closeModal(): void {
   isConfirmingDelete.value = false;
+  emit('update');
+}
+
+function openEditModal(): void {
+  showEditModal.value = true;
+}
+
+function cancelEditModal(): void {
+  showEditModal.value = false;
+}
+
+function saveEditModal(): void {
+  showEditModal.value = false;
   emit('update');
 }
 
@@ -371,6 +396,47 @@ function confirmDelete(): void {
   margin-top: auto;
   display: flex;
   justify-content: flex-end;
+}
+
+.event-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  width: 100%;
+}
+
+.edit-btn {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid rgba(37, 99, 235, 0.22);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(239, 246, 255, 0.96) 0%, rgba(219, 234, 254, 0.92) 100%);
+  color: #1d4ed8;
+  font: inherit;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease,
+    box-shadow 0.16s ease,
+    color 0.16s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: rgba(29, 78, 216, 0.34);
+    background: linear-gradient(
+      180deg,
+      rgba(219, 234, 254, 0.98) 0%,
+      rgba(191, 219, 254, 0.94) 100%
+    );
+    box-shadow:
+      0 8px 18px rgba(37, 99, 235, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.62);
+    color: #1e40af;
+  }
 }
 
 .delete-confirmation {
