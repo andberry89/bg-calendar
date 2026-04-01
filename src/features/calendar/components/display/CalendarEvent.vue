@@ -46,6 +46,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { getEventTypeConfig } from '@/features/calendar/utils/eventTypeConfig';
+import { getStaffAvatarUrl } from '@/features/calendar/utils/staffAvatars';
 import type { AssignedCalendarEvent, CalendarEvent, Staff } from '@/types/calendar';
 
 const { event } = defineProps<{
@@ -56,17 +57,8 @@ const emit = defineEmits<{
   (e: 'update', value: CalendarEvent | AssignedCalendarEvent): void;
 }>();
 
-const images = import.meta.glob('@/assets/staff/*.{jpg,png}', {
-  eager: true,
-  import: 'default'
-}) as Record<string, string>;
-
 function imgUrl(name: string): string {
-  return (
-    images[`/src/assets/staff/${name}.jpg`] ||
-    images[`/src/assets/staff/${name}.png`] ||
-    images['/src/assets/staff/user.png']
-  );
+  return getStaffAvatarUrl(name);
 }
 
 const eventTypeTintByClass: Partial<Record<CalendarEvent['class'], string>> = {
@@ -151,7 +143,7 @@ const avatarSrc = computed((): string => {
   const staff = leadStaff.value;
 
   if (!staff?.lastName) {
-    return images['/src/assets/staff/user.png'] || '';
+    return getStaffAvatarUrl('user');
   }
 
   return imgUrl(staff.lastName);
