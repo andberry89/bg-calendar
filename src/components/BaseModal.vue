@@ -81,10 +81,8 @@ onBeforeUnmount((): void => {
 .base-modal__overlay {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(circle at top, rgba(96, 165, 250, 0.12) 0%, rgba(96, 165, 250, 0) 34%),
-    linear-gradient(180deg, rgba(15, 23, 42, 0.38) 0%, rgba(15, 23, 42, 0.64) 100%);
-  backdrop-filter: blur(10px);
+  background: var(--modal-overlay-background);
+  backdrop-filter: blur(var(--modal-overlay-blur));
 }
 
 .base-modal__content {
@@ -101,23 +99,18 @@ onBeforeUnmount((): void => {
   position: relative;
   overflow: auto;
   max-height: inherit;
-  border: 1px solid rgba(148, 163, 184, 0.28);
-  border-radius: 20px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 250, 252, 0.96) 100%);
-  box-shadow:
-    0 24px 60px rgba(15, 23, 42, 0.28),
-    0 10px 24px rgba(15, 23, 42, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  border: var(--modal-surface-border);
+  border-radius: var(--modal-surface-radius);
+  background: var(--modal-surface-background);
+  box-shadow: var(--modal-surface-shadow);
 }
 
 .base-modal__surface::before {
   content: '';
   position: absolute;
   inset: 0 0 auto 0;
-  height: 56px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 100%),
-    linear-gradient(135deg, rgba(37, 99, 235, 0.14) 0%, rgba(45, 212, 191, 0.1) 100%);
+  height: var(--modal-surface-highlight-height);
+  background: var(--modal-surface-highlight-background);
   pointer-events: none;
 }
 
@@ -134,15 +127,12 @@ onBeforeUnmount((): void => {
   }
 
   .base-modal__surface {
-    border-radius: 16px;
-    box-shadow:
-      0 18px 40px rgba(15, 23, 42, 0.26),
-      0 8px 18px rgba(15, 23, 42, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.64);
+    border-radius: var(--modal-surface-radius-mobile);
+    box-shadow: var(--modal-surface-shadow-mobile);
   }
 
   .base-modal__surface::before {
-    height: 44px;
+    height: var(--modal-surface-highlight-height-mobile);
   }
 }
 </style>
