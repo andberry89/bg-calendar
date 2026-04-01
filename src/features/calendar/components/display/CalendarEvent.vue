@@ -96,21 +96,27 @@ type EventPillShape = 'default' | 'single' | 'start' | 'middle' | 'end';
 
 const isHoliday = computed((): boolean => event.class === 'holiday');
 
-const isAssignedEvent = computed((): boolean => {
-  return 'display' in event && typeof event.display === 'object' && event.display !== null;
+const assignedEvent = computed((): AssignedCalendarEvent | null => {
+  if (!('display' in event) || typeof event.display !== 'object' || event.display === null) {
+    return null;
+  }
+
+  return event as AssignedCalendarEvent;
 });
 
 const isMultiDay = computed((): boolean => {
-  return isAssignedEvent.value && event.display.isMultiDay === true;
+  return assignedEvent.value?.display.isMultiDay === true;
 });
 
 const pillShape = computed((): EventPillShape => {
-  if (!isMultiDay.value) {
+  const display = assignedEvent.value?.display;
+
+  if (!display || display.isMultiDay !== true) {
     return 'default';
   }
 
-  const startsToday = event.display.startsToday === true;
-  const endsToday = event.display.endsToday === true;
+  const startsToday = display.startsToday === true;
+  const endsToday = display.endsToday === true;
 
   if (startsToday && endsToday) {
     return 'single';
@@ -247,11 +253,7 @@ const eventColorVar = computed((): string => {
 });
 
 const isSingleDay = computed((): boolean => {
-  if (!isAssignedEvent.value) {
-    return true;
-  }
-
-  return event.display.isMultiDay !== true;
+  return assignedEvent.value?.display.isMultiDay !== true;
 });
 
 const eventStyle = computed(

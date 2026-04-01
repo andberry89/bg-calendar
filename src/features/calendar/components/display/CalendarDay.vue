@@ -108,6 +108,7 @@ import CalendarEvent from '@/features/calendar/components/display/CalendarEvent.
 import EventModal from '@/features/calendar/components/modals/EventModal.vue';
 import DayModal from '@/features/calendar/components/modals/DayModal.vue';
 import type {
+  AssignedCalendarEvent,
   CalendarEvent as CalendarEventType,
   CalendarEventLaneSlot,
   CurrentDate
@@ -223,10 +224,21 @@ const visibleRegularLaneCount = computed((): number => {
   return visibleRegularEventLimit.value;
 });
 
+function isAssignedCalendarEvent(
+  event: CalendarEventType | AssignedCalendarEvent | null
+): event is AssignedCalendarEvent {
+  return (
+    event !== null &&
+    'display' in event &&
+    typeof event.display === 'object' &&
+    event.display !== null
+  );
+}
+
 const normalizedRegularEventLaneSlots = computed((): CalendarEventLaneSlot[] => {
   if (props.regularEventLaneSlots.length > 0) {
     return props.regularEventLaneSlots.map((slot) => {
-      if (!slot.event?.display?.isMultiDay) {
+      if (!isAssignedCalendarEvent(slot.event) || slot.event.display.isMultiDay !== true) {
         return slot;
       }
 
