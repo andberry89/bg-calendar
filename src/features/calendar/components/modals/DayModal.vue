@@ -126,13 +126,9 @@ import { computed, ref } from 'vue';
 import { format } from 'date-fns';
 import BaseModal from '@/components/BaseModal.vue';
 import { getPersonColorStyle } from '@/features/calendar/utils/colorTokens';
+import { getStaffAvatarUrl } from '@/features/calendar/utils/staffAvatars';
 import type { CalendarEvent, CurrentDate, Staff } from '@/types/calendar';
 import { useStaffStore } from '@/stores/staff';
-
-const images = import.meta.glob('@/assets/staff/*.{jpg,png}', {
-  eager: true,
-  import: 'default'
-}) as Record<string, string>;
 
 const props = defineProps<{
   currentDate: CurrentDate;
@@ -252,11 +248,7 @@ function getRemainingStaffCount(event: CalendarEvent): number {
 }
 
 function imgUrl(name: string): string {
-  return (
-    images[`/src/assets/staff/${name}.jpg`] ||
-    images[`/src/assets/staff/${name}.png`] ||
-    images['/src/assets/staff/user.png']
-  );
+  return getStaffAvatarUrl(name);
 }
 
 function getStaffColorStyle(staffId: string): Record<string, string> {
