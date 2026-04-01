@@ -1,6 +1,10 @@
 import { defineStore } from 'pinia';
 import { fetchStaff as fetchStaffData } from '@/services/calendar/calendar-data';
 import { addStaff as addStaffMutation, deleteStaff as deleteStaffMutation } from '@/services';
+import {
+  getPersonColorKeyByIndex,
+  type PersonColorKey
+} from '@/features/calendar/utils/colorTokens';
 import type { MutationResult, NewStaffInput, Staff } from '@/types/calendar';
 
 interface StaffState {
@@ -11,6 +15,16 @@ export const useStaffStore = defineStore('staff', {
   state: (): StaffState => ({
     staff: []
   }),
+
+  getters: {
+    staffColorKeyById(state): Record<string, PersonColorKey> {
+      const sortedStaff = [...state.staff].sort((left, right) => left.id.localeCompare(right.id));
+
+      return Object.fromEntries(
+        sortedStaff.map((member, index) => [member.id, getPersonColorKeyByIndex(index)])
+      );
+    }
+  },
 
   actions: {
     async fetchStaff(): Promise<void> {

@@ -79,11 +79,9 @@
 import { computed, ref } from 'vue';
 import { format } from 'date-fns';
 import BaseModal from '@/components/BaseModal.vue';
-import {
-  getPersonColorKeyByIndex,
-  getPersonColorStyle
-} from '@/features/calendar/utils/colorTokens';
+import { getPersonColorStyle } from '@/features/calendar/utils/colorTokens';
 import type { CalendarEvent, Staff } from '@/types/calendar';
+import { useStaffStore } from '@/stores/staff';
 
 const images = import.meta.glob('@/assets/staff/*.{jpg,png}', {
   eager: true,
@@ -99,6 +97,8 @@ const emit = defineEmits<{
   (e: 'update'): void;
   (e: 'delete', value: CalendarEvent): void;
 }>();
+
+const staffStore = useStaffStore();
 
 const isConfirmingDelete = ref(false);
 
@@ -150,8 +150,11 @@ function imgUrl(name: string): string {
 }
 
 function getStaffColorStyle(staffId: string): Record<string, string> {
-  const index = event.staff.findIndex((person) => person.id === staffId);
-  const key = getPersonColorKeyByIndex(index >= 0 ? index : 0);
+  const key = staffStore.staffColorKeyById[staffId];
+
+  if (!key) {
+    return getPersonColorStyle('person-1');
+  }
 
   return getPersonColorStyle(key);
 }

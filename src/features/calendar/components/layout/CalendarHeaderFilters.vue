@@ -49,13 +49,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import {
-  getPersonColorKeyByIndex,
-  getPersonColorStyle
-} from '@/features/calendar/utils/colorTokens';
+import { getPersonColorStyle } from '@/features/calendar/utils/colorTokens';
 import { getEventTypeConfig } from '@/features/calendar/utils/eventTypeConfig';
 import type { EventFilters } from '@/features/calendar/utils/filterEvents';
 import type { EventType, Staff } from '@/types/calendar';
+import { useStaffStore } from '@/stores/staff';
 
 const props = defineProps<{
   staff: Staff[];
@@ -65,6 +63,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'filters', value: EventFilters): void;
 }>();
+
+const staffStore = useStaffStore();
 
 const filterableEventTypes: Exclude<EventType, 'Holiday' | 'Birthday'>[] = [
   'Vacation',
@@ -88,14 +88,6 @@ const hasActiveTypeFilter = computed((): boolean => {
   return props.filters.types.length > 0;
 });
 
-const staffColorKeyById = computed(
-  (): Record<string, ReturnType<typeof getPersonColorKeyByIndex>> => {
-    return Object.fromEntries(
-      props.staff.map((member, index) => [member.id, getPersonColorKeyByIndex(index)])
-    );
-  }
-);
-
 function imgUrl(name: string): string {
   return (
     images[`/src/assets/staff/${name}.jpg`] ||
@@ -115,7 +107,11 @@ function getTypePillStyle(
 }
 
 function getStaffColorStyle(staffId: string): Record<string, string> {
-  const key = staffColorKeyById.value[staffId] ?? getPersonColorKeyByIndex(0);
+  const key = staffStore.staffColorKeyById[staffId];
+
+  if (!key) {
+    return getPersonColorStyle('person-1');
+  }
 
   return getPersonColorStyle(key);
 }
