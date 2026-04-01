@@ -1,6 +1,10 @@
 import { defineStore } from 'pinia';
 import { fetchEvents as fetchEventsData } from '@/services/calendar/calendar-data';
-import { addEvent as addEventMutation, deleteEvent as deleteEventMutation } from '@/services';
+import {
+  addEvent as addEventMutation,
+  deleteEvent as deleteEventMutation,
+  updateEvent as updateEventMutation
+} from '@/services';
 import type { CalendarEvent, MutationResult, NewCalendarEvent } from '@/types/calendar';
 
 interface EventsState {
@@ -19,6 +23,16 @@ export const useEventsStore = defineStore('events', {
 
     async addEvent(event: NewCalendarEvent): Promise<MutationResult> {
       const result = await addEventMutation(event);
+
+      if (result.success) {
+        await this.fetchEvents();
+      }
+
+      return result;
+    },
+
+    async updateEvent(id: string, event: NewCalendarEvent): Promise<MutationResult> {
+      const result = await updateEventMutation(id, event);
 
       if (result.success) {
         await this.fetchEvents();
