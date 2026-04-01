@@ -101,6 +101,13 @@ type CalendarWeekSpanningSegment = {
   isFullCloseStart: boolean;
 };
 
+type CalendarWeekRegularEventPlacement = {
+  event: AssignedCalendarEvent;
+  laneIndex: number;
+  startDayIndex: number;
+  endDayIndex: number;
+};
+
 type SelectedWeekSpanEvent = {
   event: CalendarEventType;
   day: number;
@@ -268,41 +275,92 @@ function getEventRowSpan(_event: AssignedCalendarEvent): number {
   return 1;
 }
 
-const weekRegularEventOrder = computed((): AssignedCalendarEvent[][] => {
+const weekRegularEventPlacements = computed((): CalendarWeekRegularEventPlacement[][] => {
   return weekEvents.value.map((week) => {
-    const map = new Map<string, AssignedCalendarEvent>();
+    const eventBoundsByKey = new Map<
+      string,
+      {
+        event: AssignedCalendarEvent;
+        startDayIndex: number;
+        endDayIndex: number;
+      }
+    >();
 
-    week.forEach((dayEvents) => {
+    week.forEach((dayEvents, dayIdx) => {
       dayEvents.forEach((event) => {
         if (event.type === 'Holiday') {
           return;
         }
 
         const key = getEventKey(event);
+        const existing = eventBoundsByKey.get(key);
 
-        if (!map.has(key)) {
-          map.set(key, event);
+        if (!existing) {
+          eventBoundsByKey.set(key, {
+            event,
+            startDayIndex: dayIdx,
+            endDayIndex: dayIdx
+          });
+
+          return;
         }
+
+        existing.startDayIndex = Math.min(existing.startDayIndex, dayIdx);
+        existing.endDayIndex = Math.max(existing.endDayIndex, dayIdx);
       });
     });
 
-    return Array.from(map.values());
+    const orderedEvents = Array.from(eventBoundsByKey.values()).sort((left, right) => {
+      if (left.startDayIndex !== right.startDayIndex) {
+        return left.startDayIndex - right.startDayIndex;
+      }
+
+      if (left.endDayIndex !== right.endDayIndex) {
+        return left.endDayIndex - right.endDayIndex;
+      }
+
+      return getEventKey(left.event).localeCompare(getEventKey(right.event));
+    });
+
+    const laneEndDayIndices: number[] = [];
+
+    return orderedEvents.map(({ event, startDayIndex, endDayIndex }) => {
+      let laneIndex = laneEndDayIndices.findIndex(
+        (laneEndDayIndex) => laneEndDayIndex < startDayIndex
+      );
+
+      if (laneIndex === -1) {
+        laneIndex = laneEndDayIndices.length;
+        laneEndDayIndices.push(endDayIndex);
+      } else {
+        laneEndDayIndices[laneIndex] = endDayIndex;
+      }
+
+      return {
+        event,
+        laneIndex,
+        startDayIndex,
+        endDayIndex
+      };
+    });
   });
 });
 
 const weekRegularEventLanePlan = computed(() => {
-  return weekRegularEventOrder.value.map((orderedEvents) => {
+  return weekRegularEventPlacements.value.map((placements) => {
     const laneIndexByKey = new Map<string, { startRow: number; spanRows: number }>();
-    let totalRows = 0;
 
-    orderedEvents.forEach((event) => {
-      const spanRows = getEventRowSpan(event);
-      laneIndexByKey.set(getEventKey(event), {
-        startRow: totalRows,
-        spanRows
+    placements.forEach((placement) => {
+      laneIndexByKey.set(getEventKey(placement.event), {
+        startRow: placement.laneIndex,
+        spanRows: getEventRowSpan(placement.event)
       });
-      totalRows += spanRows;
     });
+
+    const totalRows =
+      placements.reduce((maxLaneIndex, placement) => {
+        return Math.max(maxLaneIndex, placement.laneIndex);
+      }, -1) + 1;
 
     return {
       laneIndexByKey,
@@ -315,8 +373,8 @@ const orderedWeekEvents = computed((): AssignedCalendarEvent[][][] => {
   return weekEvents.value.map((week, weekIdx) => {
     const regularEventOrderIndex = new Map<string, number>();
 
-    weekRegularEventOrder.value[weekIdx].forEach((event, index) => {
-      regularEventOrderIndex.set(getEventKey(event), index);
+    weekRegularEventPlacements.value[weekIdx].forEach((placement) => {
+      regularEventOrderIndex.set(getEventKey(placement.event), placement.laneIndex);
     });
 
     return week.map((dayEvents) => {
@@ -471,7 +529,8 @@ const weekSpanningSegments = computed((): CalendarWeekSpanningSegment[][] => {
     const lanePlan = weekRegularEventLanePlan.value[weekIdx];
     const segments: CalendarWeekSpanningSegment[] = [];
 
-    weekRegularEventOrder.value[weekIdx].forEach((event) => {
+    weekRegularEventPlacements.value[weekIdx].forEach((placement) => {
+      const event = placement.event;
       if (!event.display?.isMultiDay) {
         return;
       }
@@ -547,7 +606,8 @@ const hiddenWeekSpanningEventCounts = computed((): number[][] => {
     const hiddenCounts = Array.from({ length: week.length }, () => 0);
     const lanePlan = weekRegularEventLanePlan.value[weekIdx];
 
-    weekRegularEventOrder.value[weekIdx].forEach((event) => {
+    weekRegularEventPlacements.value[weekIdx].forEach((placement) => {
+      const event = placement.event;
       if (!event.display?.isMultiDay) {
         return;
       }
