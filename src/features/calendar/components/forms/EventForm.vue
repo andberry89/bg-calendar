@@ -1,7 +1,7 @@
 <template>
   <div class="event-form">
     <label for="eventType">Event Type</label>
-    <select id="eventType" v-model="localEvent.type">
+    <select id="eventType" v-model="localEvent.type" @change="emitModelValue">
       <option disabled value="">--Event Type--</option>
       <option v-for="option in eventType" :key="option" :value="option">
         {{ option }}
@@ -17,9 +17,18 @@
 
     <div v-if="localEvent.type === 'Holiday'" class="event-form__holiday-options">
       <span class="event-form__section-label">Office Closed?</span>
-      <label><input v-model="localEvent.closed" type="radio" value="full" />Full Day</label>
-      <label><input v-model="localEvent.closed" type="radio" value="half" />Half Day</label>
-      <label><input v-model="localEvent.closed" type="radio" value="none" />Office Open</label>
+      <label>
+        <input v-model="localEvent.closed" type="radio" value="full" @change="emitModelValue" />
+        Full Day
+      </label>
+      <label>
+        <input v-model="localEvent.closed" type="radio" value="half" @change="emitModelValue" />
+        Half Day
+      </label>
+      <label>
+        <input v-model="localEvent.closed" type="radio" value="none" @change="emitModelValue" />
+        Office Open
+      </label>
     </div>
 
     <div v-if="localEvent.type !== 'Birthday'" class="event-form__field">
@@ -30,6 +39,7 @@
         type="text"
         placeholder="Details"
         :disabled="isFieldDisabled('details')"
+        @input="emitModelValue"
       />
     </div>
 
@@ -56,6 +66,7 @@
           type="checkbox"
           :value="person"
           :disabled="isFieldDisabled('staff')"
+          @change="emitModelValue"
         />
         <label :for="`staff-${person.id}`">{{ person.shortName }}</label>
       </li>
@@ -90,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { eventType } from '@/features/calendar/utils/selectOptions';
 import { getSpecialDayReminder } from '@/features/calendar/utils/eventRules';
 import {
@@ -122,36 +133,22 @@ const localEvent = ref<DraftCalendarEventInput>({
   ...props.modelValue,
   staff: [...props.modelValue.staff]
 });
+
 const errors = ref<string[]>([]);
 const showErrors = ref(false);
-
-watch(
-  () => props.modelValue,
-  (value) => {
-    localEvent.value = {
-      ...value,
-      staff: [...value.staff]
-    };
-  },
-  { deep: true }
-);
-
-watch(
-  localEvent,
-  (value) => {
-    emit('update:modelValue', {
-      ...value,
-      staff: [...value.staff]
-    });
-  },
-  { deep: true }
-);
 
 const eventReminder = computed(() => getSpecialDayReminder(localEvent.value.type));
 
 const requiredFields = computed(() =>
   localEvent.value.type ? new Set(getRequiredEventFields(localEvent.value.type)) : new Set()
 );
+
+function emitModelValue(): void {
+  emit('update:modelValue', {
+    ...localEvent.value,
+    staff: [...localEvent.value.staff]
+  });
+}
 
 function isFieldDisabled(field: 'details' | 'staff'): boolean {
   return !!localEvent.value.type && !requiredFields.value.has(field);
@@ -167,6 +164,7 @@ function compareDates(target: DateSyncTarget): void {
 
   localEvent.value.start = syncedDates.start;
   localEvent.value.end = syncedDates.end;
+  emitModelValue();
 }
 
 function submitForm(): void {
