@@ -52,6 +52,7 @@ import { computed } from 'vue';
 import { getPersonColorStyle } from '@/features/calendar/utils/colorTokens';
 import { getEventTypeConfig } from '@/features/calendar/utils/eventTypeConfig';
 import type { EventFilters } from '@/features/calendar/utils/filterEvents';
+import { getStaffAvatarUrl } from '@/features/calendar/utils/staffAvatars';
 import type { EventType, Staff } from '@/types/calendar';
 import { useStaffStore } from '@/stores/staff';
 
@@ -75,11 +76,6 @@ const filterableEventTypes: Exclude<EventType, 'Holiday' | 'Birthday'>[] = [
   'Comp Day'
 ];
 
-const images = import.meta.glob('@/assets/staff/*.{jpg,png}', {
-  eager: true,
-  import: 'default'
-}) as Record<string, string>;
-
 const hasActiveFilters = computed((): boolean => {
   return props.filters.types.length > 0 || props.filters.staffIds.length > 0;
 });
@@ -89,11 +85,7 @@ const hasActiveTypeFilter = computed((): boolean => {
 });
 
 function imgUrl(name: string): string {
-  return (
-    images[`/src/assets/staff/${name}.jpg`] ||
-    images[`/src/assets/staff/${name}.png`] ||
-    images['/src/assets/staff/user.png']
-  );
+  return getStaffAvatarUrl(name);
 }
 
 function getTypePillStyle(
