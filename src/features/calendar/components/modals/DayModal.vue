@@ -105,6 +105,8 @@
           </div>
 
           <div class="day-modal__details-actions">
+            <button class="day-modal__edit" type="button" @click="openEditModal">Edit Event</button>
+
             <button class="day-modal__delete" type="button" @click="deleteEvent(selectedEvent)">
               Delete Event ✘
             </button>
@@ -118,6 +120,12 @@
 
       <p v-else class="day-modal__empty">No events for this day.</p>
     </div>
+    <EditEventModal
+      v-if="showEditModal && selectedEvent"
+      :event="selectedEvent"
+      @cancel="cancelEditModal"
+      @saved="saveEditModal"
+    />
   </BaseModal>
 </template>
 
@@ -125,6 +133,7 @@
 import { computed, ref } from 'vue';
 import { format } from 'date-fns';
 import BaseModal from '@/components/BaseModal.vue';
+import EditEventModal from '@/features/calendar/components/modals/EditEventModal.vue';
 import { getPersonColorStyle } from '@/features/calendar/utils/colorTokens';
 import { getStaffAvatarUrl } from '@/features/calendar/utils/staffAvatars';
 import type { CalendarEvent, CurrentDate, Staff } from '@/types/calendar';
@@ -146,6 +155,8 @@ const staffStore = useStaffStore();
 
 const selectedEvent = ref<CalendarEvent | null>(null);
 
+const showEditModal = ref(false);
+
 const title = computed((): string => {
   return format(
     new Date(props.currentDate.year, props.currentDate.month, props.date),
@@ -154,6 +165,7 @@ const title = computed((): string => {
 });
 
 function closeDayModal(): void {
+  showEditModal.value = false;
   selectedEvent.value = null;
   emit('update');
 }
@@ -164,6 +176,24 @@ function selectEvent(event: CalendarEvent): void {
 
 function clearSelectedEvent(): void {
   selectedEvent.value = null;
+}
+
+function openEditModal(): void {
+  if (!selectedEvent.value) {
+    return;
+  }
+
+  showEditModal.value = true;
+}
+
+function cancelEditModal(): void {
+  showEditModal.value = false;
+}
+
+function saveEditModal(): void {
+  showEditModal.value = false;
+  selectedEvent.value = null;
+  emit('update');
 }
 
 function deleteEvent(event: CalendarEvent): void {
@@ -576,6 +606,39 @@ function getStaffColorStyle(staffId: string): Record<string, string> {
   margin-top: 16px;
   display: flex;
   justify-content: flex-end;
+}
+
+.day-modal__edit {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid rgba(37, 99, 235, 0.22);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(239, 246, 255, 0.96) 0%, rgba(219, 234, 254, 0.92) 100%);
+  color: #1d4ed8;
+  font: inherit;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease,
+    box-shadow 0.16s ease,
+    color 0.16s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: rgba(29, 78, 216, 0.34);
+    background: linear-gradient(
+      180deg,
+      rgba(219, 234, 254, 0.98) 0%,
+      rgba(191, 219, 254, 0.94) 100%
+    );
+    box-shadow:
+      0 8px 18px rgba(37, 99, 235, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.62);
+    color: #1e40af;
+  }
 }
 
 .day-modal__delete {
