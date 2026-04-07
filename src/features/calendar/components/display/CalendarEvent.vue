@@ -36,7 +36,12 @@
       </span>
       <span v-else-if="!isHoliday" class="event-pill__dot" />
       <span class="event-pill__content">
-        <span class="event-pill__primary">{{ primaryText }}</span>
+        <span class="event-pill__primary-row">
+          <span class="event-pill__primary">{{ primaryText }}</span>
+          <span v-if="multiStaffCount > 0" class="event-pill__staff-count"
+            >+{{ multiStaffCount }}</span
+          >
+        </span>
         <span v-if="secondaryText" class="event-pill__secondary">{{ secondaryText }}</span>
       </span>
     </div>
@@ -126,6 +131,14 @@ const pillShape = computed((): EventPillShape => {
 });
 
 const leadStaff = computed((): StaffMember | undefined => event.staff[0]);
+
+const multiStaffCount = computed((): number => {
+  if (!event.staff.length) {
+    return 0;
+  }
+
+  return showAvatar.value ? Math.max(event.staff.length - 1, 0) : event.staff.length;
+});
 
 const showAvatar = computed((): boolean => {
   if (isHoliday.value) {
@@ -361,6 +374,26 @@ function emitEvent(): void {
   min-height: 0;
 }
 
+.event-pill__primary-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  width: 100%;
+}
+
+.event-pill__staff-count {
+  flex: 0 0 auto;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--event-pill-color) 12%, white 88%);
+  color: var(--event-pill-color);
+  font:
+    700 0.58rem/1 Arial,
+    sans-serif;
+  letter-spacing: 0.01em;
+}
+
 .event-pill__primary,
 .event-pill__secondary {
   display: block;
@@ -497,6 +530,15 @@ function emitEvent(): void {
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
   }
+
+  .event-pill__primary-row {
+    gap: 4px;
+  }
+
+  .event-pill__staff-count {
+    padding: 1px 5px;
+    font-size: 0.54rem;
+  }
 }
 
 @media (max-width: 640px) {
@@ -538,6 +580,15 @@ function emitEvent(): void {
   .event-pill--multi-day.event-pill--shape-end {
     border-top-right-radius: 8px;
     border-bottom-right-radius: 8px;
+  }
+
+  .event-pill__primary-row {
+    gap: 3px;
+  }
+
+  .event-pill__staff-count {
+    padding: 1px 4px;
+    font-size: 0.5rem;
   }
 }
 </style>
