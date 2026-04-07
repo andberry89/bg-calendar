@@ -141,9 +141,7 @@ const requiredFields = computed(() =>
   localEvent.value.type ? new Set(getRequiredEventFields(localEvent.value.type)) : new Set()
 );
 
-const showDetailsField = computed(() => {
-  return localEvent.value.type !== 'Birthday' && localEvent.value.type !== 'Sick Time';
-});
+const showDetailsField = computed(() => requiredFields.value.has('details'));
 
 const showStaffField = computed(() => requiredFields.value.has('staff'));
 
