@@ -1,5 +1,5 @@
 import type { EventType } from '@/types/calendar';
-import { showsSpecialDayReminder } from '@/features/calendar/utils/eventTypeConfig';
+import { showsSpecialDayReminder } from '@/features/calendar/utils';
 
 type DraftEventType = EventType | '';
 

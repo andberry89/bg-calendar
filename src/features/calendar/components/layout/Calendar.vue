@@ -40,11 +40,15 @@ import CalendarBody from '@/features/calendar/components/layout/CalendarBody.vue
 import EventList from '@/features/calendar/components/layout/EventList.vue';
 import { useEventsStore } from '@/stores/events';
 import { useStaffStore } from '@/stores/staff';
-import { sortEvents } from '@/features/calendar/utils/sortEvents';
-import { getCurrentMonthEvents } from '@/features/calendar/utils/getCurrentMonthEvents';
-import { filterEvents, type EventFilters } from '@/features/calendar/utils/filterEvents';
-import { getPrevMonthDays, getCurrentMonthDays } from '@/features/calendar/utils/getMonthDayCounts';
-import { getCurrentDate as getInitialCurrentDate } from '@/features/calendar/utils/getCurrentDate';
+import {
+  sortEvents,
+  getCurrentMonthEvents,
+  filterEvents,
+  getPrevMonthDays,
+  getCurrentMonthDays,
+  getCurrentDate as getInitialCurrentDate,
+  type EventFilters
+} from '@/features/calendar/utils';
 import type {
   CalendarEvent,
   CurrentDate,

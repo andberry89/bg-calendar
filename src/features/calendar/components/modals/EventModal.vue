@@ -90,8 +90,7 @@ import { computed, ref } from 'vue';
 import { format } from 'date-fns';
 import BaseModal from '@/components/BaseModal.vue';
 import EditEventModal from '@/features/calendar/components/modals/EditEventModal.vue';
-import { getPersonColorStyle } from '@/features/calendar/utils/colorTokens';
-import { getStaffAvatarUrl } from '@/features/calendar/utils/staffAvatars';
+import { getPersonColorStyle, getStaffAvatarUrl } from '@/features/calendar/utils';
 import type { CalendarEvent, Staff } from '@/types/calendar';
 import { useStaffStore } from '@/stores/staff';
 

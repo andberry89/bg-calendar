@@ -75,7 +75,7 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import CalendarDay from '@/features/calendar/components/display/CalendarDay.vue';
 import CalendarEvent from '@/features/calendar/components/display/CalendarEvent.vue';
 import EventModal from '@/features/calendar/components/modals/EventModal.vue';
-import assignEvents from '@/features/calendar/utils/assignEvents';
+import { assignEvents } from '@/features/calendar/utils';
 import type {
   AssignedCalendarEvent,
   CalendarEvent as CalendarEventType,

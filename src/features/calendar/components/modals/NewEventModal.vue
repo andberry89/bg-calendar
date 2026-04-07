@@ -26,7 +26,7 @@ import { ref } from 'vue';
 import Button from '@/components/Button.vue';
 import BaseModal from '@/components/BaseModal.vue';
 import EventForm from '@/features/calendar/components/forms/EventForm.vue';
-import type { DraftCalendarEventInput } from '@/features/calendar/utils/eventCreation';
+import type { DraftCalendarEventInput } from '@/features/calendar/utils';
 import type { NewCalendarEvent, Staff } from '@/types/calendar';
 
 const { staff } = defineProps<{

@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import MonthYearPicker from '@/features/calendar/components/controls/MonthYearPicker.vue';
-import { month } from '@/features/calendar/utils/selectOptions';
+import { month } from '@/features/calendar/utils';
 import type { CurrentDate } from '@/types/calendar';
 
 const { currentDate } = defineProps<{

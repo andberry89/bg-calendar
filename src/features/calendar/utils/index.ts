@@ -1,4 +1,5 @@
 export * from './assignEvents';
+export { default as assignEvents } from './assignEvents';
 export * from './colorTokens';
 export * from './eventCreation';
 export * from './eventDateSync';
