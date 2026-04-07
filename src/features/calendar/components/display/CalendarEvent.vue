@@ -50,7 +50,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { getEventTypeConfig } from '@/features/calendar/utils/eventTypeConfig';
+import {
+  getEventTypeColor,
+  getEventTypePillBg,
+  getEventTypePillBorder
+} from '@/features/calendar/utils/eventTypeConfig';
 import { getStaffAvatarUrl } from '@/features/calendar/utils/staffAvatars';
 import type { AssignedCalendarEvent, CalendarEvent, Staff } from '@/types/calendar';
 
@@ -65,28 +69,6 @@ const emit = defineEmits<{
 function imgUrl(name: string): string {
   return getStaffAvatarUrl(name);
 }
-
-const eventTypeTintByClass: Partial<Record<CalendarEvent['class'], string>> = {
-  vacation: 'rgba(22, 163, 74, 0.16)',
-  'sick-time': 'rgba(239, 68, 68, 0.16)',
-  holiday: 'rgba(192, 132, 26, 0.2)',
-  'press-trip': 'rgba(37, 99, 235, 0.16)',
-  'auto-show': 'rgba(234, 88, 12, 0.16)',
-  birthday: 'rgba(219, 39, 119, 0.16)',
-  'cd-event': 'rgba(124, 58, 237, 0.16)',
-  'comp-day': 'rgba(15, 118, 110, 0.16)'
-};
-
-const eventTypeBorderByClass: Partial<Record<CalendarEvent['class'], string>> = {
-  vacation: 'rgba(22, 163, 74, 0.3)',
-  'sick-time': 'rgba(239, 68, 68, 0.3)',
-  holiday: 'rgba(192, 132, 26, 0.36)',
-  'press-trip': 'rgba(37, 99, 235, 0.3)',
-  'auto-show': 'rgba(234, 88, 12, 0.3)',
-  birthday: 'rgba(219, 39, 119, 0.3)',
-  'cd-event': 'rgba(124, 58, 237, 0.3)',
-  'comp-day': 'rgba(15, 118, 110, 0.3)'
-};
 
 type StaffMember = Staff;
 type EventPillShape = 'default' | 'single' | 'start' | 'middle' | 'end';
@@ -252,9 +234,15 @@ const secondaryText = computed((): string => {
 });
 
 const eventColorVar = computed((): string => {
-  const config = getEventTypeConfig(event.type);
+  return getEventTypeColor(event.type) ?? 'var(--calendar-border-strong)';
+});
 
-  return config ? `var(${config.colorVar})` : 'var(--calendar-border-strong)';
+const eventPillBg = computed((): string => {
+  return getEventTypePillBg(event.type) ?? 'rgba(255, 255, 255, 0.12)';
+});
+
+const eventPillBorder = computed((): string => {
+  return getEventTypePillBorder(event.type) ?? 'rgba(148, 163, 184, 0.3)';
 });
 
 const isSingleDay = computed((): boolean => {
@@ -264,8 +252,8 @@ const isSingleDay = computed((): boolean => {
 const eventStyle = computed(
   (): Record<string, string> => ({
     '--event-pill-color': eventColorVar.value,
-    '--event-pill-bg': eventTypeTintByClass[event.class] ?? 'rgba(255, 255, 255, 0.12)',
-    '--event-pill-border': eventTypeBorderByClass[event.class] ?? 'rgba(148, 163, 184, 0.3)'
+    '--event-pill-bg': eventPillBg.value,
+    '--event-pill-border': eventPillBorder.value
   })
 );
 
