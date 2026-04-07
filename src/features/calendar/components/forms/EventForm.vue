@@ -31,14 +31,13 @@
       </label>
     </div>
 
-    <div v-if="localEvent.type !== 'Birthday'" class="event-form__field">
+    <div v-if="showDetailsField" class="event-form__field">
       <label for="details">Event Details</label>
       <input
         id="details"
         v-model="localEvent.details"
         type="text"
         placeholder="Details"
-        :disabled="isFieldDisabled('details')"
         @input="emitModelValue"
       />
     </div>
@@ -58,14 +57,13 @@
       </div>
     </div>
 
-    <ul v-if="localEvent.type !== 'Holiday'" class="event-form__staff-list">
+    <ul v-if="showStaffField" class="event-form__staff-list">
       <li v-for="person in staff" :key="person.id" class="event-form__staff-item">
         <input
           :id="`staff-${person.id}`"
           v-model="localEvent.staff"
           type="checkbox"
           :value="person"
-          :disabled="isFieldDisabled('staff')"
           @change="emitModelValue"
         />
         <label :for="`staff-${person.id}`">{{ person.shortName }}</label>
@@ -143,15 +141,17 @@ const requiredFields = computed(() =>
   localEvent.value.type ? new Set(getRequiredEventFields(localEvent.value.type)) : new Set()
 );
 
+const showDetailsField = computed(() => {
+  return localEvent.value.type !== 'Birthday' && localEvent.value.type !== 'Sick Time';
+});
+
+const showStaffField = computed(() => requiredFields.value.has('staff'));
+
 function emitModelValue(): void {
   emit('update:modelValue', {
     ...localEvent.value,
     staff: [...localEvent.value.staff]
   });
-}
-
-function isFieldDisabled(field: 'details' | 'staff'): boolean {
-  return !!localEvent.value.type && !requiredFields.value.has(field);
 }
 
 function compareDates(target: DateSyncTarget): void {
