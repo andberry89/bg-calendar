@@ -75,14 +75,6 @@
   - notes:
     - Project overview, architecture, setup, workflows
 
-- [ ] CAL-022 Indicate multi-staff membership on spanning calendar events
-  - type: UX
-  - priority: P2
-  - scope: small
-  - notes:
-    - Add visual cue for events with multiple staff
-    - Keep it compact and non-cluttered
-
 - [ ] CAL-023 Automatic holiday and birthday event generation
   - type: feature
   - priority: P2
@@ -140,3 +132,6 @@
 
 - [x] CAL-021 Improve disabled form section visibility
   - PR: feat(events): improve event form field visibility by type
+
+- [x] CAL-022 Indicate multi-staff membership on spanning calendar events
+  - PR: feat(events): add multi-staff indicator to event pills
