@@ -8,14 +8,6 @@
 
 ## Planned (Not Started)
 
-- [ ] CAL-010 Centralize event-type color system
-  - type: refactor
-  - priority: P2
-  - scope: medium
-  - notes:
-    - Event-type colors are only partially centralized today
-    - Move remaining color logic into shared tokens
-
 - [ ] CAL-013 Utils barrel exports
   - type: refactor
   - priority: P3
@@ -86,6 +78,16 @@
     - Keep behavior configurable so auto-generated events can be distinguished from manual events
     - Avoid changing layout/lane behavior unless required
 
+- [ ] CAL-024 Revisit event form field rules alignment
+  - type: refactor
+  - priority: P2
+  - scope: small
+  - notes:
+    - Align EventForm visibility logic with eventTypeConfig
+    - Remove hardcoded type checks introduced in CAL-021
+    - Ensure requiredFields is the single source of truth
+    - Prevent drift between form behavior and config
+
 ---
 
 ## Icebox (Future Ideas)
@@ -120,6 +122,9 @@
 
 - [x] CAL-009 Modal styling tokenization
   - PR: refactor(modals): extract BaseModal styling into shared tokens
+
+- [ ] CAL-010 Centralize event-type color system
+  - PR: refactor(events): centralize event type color system
 
 - [x] CAL-011 Display event details in modal views
   - PR: refactor(modals): display event details in EventModal and DayModal
