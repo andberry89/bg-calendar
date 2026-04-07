@@ -100,14 +100,16 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { eventType } from '@/features/calendar/utils/selectOptions';
-import { getSpecialDayReminder } from '@/features/calendar/utils/eventRules';
 import {
+  eventType,
+  getSpecialDayReminder,
   createNewCalendarEvent,
-  type DraftCalendarEventInput
-} from '@/features/calendar/utils/eventCreation';
-import { syncEventDates, type DateSyncTarget } from '@/features/calendar/utils/eventDateSync';
-import { validateEvent, getRequiredEventFields } from '@/features/calendar/utils/eventValidation';
+  syncEventDates,
+  validateEvent,
+  getRequiredEventFields,
+  type DraftCalendarEventInput,
+  type DateSyncTarget
+} from '@/features/calendar/utils';
 import type { NewCalendarEvent, Staff } from '@/types/calendar';
 
 const props = withDefaults(

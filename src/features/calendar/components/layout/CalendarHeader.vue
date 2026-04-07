@@ -45,7 +45,7 @@ import CalendarHeaderDateControls from '@/features/calendar/components/layout/Ca
 import CalendarHeaderFilters from '@/features/calendar/components/layout/CalendarHeaderFilters.vue';
 import NewEventModal from '@/features/calendar/components/modals/NewEventModal.vue';
 import ManageStaffModal from '@/features/calendar/components/modals/ManageStaffModal.vue';
-import type { EventFilters } from '@/features/calendar/utils/filterEvents';
+import type { EventFilters } from '@/features/calendar/utils';
 import type { CurrentDate, NewCalendarEvent, Staff, StaffUpdatePayload } from '@/types/calendar';
 
 const TRANSITION_DURATION_MS = 360;

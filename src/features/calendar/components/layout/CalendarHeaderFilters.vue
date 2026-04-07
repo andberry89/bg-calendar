@@ -49,10 +49,12 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { getPersonColorStyle } from '@/features/calendar/utils/colorTokens';
-import { getEventTypeConfig } from '@/features/calendar/utils/eventTypeConfig';
-import type { EventFilters } from '@/features/calendar/utils/filterEvents';
-import { getStaffAvatarUrl } from '@/features/calendar/utils/staffAvatars';
+import {
+  getPersonColorStyle,
+  getEventTypeConfig,
+  getStaffAvatarUrl,
+  type EventFilters
+} from '@/features/calendar/utils';
 import type { EventType, Staff } from '@/types/calendar';
 import { useStaffStore } from '@/stores/staff';
 

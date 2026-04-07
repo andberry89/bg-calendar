@@ -53,9 +53,9 @@ import { computed } from 'vue';
 import {
   getEventTypeColor,
   getEventTypePillBg,
-  getEventTypePillBorder
-} from '@/features/calendar/utils/eventTypeConfig';
-import { getStaffAvatarUrl } from '@/features/calendar/utils/staffAvatars';
+  getEventTypePillBorder,
+  getStaffAvatarUrl
+} from '@/features/calendar/utils';
 import type { AssignedCalendarEvent, CalendarEvent, Staff } from '@/types/calendar';
 
 const { event } = defineProps<{

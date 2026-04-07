@@ -21,7 +21,7 @@
 import { ref } from 'vue';
 import BaseModal from '@/components/BaseModal.vue';
 import EventForm from '@/features/calendar/components/forms/EventForm.vue';
-import type { DraftCalendarEventInput } from '@/features/calendar/utils/eventCreation';
+import type { DraftCalendarEventInput } from '@/features/calendar/utils';
 import type { CalendarEvent, NewCalendarEvent } from '@/types/calendar';
 import { useEventsStore } from '@/stores/events';
 import { useStaffStore } from '@/stores/staff';

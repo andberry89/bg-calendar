@@ -1,6 +1,5 @@
 import type { EventType, Staff } from '@/types/calendar';
-import type { EventTypeField } from '@/features/calendar/utils/eventTypeConfig';
-import { getEventTypeConfig } from '@/features/calendar/utils/eventTypeConfig';
+import { getEventTypeConfig, type EventTypeField } from '@/features/calendar/utils';
 
 type DraftEventType = EventType | '';
 

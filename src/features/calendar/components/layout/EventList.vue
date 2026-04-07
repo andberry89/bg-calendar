@@ -24,7 +24,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { month } from '@/features/calendar/utils/selectOptions';
+import { month } from '@/features/calendar/utils';
 import type { CalendarEvent, CurrentDate } from '@/types/calendar';
 
 defineProps<{
