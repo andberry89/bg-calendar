@@ -8,15 +8,6 @@
 
 ## Planned (Not Started)
 
-- [ ] CAL-013 Utils barrel exports
-  - type: refactor
-  - priority: P3
-  - scope: small
-  - notes:
-    - Add barrel exports for `@/features/calendar/utils`
-    - Standardize imports across components
-    - Dedicated cleanup pass
-
 - [ ] CAL-014 Codebase audit and refactor plan
   - type: refactor
   - priority: P1
@@ -121,6 +112,9 @@
 
 - [x] CAL-012 Clear expired event lanes during week layout
   - PR: fix(layout): clear expired event lanes during week layout
+
+- [ ] CAL-013 Utils barrel exports
+  - PR: refactor(utils): add calendar utils barrel exports and standardize imports
 
 - [x] CAL-016 TypeScript type-check cleanup
   - PR: fix(types): resolve TypeScript errors across calendar components
