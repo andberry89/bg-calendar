@@ -75,14 +75,6 @@
   - notes:
     - Project overview, architecture, setup, workflows
 
-- [ ] CAL-021 Improve disabled form section visibility
-  - type: UX
-  - priority: P2
-  - scope: small
-  - notes:
-    - Hide form sections when not relevant to selected event type
-    - Avoid showing disabled fields that feel broken
-
 - [ ] CAL-022 Indicate multi-staff membership on spanning calendar events
   - type: UX
   - priority: P2
@@ -145,3 +137,6 @@
 
 - [x] CAL-016 TypeScript type-check cleanup
   - PR: fix(types): resolve TypeScript errors across calendar components
+
+- [x] CAL-021 Improve disabled form section visibility
+  - PR: feat(events): improve event form field visibility by type
