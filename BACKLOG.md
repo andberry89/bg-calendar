@@ -78,16 +78,6 @@
     - Keep behavior configurable so auto-generated events can be distinguished from manual events
     - Avoid changing layout/lane behavior unless required
 
-- [ ] CAL-024 Revisit event form field rules alignment
-  - type: refactor
-  - priority: P2
-  - scope: small
-  - notes:
-    - Align EventForm visibility logic with eventTypeConfig
-    - Remove hardcoded type checks introduced in CAL-021
-    - Ensure requiredFields is the single source of truth
-    - Prevent drift between form behavior and config
-
 ---
 
 ## Icebox (Future Ideas)
@@ -140,3 +130,6 @@
 
 - [x] CAL-022 Indicate multi-staff membership on spanning calendar events
   - PR: feat(events): add multi-staff indicator to event pills
+
+- [x] CAL-024 Revisit event form field rules alignment
+  - PR: refactor(events): align event form field visibility with event type config

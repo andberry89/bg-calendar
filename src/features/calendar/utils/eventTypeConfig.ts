@@ -21,7 +21,7 @@ const eventTypeConfig: Readonly<Record<EventType, EventTypeConfig>> = {
     pillBorder: 'rgba(22, 163, 74, 0.3)'
   },
   'Sick Time': {
-    requiredFields: ['details', 'staff'],
+    requiredFields: ['staff'],
     showsSpecialDayReminder: false,
     colorVar: '--event-type-sick-time',
     pillBg: 'rgba(239, 68, 68, 0.16)',
