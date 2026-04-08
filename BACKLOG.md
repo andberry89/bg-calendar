@@ -75,11 +75,6 @@
     - Derived from completed audit pass
     - Split into smaller implementation tasks:
 
-    **CAL-017C — Event identity audit**
-    - Verify `CalendarEvent.id` is always present
-    - Remove fallback key logic if no longer needed
-    - Otherwise loosen type if required
-
     **CAL-017D — Date typing audit**
     - Evaluate `start` / `end` string assumptions
     - Consider stricter typing or documented format contract
@@ -115,5 +110,9 @@
 
 - [x] **CAL-017A — Lane slot type tightening**
   - PR: refactor(types): tighten calendar event lane slot typing
+
 - [x] **CAL-017B — Draft vs saved event boundary**
   - PR: refactor(events): remove derived class from draft event state
+
+- [x] **CAL-017C — Event identity audit**
+  - PR: refactor(events): rely on event id for calendar event identity

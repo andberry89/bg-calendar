@@ -268,7 +268,7 @@ const weekEvents = computed((): AssignedCalendarEvent[][][] => {
 });
 
 function getEventKey(event: CalendarEventType): string {
-  return event.id ?? `${event.type}-${event.start}-${event.end}`;
+  return event.id;
 }
 
 function getEventRowSpan(_event: AssignedCalendarEvent): number {
