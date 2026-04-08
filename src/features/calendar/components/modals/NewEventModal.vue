@@ -38,7 +38,6 @@ const emit = defineEmits<{
 }>();
 
 const createEmptyEvent = (): DraftCalendarEventInput => ({
-  class: '',
   closed: '',
   details: '',
   end: '',

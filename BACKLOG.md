@@ -75,11 +75,6 @@
     - Derived from completed audit pass
     - Split into smaller implementation tasks:
 
-    **CAL-017B — Draft vs saved event boundary**
-    - Remove derived fields (e.g. `class`) from draft state
-    - Clarify ownership of `DraftCalendarEventInput`
-    - Ensure form state only contains user-editable data
-
     **CAL-017C — Event identity audit**
     - Verify `CalendarEvent.id` is always present
     - Remove fallback key logic if no longer needed
@@ -120,3 +115,5 @@
 
 - [x] **CAL-017A — Lane slot type tightening**
   - PR: refactor(types): tighten calendar event lane slot typing
+- [x] **CAL-017B — Draft vs saved event boundary**
+  - PR: refactor(events): remove derived class from draft event state
