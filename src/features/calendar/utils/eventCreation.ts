@@ -7,7 +7,6 @@ import type {
 } from '@/types/calendar';
 
 export interface DraftCalendarEventInput {
-  class: EventClass | '';
   closed: HolidayClosure;
   details: string;
   end: string;

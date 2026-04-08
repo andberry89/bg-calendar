@@ -39,7 +39,6 @@ const eventsStore = useEventsStore();
 const staffStore = useStaffStore();
 
 const editableEvent = ref<DraftCalendarEventInput>({
-  class: event.class,
   closed: event.closed,
   details: event.details,
   end: event.end,
