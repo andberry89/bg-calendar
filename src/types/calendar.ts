@@ -57,7 +57,7 @@ export interface AssignedCalendarEvent extends CalendarEvent {
 }
 
 export interface CalendarEventLaneSlot {
-  event: AssignedCalendarEvent | CalendarEvent | null;
+  event: AssignedCalendarEvent | null;
   spanRows: number;
   isReserved: boolean;
   occupiedBySpan: boolean;

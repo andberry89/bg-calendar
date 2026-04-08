@@ -236,25 +236,16 @@ function isAssignedCalendarEvent(
 }
 
 const normalizedRegularEventLaneSlots = computed((): CalendarEventLaneSlot[] => {
-  if (props.regularEventLaneSlots.length > 0) {
-    return props.regularEventLaneSlots.map((slot) => {
-      if (!isAssignedCalendarEvent(slot.event) || slot.event.display.isMultiDay !== true) {
-        return slot;
-      }
+  return props.regularEventLaneSlots.map((slot) => {
+    if (!isAssignedCalendarEvent(slot.event) || slot.event.display.isMultiDay !== true) {
+      return slot;
+    }
 
-      return {
-        ...slot,
-        event: null
-      };
-    });
-  }
-
-  return filteredEvents.value.map((event) => ({
-    event,
-    spanRows: event.class === 'auto-show' ? 2 : 1,
-    isReserved: false,
-    occupiedBySpan: false
-  }));
+    return {
+      ...slot,
+      event: null
+    };
+  });
 });
 
 const visibleRegularLaneSlots = computed((): CalendarEventLaneSlot[] => {
