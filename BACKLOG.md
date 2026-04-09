@@ -75,10 +75,6 @@
     - Derived from completed audit pass
     - Split into smaller implementation tasks:
 
-    **CAL-017D — Date typing audit**
-    - Evaluate `start` / `end` string assumptions
-    - Consider stricter typing or documented format contract
-
     **CAL-017E — Local state/type cleanup**
     - Reduce non-null assertions
     - Improve component-level type narrowing
@@ -116,3 +112,6 @@
 
 - [x] **CAL-017C — Event identity audit**
   - PR: refactor(events): rely on event id for calendar event identity
+
+- [x] **CAL-017D — Date typing audit**
+  - PR: refactor(types): clarify calendar event date string contract
