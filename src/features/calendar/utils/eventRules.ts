@@ -1,7 +1,5 @@
-import type { EventType } from '@/types/calendar';
+import type { DraftEventType } from '@/types/calendar-draft';
 import { showsSpecialDayReminder } from '@/features/calendar/utils';
-
-type DraftEventType = EventType | '';
 
 export interface EventReminder {
   message: string;

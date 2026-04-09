@@ -1,9 +1,7 @@
 import { compareDesc, parse } from 'date-fns';
-import type { EventType } from '@/types/calendar';
+import type { DraftEventType } from '@/types/calendar-draft';
 
 export type DateSyncTarget = 'start' | 'end';
-
-type DraftEventType = EventType | '';
 
 export interface SyncEventDatesInput {
   start: string;
