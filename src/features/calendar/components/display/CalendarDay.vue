@@ -19,8 +19,8 @@
       @click.stop
     />
     <EventModal
-      v-if="showEventDetails"
-      :event="modalEvent!"
+      v-if="showEventDetails && modalEvent"
+      :event="modalEvent"
       :day="getDay"
       @update="closeModal"
       @delete="deleteEvent($event)"
