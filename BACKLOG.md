@@ -67,14 +67,6 @@
     - Avoid churn unless organization clearly improves maintainability and import clarity
     - Keep aligned with existing architecture and incremental refactor rules
 
-- [ ] CAL-017 Types robustness follow-ups
-  - type: refactor
-  - priority: P1
-  - scope: large (split into sub-tasks)
-  - notes:
-    - Derived from completed audit pass
-    - Split into smaller implementation tasks:
-
 ---
 
 ## Icebox (Future Ideas)
