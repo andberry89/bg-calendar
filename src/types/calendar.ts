@@ -34,14 +34,15 @@ export type EventClass =
   | 'comp-day';
 
 export type HolidayClosure = '' | 'none' | 'half' | 'full';
+export type CalendarDateString = string;
 
 export interface CalendarEvent {
   id: string;
   class: EventClass;
   closed: HolidayClosure;
   details: string;
-  end: string;
-  start: string;
+  end: CalendarDateString;
+  start: CalendarDateString;
   staff: Staff[];
   type: EventType;
 }
