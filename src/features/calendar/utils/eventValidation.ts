@@ -1,7 +1,6 @@
-import type { EventType, Staff } from '@/types/calendar';
+import type { Staff } from '@/types/calendar';
+import type { DraftEventType } from '@/types/calendar-draft';
 import { getEventTypeConfig, type EventTypeField } from '@/features/calendar/utils';
-
-type DraftEventType = EventType | '';
 
 interface EventValidationInput {
   type: DraftEventType;

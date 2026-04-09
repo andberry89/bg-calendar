@@ -1,6 +1,5 @@
 import type { EventType } from '@/types/calendar';
-
-type DraftEventType = EventType | '';
+import type { DraftEventType } from '@/types/calendar-draft';
 
 export type EventTypeField = 'details' | 'staff';
 

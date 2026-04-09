@@ -82,37 +82,16 @@ import type {
   CalendarEventLaneSlot,
   CurrentDate
 } from '@/types/calendar';
+import type {
+  CalendarWeekRegularEventPlacement,
+  CalendarWeekSegmentState,
+  CalendarWeekSpanningSegment,
+  SelectedWeekSpanEvent
+} from '@/types/calendar-layout';
 
 type CalendarWeekCell = {
   date: number;
   month: 'prev' | 'current' | 'next';
-};
-
-type CalendarWeekSegmentState = 'single' | 'start' | 'middle' | 'end';
-
-type CalendarWeekSpanningSegment = {
-  event: AssignedCalendarEvent;
-  laneIndex: number;
-  startDayIndex: number;
-  endDayIndex: number;
-  state: CalendarWeekSegmentState;
-  isClippedLeft: boolean;
-  isClippedRight: boolean;
-  isFullCloseStart: boolean;
-};
-
-type CalendarWeekRegularEventPlacement = {
-  event: AssignedCalendarEvent;
-  laneIndex: number;
-  startDayIndex: number;
-  endDayIndex: number;
-};
-
-type SelectedWeekSpanEvent = {
-  event: CalendarEventType;
-  day: number;
-  anchorDay: number;
-  weekIdx: number;
 };
 
 const {

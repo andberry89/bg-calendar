@@ -56,24 +56,6 @@
     - Keep behavior configurable so auto-generated events can be distinguished from manual events
     - Avoid changing layout/lane behavior unless required
 - [ ] CAL-025 Audit click-outside directive usage
-- [ ] CAL-026 Calendar type organization review
-  - type: refactor
-  - priority: P2
-  - scope: medium
-  - notes:
-    - Evaluate whether `types/calendar.ts` should remain a single file
-    - Identify safe split points for event, assignment, modal, and form-related types
-    - Decide whether barrel exports are appropriate for types
-    - Avoid churn unless organization clearly improves maintainability and import clarity
-    - Keep aligned with existing architecture and incremental refactor rules
-
-- [ ] CAL-017 Types robustness follow-ups
-  - type: refactor
-  - priority: P1
-  - scope: large (split into sub-tasks)
-  - notes:
-    - Derived from completed audit pass
-    - Split into smaller implementation tasks:
 
 ---
 
@@ -114,3 +96,6 @@
 
 - [x] **CAL-017E — Local state/type cleanup**
   - PR: refactor(events): remove non-null assertion in CalendarDay modal
+
+- [x] CAL-026 Calendar type organization review
+- PR: refactor(types): extract shared calendar layout and draft types

@@ -1,9 +1,13 @@
+// Calendar navigation / date state
 export interface CurrentDate {
   date: number;
   month: number;
   year: number;
 }
 
+export type CalendarDateString = string;
+
+// Staff
 export interface Staff {
   id: string;
   firstName: string;
@@ -12,6 +16,16 @@ export interface Staff {
   shortName: string;
 }
 
+export type StaffDocument = Omit<Staff, 'id'>;
+
+export interface NewStaffInput {
+  firstName: string;
+  lastName: string;
+}
+
+export type StaffUpdatePayload = ['add', NewStaffInput] | ['remove', Staff];
+
+// Event taxonomy
 export type EventType =
   | 'Vacation'
   | 'Sick Time'
@@ -34,8 +48,8 @@ export type EventClass =
   | 'comp-day';
 
 export type HolidayClosure = '' | 'none' | 'half' | 'full';
-export type CalendarDateString = string;
 
+// Calendar events
 export interface CalendarEvent {
   id: string;
   class: EventClass;
@@ -65,20 +79,12 @@ export interface CalendarEventLaneSlot {
 }
 
 export type CalendarEventDocument = Omit<CalendarEvent, 'id'>;
-export type StaffDocument = Omit<Staff, 'id'>;
 export type NewCalendarEvent = CalendarEventDocument;
+export type EventsByYear = Record<string, CalendarEvent[]>;
 
-export interface NewStaffInput {
-  firstName: string;
-  lastName: string;
-}
-
+// Shared service/store results
 export interface MutationResult {
   success: boolean;
   message: string;
   error?: unknown;
 }
-
-export type EventsByYear = Record<string, CalendarEvent[]>;
-
-export type StaffUpdatePayload = ['add', NewStaffInput] | ['remove', Staff];
