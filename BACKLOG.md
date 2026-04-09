@@ -75,10 +75,6 @@
     - Derived from completed audit pass
     - Split into smaller implementation tasks:
 
-    **CAL-017E — Local state/type cleanup**
-    - Reduce non-null assertions
-    - Improve component-level type narrowing
-
 ---
 
 ## Icebox (Future Ideas)
@@ -115,3 +111,6 @@
 
 - [x] **CAL-017D — Date typing audit**
   - PR: refactor(types): clarify calendar event date string contract
+
+- [x] **CAL-017E — Local state/type cleanup**
+  - PR: refactor(events): remove non-null assertion in CalendarDay modal
