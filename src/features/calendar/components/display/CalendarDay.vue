@@ -103,12 +103,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, ref, toRef } from 'vue';
 import CalendarEvent from '@/features/calendar/components/display/CalendarEvent.vue';
 import EventModal from '@/features/calendar/components/modals/EventModal.vue';
 import DayModal from '@/features/calendar/components/modals/DayModal.vue';
+import { useMediaQuery } from '@/composables/useMediaQuery';
+import { useCalendarDayDate } from '@/features/calendar/composables/useCalendarDayDate';
+import { useCalendarDayEvents } from '@/features/calendar/composables/useCalendarDayEvents';
 import type {
-  AssignedCalendarEvent,
   CalendarEvent as CalendarEventType,
   CalendarEventLaneSlot,
   CurrentDate
@@ -117,6 +119,7 @@ import type {
 type CalendarMonthOffset = 'prev' | 'next';
 
 const MOBILE_BREAKPOINT_QUERY = '(max-width: 640px)';
+const isMobile = useMediaQuery(MOBILE_BREAKPOINT_QUERY);
 
 const props = withDefaults(
   defineProps<{
@@ -146,70 +149,11 @@ const emit = defineEmits<{
 const showEventDetails = ref(false);
 const modalEvent = ref<CalendarEventType | null>(null);
 const showDayModal = ref(false);
-const isMobile = ref(false);
 
-const eventGroups = computed(
-  (): { holidays: CalendarEventType[]; regularEvents: CalendarEventType[] } => {
-    return props.events.reduce(
-      (groups, event) => {
-        if (event.type === 'Holiday') {
-          groups.holidays.push(event);
-        } else {
-          groups.regularEvents.push(event);
-        }
-
-        return groups;
-      },
-      {
-        holidays: [] as CalendarEventType[],
-        regularEvents: [] as CalendarEventType[]
-      }
-    );
-  }
-);
-
-const holidays = computed((): CalendarEventType[] => eventGroups.value.holidays);
-
-const visibleHolidayBadges = computed((): CalendarEventType[] => {
-  return holidays.value.filter((event) => event.closed !== 'full');
-});
-
-const primaryHolidayBadge = computed((): CalendarEventType | null => {
-  return visibleHolidayBadges.value[0] ?? null;
-});
-
-const hiddenHolidayBadgeCount = computed((): number => {
-  return Math.max(visibleHolidayBadges.value.length - 1, 0);
-});
-
-const holidayBadgeLabel = computed((): string => {
-  if (!primaryHolidayBadge.value) {
-    return '';
-  }
-
-  if (primaryHolidayBadge.value.closed === 'half') {
-    return 'Early Close';
-  }
-
-  if (primaryHolidayBadge.value.closed === 'none' || primaryHolidayBadge.value.closed === '') {
-    return primaryHolidayBadge.value.details || 'Holiday';
-  }
-
-  return 'Holiday';
-});
-
-const filteredEvents = computed((): CalendarEventType[] => eventGroups.value.regularEvents);
-
-const allEvents = computed((): CalendarEventType[] => {
-  return [...holidays.value, ...filteredEvents.value];
-});
-
-const canOpenDayModal = computed((): boolean => {
-  return props.dayClass === 'day' && allEvents.value.length > 0;
-});
-
-const hasHalfClosureHoliday = computed((): boolean => {
-  return holidays.value.some((event) => event.closed === 'half');
+const { getDay, isWeekend } = useCalendarDayDate({
+  currentDate: toRef(props, 'currentDate'),
+  date: toRef(props, 'date'),
+  month: toRef(props, 'month')
 });
 
 const visibleRegularEventLimit = computed((): number => {
@@ -224,76 +168,25 @@ const visibleRegularLaneCount = computed((): number => {
   return visibleRegularEventLimit.value;
 });
 
-function isAssignedCalendarEvent(
-  event: CalendarEventType | AssignedCalendarEvent | null
-): event is AssignedCalendarEvent {
-  return (
-    event !== null &&
-    'display' in event &&
-    typeof event.display === 'object' &&
-    event.display !== null
-  );
-}
-
-const normalizedRegularEventLaneSlots = computed((): CalendarEventLaneSlot[] => {
-  return props.regularEventLaneSlots.map((slot) => {
-    if (!isAssignedCalendarEvent(slot.event) || slot.event.display.isMultiDay !== true) {
-      return slot;
-    }
-
-    return {
-      ...slot,
-      event: null
-    };
-  });
-});
-
-const visibleRegularLaneSlots = computed((): CalendarEventLaneSlot[] => {
-  const visibleRows = normalizedRegularEventLaneSlots.value.slice(0, visibleRegularLaneCount.value);
-
-  if (visibleRows.length === visibleRegularLaneCount.value) {
-    return visibleRows;
-  }
-
-  return [
-    ...visibleRows,
-    ...Array.from({ length: visibleRegularLaneCount.value - visibleRows.length }, () => ({
-      event: null,
-      spanRows: 1,
-      isReserved: false,
-      occupiedBySpan: false
-    }))
-  ];
-});
-
-const renderableRegularLaneSlots = computed((): CalendarEventLaneSlot[] => {
-  return normalizedRegularEventLaneSlots.value.filter((slot) => !slot.occupiedBySpan);
-});
-
-const visibleRenderableRegularLaneSlots = computed(() => {
-  return visibleRegularLaneSlots.value
-    .map((slot, rowIndex) => ({
-      slot,
-      rowIndex
-    }))
-    .filter(({ slot }) => !slot.occupiedBySpan);
-});
-
-const visibleRegularEventCount = computed((): number => {
-  return visibleRenderableRegularLaneSlots.value.filter(({ slot }) => slot.event !== null).length;
-});
-
-const hiddenEventCount = computed((): number => {
-  const totalRenderableRegularEventCount = renderableRegularLaneSlots.value.filter(
-    (slot) => slot.event !== null
-  ).length;
-
-  const hiddenRegularEventCount = Math.max(
-    totalRenderableRegularEventCount - visibleRegularEventCount.value,
-    0
-  );
-
-  return hiddenRegularEventCount + props.hiddenSpanningEventCount;
+const {
+  holidays,
+  primaryHolidayBadge,
+  hiddenHolidayBadgeCount,
+  holidayBadgeLabel,
+  allEvents,
+  canOpenDayModal,
+  hasHalfClosureHoliday,
+  hasFullClosureHoliday,
+  visibleRenderableRegularLaneSlots,
+  hiddenEventCount,
+  isFilteredEmptyDay
+} = useCalendarDayEvents({
+  dayClass: toRef(props, 'dayClass'),
+  events: toRef(props, 'events'),
+  hasUnfilteredEvents: toRef(props, 'hasUnfilteredEvents'),
+  hiddenSpanningEventCount: toRef(props, 'hiddenSpanningEventCount'),
+  regularEventLaneSlots: toRef(props, 'regularEventLaneSlots'),
+  visibleRegularLaneCount
 });
 
 const regularEventLanesStyle = computed((): Record<string, string> => {
@@ -309,72 +202,6 @@ function getLaneStyle(rowIndex: number, spanRows: number): Record<string, string
     width: '100%'
   };
 }
-
-const isFilteredEmptyDay = computed((): boolean => {
-  return props.dayClass === 'day' && props.hasUnfilteredEvents && allEvents.value.length === 0;
-});
-
-const displayDate = computed((): CurrentDate => {
-  const { year, month } = props.currentDate;
-
-  if (props.month === 'prev') {
-    return month === 0
-      ? { ...props.currentDate, year: year - 1, month: 11 }
-      : { ...props.currentDate, month: month - 1 };
-  }
-
-  if (props.month === 'next') {
-    return month === 11
-      ? { ...props.currentDate, year: year + 1, month: 0 }
-      : { ...props.currentDate, month: month + 1 };
-  }
-
-  return props.currentDate;
-});
-
-const getDay = computed((): number => {
-  return new Date(displayDate.value.year, displayDate.value.month, props.date).getDay();
-});
-
-const hasFullClosureHoliday = computed((): boolean => {
-  return holidays.value.some((event) => event.closed === 'full');
-});
-
-const isWeekend = computed((): boolean => {
-  const day = new Date(displayDate.value.year, displayDate.value.month, props.date).getDay();
-  return day === 0 || day === 6;
-});
-
-let mediaQueryList: MediaQueryList | null = null;
-
-function syncMobileState(event?: MediaQueryListEvent): void {
-  if (event) {
-    isMobile.value = event.matches;
-    return;
-  }
-
-  if (typeof window === 'undefined') {
-    isMobile.value = false;
-    return;
-  }
-
-  mediaQueryList = window.matchMedia(MOBILE_BREAKPOINT_QUERY);
-  isMobile.value = mediaQueryList.matches;
-}
-
-onMounted((): void => {
-  syncMobileState();
-
-  if (!mediaQueryList) {
-    return;
-  }
-
-  mediaQueryList.addEventListener('change', syncMobileState);
-});
-
-onBeforeUnmount((): void => {
-  mediaQueryList?.removeEventListener('change', syncMobileState);
-});
 
 function closeModal(): void {
   modalEvent.value = null;
