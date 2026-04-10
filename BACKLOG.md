@@ -17,14 +17,6 @@
     - Identify composables, utils, and component extraction opportunities
     - Review CalendarBody → CalendarDay → CalendarEvent flow
     - Produce actionable follow-up tasks
-- [ ] CAL-015 Component responsibility audit
-  - type: refactor
-    - priority: P1
-    - scope: medium
-    - notes:
-      - Review component size/responsibility
-      - Focus on large components like CalendarBody.vue
-      - Identify safe extraction opportunities
 - [ ] CAL-018 Code comments and documentation pass
   - type: refactor
   - priority: P2
@@ -99,3 +91,6 @@
 
 - [x] CAL-026 Calendar type organization review
 - PR: refactor(types): extract shared calendar layout and draft types
+
+- [x] CAL-015 Component responsibility audit
+  - PR: refactor(calendar): audit large calendar files and extract shared display logic
