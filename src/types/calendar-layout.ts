@@ -1,5 +1,10 @@
 import type { AssignedCalendarEvent, CalendarEvent as CalendarEventType } from '@/types/calendar';
 
+export type CalendarWeekCell = {
+  date: number;
+  month: 'prev' | 'current' | 'next';
+};
+
 export type CalendarWeekSegmentState = 'single' | 'start' | 'middle' | 'end';
 
 export type CalendarWeekSpanningSegment = {
