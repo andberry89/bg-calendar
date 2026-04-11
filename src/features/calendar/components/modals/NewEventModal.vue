@@ -3,10 +3,10 @@
     <Button @click="openForm">New Event</Button>
 
     <BaseModal v-if="showForm" @update="closeForm" @close="closeForm">
-      <div class="new-event-modal">
-        <div class="new-event-modal__header">
-          <h3 class="new-event-modal__title">New Event</h3>
-          <button class="new-event-modal__close" type="button" @click="closeForm">×</button>
+      <div class="event-form-modal">
+        <div class="event-form-modal__header">
+          <h3 class="event-form-modal__title">New Event</h3>
+          <button class="event-form-modal__close" type="button" @click="closeForm">×</button>
         </div>
 
         <EventForm
@@ -80,7 +80,7 @@ function closeForm(): void {
   text-shadow: none;
 }
 
-.new-event-modal {
+.event-form-modal {
   position: relative;
   width: min(560px, calc(100vw - 24px));
   max-width: 560px;
@@ -90,7 +90,7 @@ function closeForm(): void {
   background: transparent;
 }
 
-.new-event-modal__header {
+.event-form-modal__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -99,7 +99,7 @@ function closeForm(): void {
   padding: 0 0 12px;
 }
 
-.new-event-modal__title {
+.event-form-modal__title {
   margin: 0;
   color: #0f172a;
   font-size: 1.15rem;
@@ -108,7 +108,7 @@ function closeForm(): void {
   letter-spacing: 0.01em;
 }
 
-.new-event-modal__close {
+.event-form-modal__close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -368,11 +368,11 @@ function closeForm(): void {
 }
 
 @media (max-width: 640px) {
-  .new-event-modal {
+  .event-form-modal {
     padding: 14px;
   }
 
-  .new-event-modal__header {
+  .event-form-modal__header {
     margin-bottom: 12px;
     padding-bottom: 10px;
   }
@@ -399,6 +399,7 @@ function closeForm(): void {
       padding: 8px 9px;
     }
   }
+
   .submit-event-button {
     min-height: 34px;
     padding: 7px 12px;
