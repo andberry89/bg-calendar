@@ -1,3 +1,5 @@
+import type { EventType } from '@/types/calendar';
+
 export const month = [
   'January',
   'February',
@@ -23,7 +25,7 @@ export const weekdayNames = [
   'Saturday'
 ];
 
-export const eventType = [
+export const eventType: readonly EventType[] = [
   'Vacation',
   'Sick Time',
   'Holiday',
@@ -32,4 +34,4 @@ export const eventType = [
   'Birthday',
   'C/D Event',
   'Comp Day'
-];
+] as const;
