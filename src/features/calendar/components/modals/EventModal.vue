@@ -87,7 +87,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { format } from 'date-fns';
+import { formatEventDateRange } from '@/features/calendar/utils/formatEventDates';
 import BaseModal from '@/components/BaseModal.vue';
 import EditEventModal from '@/features/calendar/components/modals/EditEventModal.vue';
 import { getPersonColorStyle, getStaffAvatarUrl } from '@/features/calendar/utils';
@@ -132,20 +132,10 @@ const staffSummary = computed((): string => {
 });
 
 const eventDates = computed((): string => {
-  const startDate = new Date(event.start.replace(/-/g, '/'));
-  const endDate = new Date(event.end.replace(/-/g, '/'));
-  const sameDay = event.start === event.end;
-  const sameYear = startDate.getFullYear() === endDate.getFullYear();
-
-  if (sameDay) {
-    return format(startDate, 'MMM d, yyyy');
-  }
-
-  if (sameYear) {
-    return `${format(startDate, 'MMM d')} - ${format(endDate, 'MMM d, yyyy')}`;
-  }
-
-  return `${format(startDate, 'MMM d, yyyy')} - ${format(endDate, 'MMM d, yyyy')}`;
+  return formatEventDateRange({
+    start: event.start,
+    end: event.end
+  });
 });
 
 function imgUrl(name: string): string {
