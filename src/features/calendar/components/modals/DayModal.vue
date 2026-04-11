@@ -132,6 +132,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { format } from 'date-fns';
+import { formatEventDateRange } from '@/features/calendar/utils/formatEventDates';
 import BaseModal from '@/components/BaseModal.vue';
 import EditEventModal from '@/features/calendar/components/modals/EditEventModal.vue';
 import { getPersonColorStyle, getStaffAvatarUrl } from '@/features/calendar/utils';
@@ -201,20 +202,10 @@ function deleteEvent(event: CalendarEvent): void {
 }
 
 function formatEventDates(event: CalendarEvent): string {
-  const start = new Date(event.start.replace(/-/g, '/'));
-  const end = new Date(event.end.replace(/-/g, '/'));
-  const sameDay = event.start === event.end;
-  const sameYear = start.getFullYear() === end.getFullYear();
-
-  if (sameDay) {
-    return format(start, 'MMM d, yyyy');
-  }
-
-  if (sameYear) {
-    return `${format(start, 'MMM d')} - ${format(end, 'MMM d, yyyy')}`;
-  }
-
-  return `${format(start, 'MMM d, yyyy')} - ${format(end, 'MMM d, yyyy')}`;
+  return formatEventDateRange({
+    start: event.start,
+    end: event.end
+  });
 }
 
 function getEventLabel(event: CalendarEvent): string {
