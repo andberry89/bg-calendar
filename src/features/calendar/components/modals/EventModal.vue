@@ -33,8 +33,8 @@
         <div class="event-meta">
           <div class="event-name">
             <span class="event-type">
-              {{ event.class === 'cd-event' ? event.details : event.type }}
-              {{ event.class === 'birthday' ? '🎂' : '' }}
+              {{ eventTitle }}
+              {{ eventEmoji }}
             </span>
           </div>
 
@@ -136,6 +136,14 @@ const eventDates = computed((): string => {
     start: event.start,
     end: event.end
   });
+});
+
+const eventTitle = computed((): string => {
+  return event.class === 'cd-event' ? event.details : event.type;
+});
+
+const eventEmoji = computed((): string => {
+  return event.class === 'birthday' ? '🎂' : '';
 });
 
 function imgUrl(name: string): string {

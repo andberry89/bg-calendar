@@ -1,9 +1,9 @@
 <template>
   <BaseModal @update="cancelModal" @close="cancelModal">
-    <div class="edit-event-modal">
-      <div class="edit-event-modal__header">
-        <h3 class="edit-event-modal__title">Edit Event</h3>
-        <button class="edit-event-modal__close" type="button" @click="cancelModal">×</button>
+    <div class="event-form-modal">
+      <div class="event-form-modal__header">
+        <h3 class="event-form-modal__title">Edit Event</h3>
+        <button class="event-form-modal__close" type="button" @click="cancelModal">×</button>
       </div>
 
       <EventForm
@@ -71,7 +71,7 @@ function cancelModal(): void {
 </script>
 
 <style lang="scss" scoped>
-.edit-event-modal {
+.event-form-modal {
   position: relative;
   width: min(560px, calc(100vw - 24px));
   max-width: 560px;
@@ -81,7 +81,7 @@ function cancelModal(): void {
   background: transparent;
 }
 
-.edit-event-modal__header {
+.event-form-modal__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -90,7 +90,7 @@ function cancelModal(): void {
   padding: 0 0 12px;
 }
 
-.edit-event-modal__title {
+.event-form-modal__title {
   margin: 0;
   color: #0f172a;
   font-size: 1.15rem;
@@ -99,7 +99,7 @@ function cancelModal(): void {
   letter-spacing: 0.01em;
 }
 
-.edit-event-modal__close {
+.event-form-modal__close {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -133,11 +133,11 @@ function cancelModal(): void {
 }
 
 @media (max-width: 640px) {
-  .edit-event-modal {
+  .event-form-modal {
     padding: 14px;
   }
 
-  .edit-event-modal__header {
+  .event-form-modal__header {
     margin-bottom: 12px;
     padding-bottom: 10px;
   }
