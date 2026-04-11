@@ -70,6 +70,8 @@ const eventTypeConfig: Readonly<Record<EventType, EventTypeConfig>> = {
   }
 };
 
+export const eventTypes = Object.keys(eventTypeConfig) as EventType[];
+
 export function getEventTypeConfig(type: DraftEventType): EventTypeConfig | null {
   return type ? eventTypeConfig[type] : null;
 }

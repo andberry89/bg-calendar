@@ -50,7 +50,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import {
-  eventType,
+  eventTypes,
   getPersonColorStyle,
   getEventTypeConfig,
   getStaffAvatarUrl,
@@ -72,7 +72,7 @@ const emit = defineEmits<{
 
 const staffStore = useStaffStore();
 
-const filterableEventTypes: readonly FilterableEventType[] = eventType.filter(
+const filterableEventTypes: readonly FilterableEventType[] = eventTypes.filter(
   (type): type is FilterableEventType => type !== 'Holiday' && type !== 'Birthday'
 );
 
