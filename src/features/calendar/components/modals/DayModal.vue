@@ -81,8 +81,8 @@
           </div>
 
           <h4 class="day-modal__details-title">
-            {{ selectedEvent.class === 'cd-event' ? selectedEvent.details : selectedEvent.type }}
-            {{ selectedEvent.class === 'birthday' ? '🎂' : '' }}
+            {{ selectedEventTitle }}
+            {{ selectedEventEmoji }}
           </h4>
 
           <div class="day-modal__details-dates">
@@ -162,6 +162,24 @@ const title = computed((): string => {
     new Date(props.currentDate.year, props.currentDate.month, props.date),
     'MMMM d, yyyy'
   );
+});
+
+const selectedEventTitle = computed((): string => {
+  if (!selectedEvent.value) {
+    return '';
+  }
+
+  return selectedEvent.value.class === 'cd-event'
+    ? selectedEvent.value.details
+    : selectedEvent.value.type;
+});
+
+const selectedEventEmoji = computed((): string => {
+  if (!selectedEvent.value) {
+    return '';
+  }
+
+  return selectedEvent.value.class === 'birthday' ? '🎂' : '';
 });
 
 function closeDayModal(): void {
