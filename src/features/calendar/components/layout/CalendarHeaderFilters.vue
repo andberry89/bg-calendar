@@ -50,6 +50,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import {
+  eventType,
   getPersonColorStyle,
   getEventTypeConfig,
   getStaffAvatarUrl,
@@ -57,6 +58,8 @@ import {
 } from '@/features/calendar/utils';
 import type { EventType, Staff } from '@/types/calendar';
 import { useStaffStore } from '@/stores/staff';
+
+type FilterableEventType = Exclude<EventType, 'Holiday' | 'Birthday'>;
 
 const props = defineProps<{
   staff: Staff[];
@@ -69,14 +72,9 @@ const emit = defineEmits<{
 
 const staffStore = useStaffStore();
 
-const filterableEventTypes: Exclude<EventType, 'Holiday' | 'Birthday'>[] = [
-  'Vacation',
-  'Sick Time',
-  'Press Trip',
-  'Auto Show',
-  'C/D Event',
-  'Comp Day'
-];
+const filterableEventTypes: readonly FilterableEventType[] = eventType.filter(
+  (type): type is FilterableEventType => type !== 'Holiday' && type !== 'Birthday'
+);
 
 const hasActiveFilters = computed((): boolean => {
   return props.filters.types.length > 0 || props.filters.staffIds.length > 0;
@@ -90,9 +88,7 @@ function imgUrl(name: string): string {
   return getStaffAvatarUrl(name);
 }
 
-function getTypePillStyle(
-  type: Exclude<EventType, 'Holiday' | 'Birthday'>
-): Record<string, string> {
+function getTypePillStyle(type: FilterableEventType): Record<string, string> {
   const config = getEventTypeConfig(type);
 
   return {
@@ -114,7 +110,7 @@ function isStaffSelected(id: string): boolean {
   return props.filters.staffIds[0] === id;
 }
 
-function isTypeSelected(type: Exclude<EventType, 'Holiday' | 'Birthday'>): boolean {
+function isTypeSelected(type: FilterableEventType): boolean {
   return props.filters.types[0] === type;
 }
 
@@ -127,7 +123,7 @@ function toggleStaff(id: string): void {
   });
 }
 
-function toggleType(type: Exclude<EventType, 'Holiday' | 'Birthday'>): void {
+function toggleType(type: FilterableEventType): void {
   const current = props.filters.types[0];
 
   emit('filters', {
