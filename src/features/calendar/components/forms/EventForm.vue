@@ -3,7 +3,7 @@
     <label for="eventType">Event Type</label>
     <select id="eventType" v-model="localEvent.type" @change="emitModelValue">
       <option disabled value="">--Event Type--</option>
-      <option v-for="option in eventType" :key="option" :value="option">
+      <option v-for="option in eventTypes" :key="option" :value="option">
         {{ option }}
       </option>
     </select>
@@ -101,7 +101,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import {
-  eventType,
+  eventTypes,
   getSpecialDayReminder,
   createNewCalendarEvent,
   syncEventDates,

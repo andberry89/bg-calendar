@@ -22,14 +22,3 @@ export const weekdayNames = [
   'Friday',
   'Saturday'
 ];
-
-export const eventType = [
-  'Vacation',
-  'Sick Time',
-  'Holiday',
-  'Press Trip',
-  'Auto Show',
-  'Birthday',
-  'C/D Event',
-  'Comp Day'
-];
