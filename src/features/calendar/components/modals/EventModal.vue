@@ -87,7 +87,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { formatEventDateRange } from '@/features/calendar/utils/formatEventDates';
+import { formatEventDateRange } from '@/features/calendar/utils';
 import BaseModal from '@/components/BaseModal.vue';
 import EditEventModal from '@/features/calendar/components/modals/EditEventModal.vue';
 import {

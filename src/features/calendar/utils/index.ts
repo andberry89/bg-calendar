@@ -1,19 +1,23 @@
-export * from './assignEvents';
-export { default as assignEvents } from './assignEvents';
-export * from './colorTokens';
-export * from './eventCreation';
-export * from './eventDateSync';
-export * from './eventRules';
-export * from './eventTypeConfig';
-export * from './eventValidation';
-export * from './filterEvents';
-export * from './formatEventDates';
-export * from './getCurrentDate';
-export * from './getCurrentMonthEvents';
-export * from './getMonthDayCounts';
-export * from './selectOptions';
-export * from './sortEvents';
-export * from './staffAvatars';
-export * from './staffIdentity';
-export * from './formatEventDates';
-export * from './eventDisplay';
+export * from './assignment/assignEvents';
+export { default as assignEvents } from './assignment/assignEvents';
+export * from './assignment/weekRegularEventLayout';
+
+export * from './dates/getCurrentDate';
+export * from './dates/getMonthDayCounts';
+
+export * from './display/colorTokens';
+export * from './display/eventDisplay';
+export * from './display/formatEventDates';
+export * from './display/selectOptions';
+
+export * from './events/eventCreation';
+export * from './events/eventDateSync';
+export * from './events/eventRules';
+export * from './events/eventTypeConfig';
+export * from './events/eventValidation';
+export * from './events/filterEvents';
+export * from './events/getCurrentMonthEvents';
+export * from './events/sortEvents';
+
+export * from './staff/staffAvatars';
+export * from './staff/staffIdentity';
