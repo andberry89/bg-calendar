@@ -3,17 +3,17 @@
     <div class="filters-left">
       <div class="staff-filters">
         <button
-          v-for="member in staff"
+          v-for="member in staffIdentityList"
           :key="member.id"
           type="button"
           class="staff-filter"
           :class="{ active: isStaffSelected(member.id) }"
-          :style="getStaffColorStyle(member.id)"
+          :style="member.colorStyle"
           :title="member.shortName"
           @click="toggleStaff(member.id)"
         >
           <span class="staff-avatar">
-            <img :src="imgUrl(member.lastName)" :alt="member.shortName" />
+            <img :src="member.avatarSrc" :alt="member.shortName" />
           </span>
           <span class="staff-label">{{ member.shortName }}</span>
         </button>
@@ -54,7 +54,8 @@ import {
   getPersonColorStyle,
   getEventTypeConfig,
   getStaffAvatarUrl,
-  type EventFilters
+  type EventFilters,
+  getVisibleStaff
 } from '@/features/calendar/utils';
 import type { EventType, Staff } from '@/types/calendar';
 import { useStaffStore } from '@/stores/staff';
@@ -71,6 +72,28 @@ const emit = defineEmits<{
 }>();
 
 const staffStore = useStaffStore();
+
+interface StaffFilterIdentity {
+  id: string;
+  shortName: string;
+  avatarSrc: string;
+  colorStyle: Record<string, string>;
+}
+
+const staffIdentityList = computed((): StaffFilterIdentity[] => {
+  return getVisibleStaff(props.staff, props.staff.length).map((member) => {
+    const key = staffStore.staffColorKeyById[member.id];
+
+    const colorStyle = key ? getPersonColorStyle(key) : getPersonColorStyle('person-1');
+
+    return {
+      id: member.id,
+      shortName: member.shortName,
+      avatarSrc: imgUrl(member.lastName),
+      colorStyle
+    };
+  });
+});
 
 const filterableEventTypes: readonly FilterableEventType[] = eventTypes.filter(
   (type): type is FilterableEventType => type !== 'Holiday' && type !== 'Birthday'
@@ -94,16 +117,6 @@ function getTypePillStyle(type: FilterableEventType): Record<string, string> {
   return {
     '--type-pill-color': config ? `var(${config.colorVar})` : 'rgba(255, 255, 255, 0.9)'
   };
-}
-
-function getStaffColorStyle(staffId: string): Record<string, string> {
-  const key = staffStore.staffColorKeyById[staffId];
-
-  if (!key) {
-    return getPersonColorStyle('person-1');
-  }
-
-  return getPersonColorStyle(key);
 }
 
 function isStaffSelected(id: string): boolean {

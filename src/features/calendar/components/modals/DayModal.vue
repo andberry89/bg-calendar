@@ -9,8 +9,8 @@
       <div v-if="events.length > 0" class="day-modal__content">
         <div class="day-modal__events">
           <button
-            v-for="(calendarEvent, idx) in events"
-            :key="`${calendarEvent.id}-${idx}`"
+            v-for="calendarEvent in events"
+            :key="calendarEvent.id"
             class="day-modal__event"
             type="button"
             @click="selectEvent(calendarEvent)"
@@ -36,9 +36,9 @@
                 v-for="person in getVisibleStaff(calendarEvent)"
                 :key="person.id"
                 class="day-modal__event-avatar"
-                :style="getStaffColorStyle(person.id)"
+                :style="person.colorStyle"
               >
-                <img :src="imgUrl(person.lastName)" :alt="person.shortName" />
+                <img :src="person.avatarSrc" :alt="person.shortName" />
               </span>
               <span
                 v-if="getRemainingStaffCount(calendarEvent) > 0"
@@ -63,9 +63,9 @@
                 v-for="person in getVisibleStaff(selectedEvent)"
                 :key="person.id"
                 class="day-modal__details-avatar"
-                :style="getStaffColorStyle(person.id)"
+                :style="person.colorStyle"
               >
-                <img :src="imgUrl(person.lastName)" :alt="person.shortName" />
+                <img :src="person.avatarSrc" :alt="person.shortName" />
               </span>
               <span
                 v-if="getRemainingStaffCount(selectedEvent) > 0"
@@ -132,11 +132,16 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { format } from 'date-fns';
-import { formatEventDateRange } from '@/features/calendar/utils/formatEventDates';
+import {} from '@/features/calendar/utils';
 import BaseModal from '@/components/BaseModal.vue';
 import EditEventModal from '@/features/calendar/components/modals/EditEventModal.vue';
-import { getPersonColorStyle, getStaffAvatarUrl } from '@/features/calendar/utils';
-import type { CalendarEvent, CurrentDate, Staff } from '@/types/calendar';
+import {
+  getPersonColorStyle,
+  getStaffAvatarUrl,
+  formatEventDateRange,
+  getStaffSummary
+} from '@/features/calendar/utils';
+import type { CalendarEvent, CurrentDate } from '@/types/calendar';
 import { useStaffStore } from '@/stores/staff';
 
 const props = defineProps<{
@@ -261,24 +266,24 @@ function getEventLabel(event: CalendarEvent): string {
   return event.type;
 }
 
-function getEventStaffSummary(event: CalendarEvent): string {
-  const [firstStaff] = event.staff;
-
-  if (!firstStaff) {
-    return '';
-  }
-
-  const baseName = `${firstStaff.firstName} ${firstStaff.lastName.charAt(0)}.`;
-
-  if (event.staff.length === 1) {
-    return baseName;
-  }
-
-  return `${baseName} (+${event.staff.length - 1} more)`;
+interface StaffIdentity {
+  id: string;
+  shortName: string;
+  avatarSrc: string;
+  colorStyle: Record<string, string>;
 }
 
-function getVisibleStaff(event: CalendarEvent): Staff[] {
-  return event.staff.slice(0, 3);
+function getStaffIdentityList(event: CalendarEvent): StaffIdentity[] {
+  return event.staff.map((person) => ({
+    id: person.id,
+    shortName: person.shortName,
+    avatarSrc: imgUrl(person.lastName),
+    colorStyle: getStaffColorStyle(person.id)
+  }));
+}
+
+function getVisibleStaff(event: CalendarEvent): StaffIdentity[] {
+  return getStaffIdentityList(event).slice(0, 3);
 }
 
 function getRemainingStaffCount(event: CalendarEvent): number {
@@ -297,6 +302,9 @@ function getStaffColorStyle(staffId: string): Record<string, string> {
   }
 
   return getPersonColorStyle(key);
+}
+function getEventStaffSummary(event: CalendarEvent): string {
+  return getStaffSummary(event.staff);
 }
 </script>
 

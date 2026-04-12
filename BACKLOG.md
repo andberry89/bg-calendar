@@ -53,6 +53,30 @@
     - Keep avatar-first identity presentation consistent
     - Prefer extending shared helpers over introducing parallel display patterns
 
+- [ ] CAL-032 Clean up unstable Vue keys
+  - type: refactor
+  - priority: P2
+  - scope: small
+  - notes:
+    - Replace index-based or weak keys in active components
+    - Focus on:
+      - EditStaff.vue
+      - DayModal.vue
+    - Prefer stable identifiers (id-based keys)
+    - Avoid unnecessary re-renders or key collisions
+
+- [ ] CAL-033 Consolidate event display mapping
+  - type: refactor
+  - priority: P3
+  - scope: small
+  - notes:
+    - Reduce duplicated event display/title mapping logic
+    - Seen across:
+      - CalendarEvent.vue
+      - EventModal.vue
+      - DayModal.vue
+    - Do not introduce new abstraction unless duplication increases
+
 ---
 
 ## Icebox (Future Ideas)

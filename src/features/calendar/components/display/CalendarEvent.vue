@@ -54,10 +54,10 @@ import {
   getEventTypeColor,
   getEventTypePillBg,
   getEventTypePillBorder,
-  getStaffAvatarUrl
+  getStaffAvatarUrl,
+  getStaffDisplayName as formatStaffDisplayName
 } from '@/features/calendar/utils';
 import type { AssignedCalendarEvent, CalendarEvent, Staff } from '@/types/calendar';
-
 const { event } = defineProps<{
   event: CalendarEvent | AssignedCalendarEvent;
 }>();
@@ -112,7 +112,51 @@ const pillShape = computed((): EventPillShape => {
   return 'middle';
 });
 
-const leadStaff = computed((): StaffMember | undefined => event.staff[0]);
+const leadStaff = computed((): StaffMember | null => {
+  return event.staff[0] ?? null;
+});
+
+const leadStaffIdentity = computed(
+  (): {
+    avatarSrc: string;
+    avatarFallback: string;
+    displayName: string;
+  } | null => {
+    const staff = leadStaff.value;
+
+    if (!staff) {
+      return null;
+    }
+
+    const lastName = staff.lastName?.trim() ?? '';
+    const shortName = staff.shortName?.trim() ?? '';
+    const initials = staff.initials?.trim() ?? '';
+    const firstName =
+      ('firstName' in staff && typeof staff.firstName === 'string' ? staff.firstName.trim() : '') ||
+      shortName;
+
+    const avatarFallback = initials
+      ? initials.slice(0, 2).toUpperCase()
+      : shortName
+          .split(/\s+/)
+          .map((part) => part[0] ?? '')
+          .join('')
+          .slice(0, 2)
+          .toUpperCase() || 'ST';
+
+    const displayName = firstName
+      ? lastName[0]
+        ? `${firstName} ${lastName[0].toUpperCase()}.`
+        : firstName
+      : 'Staff';
+
+    return {
+      avatarSrc: lastName ? imgUrl(lastName) : getStaffAvatarUrl('user'),
+      avatarFallback,
+      displayName
+    };
+  }
+);
 
 const multiStaffCount = computed((): number => {
   if (!event.staff.length) {
@@ -131,72 +175,30 @@ const showAvatar = computed((): boolean => {
     return false;
   }
 
-  return Boolean(leadStaff.value);
+  return leadStaffIdentity.value !== null;
 });
 
 const avatarSrc = computed((): string => {
-  const staff = leadStaff.value;
-
-  if (!staff?.lastName) {
-    return getStaffAvatarUrl('user');
-  }
-
-  return imgUrl(staff.lastName);
+  return leadStaffIdentity.value?.avatarSrc ?? getStaffAvatarUrl('user');
 });
 
 const avatarFallback = computed((): string => {
-  const staff = leadStaff.value;
-
-  if (!staff) {
-    return 'ST';
-  }
-
-  if (typeof staff.initials === 'string' && staff.initials.trim()) {
-    return staff.initials.trim().slice(0, 2).toUpperCase();
-  }
-
-  if (typeof staff.shortName === 'string' && staff.shortName.trim()) {
-    return staff.shortName
-      .trim()
-      .split(/\s+/)
-      .map((part) => part[0] ?? '')
-      .join('')
-      .slice(0, 2)
-      .toUpperCase();
-  }
-
-  return 'ST';
+  return leadStaffIdentity.value?.avatarFallback ?? 'ST';
 });
 
-function getStaffDisplayName(): string {
-  const staff = event.staff?.[0];
-
-  if (!staff) {
-    return 'Staff';
-  }
-
-  const firstName =
-    (staff as Staff & { firstName?: string }).firstName?.trim() || staff.shortName?.trim() || '';
-
-  const lastName = staff.lastName?.trim() || '';
-  const lastInitial = lastName[0]?.toUpperCase() ?? '';
-
-  if (!firstName) {
-    return 'Staff';
-  }
-
-  return lastInitial ? `${firstName} ${lastInitial}.` : firstName;
+function resolveStaffDisplayName(): string {
+  return formatStaffDisplayName(leadStaff.value ?? undefined);
 }
 
 const primaryText = computed((): string => {
   switch (event.class) {
     case 'birthday':
-      return `${getStaffDisplayName()} Birthday`;
+      return `${resolveStaffDisplayName()} Birthday`;
     case 'press-trip':
     case 'vacation':
     case 'sick-time':
     case 'comp-day':
-      return getStaffDisplayName();
+      return resolveStaffDisplayName();
     case 'auto-show':
       return 'Auto Show';
     case 'cd-event':

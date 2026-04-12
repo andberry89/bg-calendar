@@ -14,3 +14,5 @@ export * from './getMonthDayCounts';
 export * from './selectOptions';
 export * from './sortEvents';
 export * from './staffAvatars';
+export * from './staffIdentity';
+export * from './formatEventDates';
