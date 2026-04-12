@@ -44,18 +44,6 @@
 
 - [ ] CAL-025 Audit click-outside directive usage
 
-- [ ] CAL-033 Consolidate event display mapping
-  - type: refactor
-  - priority: P3
-  - scope: small
-  - notes:
-    - Reduce duplicated event display/title mapping logic
-    - Seen across:
-      - CalendarEvent.vue
-      - EventModal.vue
-      - DayModal.vue
-    - Do not introduce new abstraction unless duplication increases
-
 ---
 
 ## Icebox (Future Ideas)
@@ -122,3 +110,6 @@
 
 - [x] CAL-032 Clean up unstable Vue keys
   - PR: refactor(calendar): clean up remaining unstable Vue keys
+
+- [x] CAL-033 Consolidate event display mapping
+  - PR: refactor(events): consolidate shared event display mapping across calendar surfaces
