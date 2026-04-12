@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { fetchEvents as fetchEventsData } from '@/services/calendar/calendar-data';
+import { fetchEvents as fetchEventsData } from '@/features/calendar/services/calendar-data';
 import {
   addEvent as addEventMutation,
   deleteEvent as deleteEventMutation,
