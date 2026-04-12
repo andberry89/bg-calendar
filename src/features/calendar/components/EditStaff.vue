@@ -50,8 +50,8 @@
     <div v-if="showForm.remove" class="edit-staff__panel">
       <div class="remove-staff-form">
         <button
-          v-for="(person, idx) in staff"
-          :key="'staff-' + idx"
+          v-for="person in staff"
+          :key="person.id"
           type="button"
           class="remove-staff-card"
           @click="emitStaff(person)"

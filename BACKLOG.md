@@ -44,15 +44,6 @@
 
 - [ ] CAL-025 Audit click-outside directive usage
 
-- [ ] CAL-031 Standardize staff identity presentation
-  - type: refactor
-  - priority: P2
-  - scope: medium
-  - notes:
-    - Review repeated avatar, fallback, and summary logic across active components
-    - Keep avatar-first identity presentation consistent
-    - Prefer extending shared helpers over introducing parallel display patterns
-
 - [ ] CAL-032 Clean up unstable Vue keys
   - type: refactor
   - priority: P2
@@ -137,3 +128,6 @@
 
 - [x] CAL-030 Centralize event display formatting helpers
   - PR: refactor(events): use shared date formatting in event details
+
+- [x] CAL-031 Standardize staff identity presentation
+  - PR: refactor(identity): standardize staff identity presentation across calendar
