@@ -73,8 +73,8 @@
       <template v-else>
         <div class="regular-event-lanes" :style="regularEventLanesStyle">
           <div
-            v-for="({ slot, rowIndex }, idx) in visibleRenderableRegularLaneSlots"
-            :key="'regular-lane-' + idx"
+            v-for="{ slot, rowIndex } in visibleRenderableRegularLaneSlots"
+            :key="slot.event ? `${slot.event.id}-${rowIndex}` : `regular-lane-empty-${rowIndex}`"
             class="regular-event-lane"
             :style="getLaneStyle(rowIndex, slot.spanRows)"
           >

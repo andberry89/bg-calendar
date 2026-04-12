@@ -1,17 +1,20 @@
 <template>
   <section class="calendar-body">
     <div class="weekdays">
-      <div class="weekday" v-for="(weekday, idx) in weekdays" :key="idx">
+      <div class="weekday" v-for="weekday in weekdays" :key="weekday">
         {{ weekday }}
       </div>
     </div>
 
     <div class="date" v-if="dataReady">
-      <template v-for="(week, wIdx) in weeks" :key="'week-' + wIdx">
+      <template
+        v-for="(week, wIdx) in weeks"
+        :key="`${week[0]?.month ?? 'week'}-${week[0]?.date ?? wIdx}`"
+      >
         <div class="calendar-week">
           <CalendarDay
             v-for="(cell, dIdx) in week"
-            :key="'day' + wIdx + '-' + dIdx"
+            :key="`${cell.month}-${cell.date}`"
             :dayClass="cell.month === 'current' ? 'day' : 'day-hidden'"
             :class="{ active: cell.month === 'current' && cell.date === currentDate.date }"
             @click="cell.month === 'current' && updateDate(cell.date)"
