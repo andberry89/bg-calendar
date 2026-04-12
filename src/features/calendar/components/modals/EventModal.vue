@@ -90,7 +90,12 @@ import { computed, ref } from 'vue';
 import { formatEventDateRange } from '@/features/calendar/utils/formatEventDates';
 import BaseModal from '@/components/BaseModal.vue';
 import EditEventModal from '@/features/calendar/components/modals/EditEventModal.vue';
-import { getPersonColorStyle, getStaffAvatarUrl, getStaffSummary } from '@/features/calendar/utils';
+import {
+  getPersonColorStyle,
+  getStaffAvatarUrl,
+  getStaffSummary,
+  getEventDisplayContent
+} from '@/features/calendar/utils';
 import type { CalendarEvent } from '@/types/calendar';
 import { useStaffStore } from '@/stores/staff';
 
@@ -140,12 +145,18 @@ const eventDates = computed((): string => {
   });
 });
 
+const eventDisplay = computed(() => {
+  return getEventDisplayContent(event, {
+    staffDisplayName: event.staff[0] ? leadStaffSummary.value : undefined
+  });
+});
+
 const eventTitle = computed((): string => {
-  return event.class === 'cd-event' ? event.details : event.type;
+  return eventDisplay.value.primary;
 });
 
 const eventEmoji = computed((): string => {
-  return event.class === 'birthday' ? '🎂' : '';
+  return eventDisplay.value.emoji;
 });
 
 function imgUrl(name: string): string {

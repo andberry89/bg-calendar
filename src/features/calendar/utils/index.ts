@@ -16,3 +16,4 @@ export * from './sortEvents';
 export * from './staffAvatars';
 export * from './staffIdentity';
 export * from './formatEventDates';
+export * from './eventDisplay';
