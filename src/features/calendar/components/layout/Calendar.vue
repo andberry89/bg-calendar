@@ -1,10 +1,6 @@
 <template>
   <main>
     <article id="calendar" :aria-busy="isLoading">
-      <!-- <article
-      id="calendar"
-      :style="{ 'background-image': 'url(' + require('@/assets/calendar/' + currentDate.month + '.jpg') + ')' }"
-    > -->
       <CalendarHeader
         :currentDate="currentDate"
         :staff="staff"
@@ -24,7 +20,6 @@
         @delete="updateEvents('delete', $event)"
       />
     </article>
-    <EventList v-if="showEvents" :events="filteredCurrentMonthEvents" :currentDate="currentDate" />
   </main>
   <footer>
     <em>Version {{ appVersion }}</em>
@@ -37,7 +32,6 @@ import { computed, onMounted, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import CalendarHeader from '@/features/calendar/components/layout/CalendarHeader.vue';
 import CalendarBody from '@/features/calendar/components/layout/CalendarBody.vue';
-import EventList from '@/features/calendar/components/layout/EventList.vue';
 import { useEventsStore } from '@/stores/events';
 import { useStaffStore } from '@/stores/staff';
 import {
@@ -69,7 +63,6 @@ const staffStore = useStaffStore();
 const { events } = storeToRefs(eventsStore);
 const { staff } = storeToRefs(staffStore);
 
-const showEvents = ref(false);
 const isLoading = ref(true);
 
 const sortedEvents = computed<EventsByYear>(() => sortEvents(events.value));
