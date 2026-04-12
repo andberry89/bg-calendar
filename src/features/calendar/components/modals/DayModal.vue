@@ -139,7 +139,8 @@ import {
   getPersonColorStyle,
   getStaffAvatarUrl,
   formatEventDateRange,
-  getStaffSummary
+  getStaffSummary,
+  getEventDisplayContent
 } from '@/features/calendar/utils';
 import type { CalendarEvent, CurrentDate } from '@/types/calendar';
 import { useStaffStore } from '@/stores/staff';
@@ -232,38 +233,20 @@ function formatEventDates(event: CalendarEvent): string {
 }
 
 function getEventLabel(event: CalendarEvent): string {
-  if (event.class === 'birthday') {
-    return `${event.staff[0].shortName}'s Birthday 🎂`;
+  const display = getEventDisplayContent(event, {
+    staffDisplayName: event.staff[0]?.shortName
+  });
+
+  // DayModal prefers inline composition
+  if (display.emoji) {
+    return `${display.primary} ${display.emoji}`;
   }
 
-  if (event.class === 'press-trip') {
-    return 'Press Trip';
+  if (display.secondary) {
+    return `${display.primary} — ${display.secondary}`;
   }
 
-  if (event.class === 'vacation') {
-    return 'Vacation';
-  }
-
-  if (event.class === 'sick-time') {
-    return 'Sick Time';
-  }
-
-  if (event.class === 'auto-show') {
-    return `Auto Show: ${event.details}`;
-  }
-
-  if (event.class === 'cd-event') {
-    return event.details;
-  }
-
-  if (event.class === 'holiday') {
-    const closure =
-      event.closed === 'full' ? 'Office Closed' : event.closed === 'half' ? 'Early Close' : '';
-
-    return closure ? `${event.details} — ${closure}` : event.details;
-  }
-
-  return event.type;
+  return display.primary;
 }
 
 interface StaffIdentity {
