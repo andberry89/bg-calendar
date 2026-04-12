@@ -44,18 +44,6 @@
 
 - [ ] CAL-025 Audit click-outside directive usage
 
-- [ ] CAL-032 Clean up unstable Vue keys
-  - type: refactor
-  - priority: P2
-  - scope: small
-  - notes:
-    - Replace index-based or weak keys in active components
-    - Focus on:
-      - EditStaff.vue
-      - DayModal.vue
-    - Prefer stable identifiers (id-based keys)
-    - Avoid unnecessary re-renders or key collisions
-
 - [ ] CAL-033 Consolidate event display mapping
   - type: refactor
   - priority: P3
@@ -131,3 +119,6 @@
 
 - [x] CAL-031 Standardize staff identity presentation
   - PR: refactor(identity): standardize staff identity presentation across calendar
+
+- [x] CAL-032 Clean up unstable Vue keys
+  - PR: refactor(calendar): clean up remaining unstable Vue keys
