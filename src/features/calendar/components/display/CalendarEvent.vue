@@ -55,7 +55,8 @@ import {
   getEventTypePillBg,
   getEventTypePillBorder,
   getStaffAvatarUrl,
-  getStaffDisplayName as formatStaffDisplayName
+  getStaffDisplayName as formatStaffDisplayName,
+  getEventDisplayContent
 } from '@/features/calendar/utils';
 import type { AssignedCalendarEvent, CalendarEvent, Staff } from '@/types/calendar';
 const { event } = defineProps<{
@@ -190,49 +191,21 @@ function resolveStaffDisplayName(): string {
   return formatStaffDisplayName(leadStaff.value ?? undefined);
 }
 
-const primaryText = computed((): string => {
-  switch (event.class) {
-    case 'birthday':
-      return `${resolveStaffDisplayName()} Birthday`;
-    case 'press-trip':
-    case 'vacation':
-    case 'sick-time':
-    case 'comp-day':
-      return resolveStaffDisplayName();
-    case 'auto-show':
-      return 'Auto Show';
-    case 'cd-event':
-      return event.details || 'C/D Event';
-    case 'holiday':
-      return event.details || event.type;
-    default:
-      return event.type;
-  }
+const eventDisplay = computed(() => {
+  return getEventDisplayContent(event, {
+    staffDisplayName: resolveStaffDisplayName()
+  });
 });
 
+const primaryText = computed((): string => eventDisplay.value.primary);
+
 const secondaryText = computed((): string => {
-  switch (event.class) {
-    case 'birthday':
-      return '🎂';
-    case 'press-trip':
-      return 'Press Trip';
-    case 'vacation':
-      return 'Off (PTO)';
-    case 'sick-time':
-      return 'Sick Time';
-    case 'auto-show':
-      return event.details;
-    case 'comp-day':
-      return 'Comp Day';
-    case 'holiday':
-      return event.closed === 'half'
-        ? 'Early Close'
-        : event.closed === 'full'
-          ? 'Office Closed'
-          : '';
-    default:
-      return '';
+  // emoji stays separate for now to avoid UI changes
+  if (eventDisplay.value.emoji) {
+    return eventDisplay.value.emoji;
   }
+
+  return eventDisplay.value.secondary;
 });
 
 const eventColorVar = computed((): string => {
