@@ -2,7 +2,7 @@
   <div class="events-list">
     <h2>Events for {{ month[currentDate.month] }} {{ currentDate.year }}</h2>
     <ul>
-      <li v-for="(event, idx) in events" :key="'event-' + idx">
+      <li v-for="event in events" :key="event.id">
         <span class="event-date"
           >{{ event.start.split('-').slice(1).join('/') }}
           {{
@@ -15,8 +15,8 @@
           {{ holidayDetails(event) }}
         </span>
         <span class="event-staff">
-          <span v-for="(s, sIdx) in event.staff" :key="'staff-' + sIdx">
-            {{ s.shortName }}<span v-if="sIdx < event.staff.length - 1">, </span>
+          <span v-for="s in event.staff" :key="s.id">
+            {{ s.shortName }}<span v-if="s.id !== event.staff[event.staff.length - 1]?.id">, </span>
           </span>
         </span>
       </li>
