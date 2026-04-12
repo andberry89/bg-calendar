@@ -34,13 +34,29 @@
 - [ ] CAL-023 Automatic holiday and birthday event generation
   - type: feature
   - priority: P2
-  - scope: medium
+  - scope: large
   - notes:
-    - Add a system for automatically creating holiday events
-    - Add support for automatically creating birthday events
-    - Define whether these are seeded, recurring, or generated at render time
-    - Keep behavior configurable so auto-generated events can be distinguished from manual events
-    - Avoid changing layout/lane behavior unless required
+    - Introduce system-generated events for holidays and birthdays
+    - Holidays:
+      - Support fixed and variable-date holidays (e.g., July 4, Thanksgiving)
+    - Birthdays:
+      - Require adding optional `birthdate` field to Staff model
+      - Require updates to staff create/edit flows to manage birthdays
+    - Event generation:
+      - Generate events at runtime (do not persist in event state)
+      - Merge generated events with manual events before assignment
+      - Do not generate events inside components
+    - Data modeling:
+      - Add a `source` field (e.g., 'manual' | 'holiday' | 'birthday')
+      - Ensure compatibility with existing event types and rendering
+    - Constraints:
+      - Do not modify layout/lane behavior
+      - Do not introduce new modal patterns
+      - Maintain existing rendering pipeline
+    - Future considerations (not in scope):
+      - Toggle visibility of auto-generated events
+      - Override/edit generated events
+      - Advanced recurrence system
 
 ---
 
