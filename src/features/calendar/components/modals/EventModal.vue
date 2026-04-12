@@ -12,9 +12,9 @@
               v-for="person in visibleStaff"
               :key="person.id"
               class="event-header__avatar"
-              :style="getStaffColorStyle(person.id)"
+              :style="person.colorStyle"
             >
-              <img :src="imgUrl(person.lastName)" :alt="person.shortName" />
+              <img :src="person.avatarSrc" :alt="person.shortName" />
             </span>
 
             <span
@@ -26,7 +26,7 @@
           </div>
 
           <div class="event-header__staff">
-            {{ staffSummary }}
+            {{ leadStaffSummary }}
           </div>
         </div>
 
@@ -91,7 +91,7 @@ import { formatEventDateRange } from '@/features/calendar/utils/formatEventDates
 import BaseModal from '@/components/BaseModal.vue';
 import EditEventModal from '@/features/calendar/components/modals/EditEventModal.vue';
 import { getPersonColorStyle, getStaffAvatarUrl } from '@/features/calendar/utils';
-import type { CalendarEvent, Staff } from '@/types/calendar';
+import type { CalendarEvent } from '@/types/calendar';
 import { useStaffStore } from '@/stores/staff';
 
 const { event } = defineProps<{
@@ -109,20 +109,36 @@ const staffStore = useStaffStore();
 const isConfirmingDelete = ref(false);
 const showEditModal = ref(false);
 
-const visibleStaff = computed((): Staff[] => event.staff.slice(0, 3));
+interface VisibleStaffIdentity {
+  id: string;
+  shortName: string;
+  avatarSrc: string;
+  colorStyle: Record<string, string>;
+}
+
+const visibleStaff = computed((): VisibleStaffIdentity[] => {
+  return event.staff.slice(0, 3).map((person) => ({
+    id: person.id,
+    shortName: person.shortName,
+    avatarSrc: imgUrl(person.lastName),
+    colorStyle: getStaffColorStyle(person.id)
+  }));
+});
 
 const remainingStaffCount = computed((): number => {
   return Math.max(event.staff.length - visibleStaff.value.length, 0);
 });
 
-const staffSummary = computed((): string => {
-  const [firstStaff] = event.staff;
+const leadStaffSummary = computed((): string => {
+  const firstStaff = event.staff[0];
 
   if (!firstStaff) {
     return '';
   }
 
-  const baseName = `${firstStaff.firstName} ${firstStaff.lastName.charAt(0)}.`;
+  const firstName = firstStaff.firstName.trim();
+  const lastInitial = firstStaff.lastName.trim()[0]?.toUpperCase() ?? '';
+  const baseName = lastInitial ? `${firstName} ${lastInitial}.` : firstName;
 
   if (event.staff.length === 1) {
     return baseName;
