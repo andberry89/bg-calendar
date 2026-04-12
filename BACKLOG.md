@@ -23,6 +23,10 @@
   - notes:
     - Project overview, architecture, setup, workflows
 
+---
+
+## Icebox (Future Ideas)
+
 - [ ] CAL-023 Automatic holiday and birthday event generation
   - type: feature
   - priority: P2
@@ -49,12 +53,6 @@
       - Toggle visibility of auto-generated events
       - Override/edit generated events
       - Advanced recurrence system
-
----
-
-## Icebox (Future Ideas)
-
-- [ ] <TASK-ID> <idea>
 
 ---
 
