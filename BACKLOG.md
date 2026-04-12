@@ -16,13 +16,6 @@
     - Add high-value comments (intent, edge cases)
     - Avoid redundant comments
 
-- [ ] CAL-020 README documentation
-  - type: docs
-  - priority: P1
-  - scope: medium
-  - notes:
-    - Project overview, architecture, setup, workflows
-
 ---
 
 ## Icebox (Future Ideas)
@@ -84,8 +77,11 @@
 
 - [x] **CAL-017E — Local state/type cleanup**
   - PR: refactor(events): remove non-null assertion in CalendarDay modal
+
 - [x] CAL-019 File and folder organization review
   - PR:refactor(calendar): reorganize calendar feature structure and utils
+
+- [x] CAL-020 README documentation
 
 - [x] CAL-021 Improve disabled form section visibility
   - PR: feat(events): improve event form field visibility by type
@@ -95,6 +91,7 @@
 
 - [x] CAL-024 Revisit event form field rules alignment
   - PR: refactor(events): align event form field visibility with event type config
+
 - [x] CAL-025 Audit click-outside directive usage
   - PR: refactor(directives): remove unused click-outside directive
 
