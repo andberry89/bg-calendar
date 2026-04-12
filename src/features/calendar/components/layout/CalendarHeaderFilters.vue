@@ -54,7 +54,8 @@ import {
   getPersonColorStyle,
   getEventTypeConfig,
   getStaffAvatarUrl,
-  type EventFilters
+  type EventFilters,
+  getVisibleStaff
 } from '@/features/calendar/utils';
 import type { EventType, Staff } from '@/types/calendar';
 import { useStaffStore } from '@/stores/staff';
@@ -80,7 +81,7 @@ interface StaffFilterIdentity {
 }
 
 const staffIdentityList = computed((): StaffFilterIdentity[] => {
-  return props.staff.map((member) => {
+  return getVisibleStaff(props.staff, props.staff.length).map((member) => {
     const key = staffStore.staffColorKeyById[member.id];
 
     const colorStyle = key ? getPersonColorStyle(key) : getPersonColorStyle('person-1');

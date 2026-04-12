@@ -54,10 +54,10 @@ import {
   getEventTypeColor,
   getEventTypePillBg,
   getEventTypePillBorder,
-  getStaffAvatarUrl
+  getStaffAvatarUrl,
+  getStaffDisplayName as formatStaffDisplayName
 } from '@/features/calendar/utils';
 import type { AssignedCalendarEvent, CalendarEvent, Staff } from '@/types/calendar';
-
 const { event } = defineProps<{
   event: CalendarEvent | AssignedCalendarEvent;
 }>();
@@ -186,19 +186,19 @@ const avatarFallback = computed((): string => {
   return leadStaffIdentity.value?.avatarFallback ?? 'ST';
 });
 
-function getStaffDisplayName(): string {
-  return leadStaffIdentity.value?.displayName ?? 'Staff';
+function resolveStaffDisplayName(): string {
+  return formatStaffDisplayName(leadStaff.value ?? undefined);
 }
 
 const primaryText = computed((): string => {
   switch (event.class) {
     case 'birthday':
-      return `${getStaffDisplayName()} Birthday`;
+      return `${resolveStaffDisplayName()} Birthday`;
     case 'press-trip':
     case 'vacation':
     case 'sick-time':
     case 'comp-day':
-      return getStaffDisplayName();
+      return resolveStaffDisplayName();
     case 'auto-show':
       return 'Auto Show';
     case 'cd-event':

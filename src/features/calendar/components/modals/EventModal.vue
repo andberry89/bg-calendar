@@ -90,7 +90,7 @@ import { computed, ref } from 'vue';
 import { formatEventDateRange } from '@/features/calendar/utils/formatEventDates';
 import BaseModal from '@/components/BaseModal.vue';
 import EditEventModal from '@/features/calendar/components/modals/EditEventModal.vue';
-import { getPersonColorStyle, getStaffAvatarUrl } from '@/features/calendar/utils';
+import { getPersonColorStyle, getStaffAvatarUrl, getStaffSummary } from '@/features/calendar/utils';
 import type { CalendarEvent } from '@/types/calendar';
 import { useStaffStore } from '@/stores/staff';
 
@@ -130,21 +130,7 @@ const remainingStaffCount = computed((): number => {
 });
 
 const leadStaffSummary = computed((): string => {
-  const firstStaff = event.staff[0];
-
-  if (!firstStaff) {
-    return '';
-  }
-
-  const firstName = firstStaff.firstName.trim();
-  const lastInitial = firstStaff.lastName.trim()[0]?.toUpperCase() ?? '';
-  const baseName = lastInitial ? `${firstName} ${lastInitial}.` : firstName;
-
-  if (event.staff.length === 1) {
-    return baseName;
-  }
-
-  return `${baseName} (+${event.staff.length - 1} more)`;
+  return getStaffSummary(event.staff);
 });
 
 const eventDates = computed((): string => {

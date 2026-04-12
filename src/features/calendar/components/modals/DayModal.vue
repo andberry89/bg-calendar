@@ -132,10 +132,15 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { format } from 'date-fns';
-import { formatEventDateRange } from '@/features/calendar/utils/formatEventDates';
+import {} from '@/features/calendar/utils';
 import BaseModal from '@/components/BaseModal.vue';
 import EditEventModal from '@/features/calendar/components/modals/EditEventModal.vue';
-import { getPersonColorStyle, getStaffAvatarUrl } from '@/features/calendar/utils';
+import {
+  getPersonColorStyle,
+  getStaffAvatarUrl,
+  formatEventDateRange,
+  getStaffSummary
+} from '@/features/calendar/utils';
 import type { CalendarEvent, CurrentDate } from '@/types/calendar';
 import { useStaffStore } from '@/stores/staff';
 
@@ -285,24 +290,6 @@ function getRemainingStaffCount(event: CalendarEvent): number {
   return Math.max(event.staff.length - getVisibleStaff(event).length, 0);
 }
 
-function getEventStaffSummary(event: CalendarEvent): string {
-  const first = event.staff[0];
-
-  if (!first) {
-    return '';
-  }
-
-  const firstName = first.firstName.trim();
-  const lastInitial = first.lastName.trim()[0]?.toUpperCase() ?? '';
-  const baseName = lastInitial ? `${firstName} ${lastInitial}.` : firstName;
-
-  if (event.staff.length === 1) {
-    return baseName;
-  }
-
-  return `${baseName} (+${event.staff.length - 1} more)`;
-}
-
 function imgUrl(name: string): string {
   return getStaffAvatarUrl(name);
 }
@@ -315,6 +302,9 @@ function getStaffColorStyle(staffId: string): Record<string, string> {
   }
 
   return getPersonColorStyle(key);
+}
+function getEventStaffSummary(event: CalendarEvent): string {
+  return getStaffSummary(event.staff);
 }
 </script>
 
