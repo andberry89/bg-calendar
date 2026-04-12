@@ -42,8 +42,6 @@
     - Keep behavior configurable so auto-generated events can be distinguished from manual events
     - Avoid changing layout/lane behavior unless required
 
-- [ ] CAL-025 Audit click-outside directive usage
-
 ---
 
 ## Icebox (Future Ideas)
@@ -89,6 +87,8 @@
 
 - [x] CAL-024 Revisit event form field rules alignment
   - PR: refactor(events): align event form field visibility with event type config
+- [x] CAL-025 Audit click-outside directive usage
+  - PR: refactor(directives): remove unused click-outside directive
 
 - [x] CAL-026 Calendar type organization review
   - PR: refactor(types): extract shared calendar layout and draft types
