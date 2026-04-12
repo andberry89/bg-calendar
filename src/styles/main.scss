@@ -1,6 +1,3 @@
 @use './tokens.scss';
 @use './base.scss';
 @use './utilities.scss';
-
-/* Temporary bridge: keep existing global CSS until it is migrated into Sass */
-@import '../main.css';
