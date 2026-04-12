@@ -16,14 +16,6 @@
     - Add high-value comments (intent, edge cases)
     - Avoid redundant comments
 
-- [ ] CAL-019 File and folder organization review
-  - type: refactor
-  - priority: P2
-  - scope: medium
-  - notes:
-    - Improve structure and grouping
-    - Plan before restructuring
-
 - [ ] CAL-020 README documentation
   - type: docs
   - priority: P1
@@ -94,6 +86,8 @@
 
 - [x] **CAL-017E — Local state/type cleanup**
   - PR: refactor(events): remove non-null assertion in CalendarDay modal
+- [x] CAL-019 File and folder organization review
+  - PR:refactor(calendar): reorganize calendar feature structure and utils
 
 - [x] CAL-021 Improve disabled form section visibility
   - PR: feat(events): improve event form field visibility by type

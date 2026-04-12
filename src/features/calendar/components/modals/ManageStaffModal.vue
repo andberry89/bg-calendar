@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import BaseModal from '@/components/BaseModal.vue';
-import EditStaff from '@/features/calendar/components/EditStaff.vue';
+import EditStaff from '@/features/calendar/components/staff/EditStaff.vue';
 import type { Staff, StaffUpdatePayload } from '@/types/calendar';
 
 defineProps<{

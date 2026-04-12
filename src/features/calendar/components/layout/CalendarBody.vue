@@ -79,8 +79,7 @@ import CalendarDay from '@/features/calendar/components/display/CalendarDay.vue'
 import CalendarEvent from '@/features/calendar/components/display/CalendarEvent.vue';
 import EventModal from '@/features/calendar/components/modals/EventModal.vue';
 import { useCalendarWeekSpans } from '@/features/calendar/composables/useCalendarWeekSpans';
-import { useWeekRegularEventLayout } from '@/features/calendar/utils/weekRegularEventLayout';
-import { assignEvents } from '@/features/calendar/utils';
+import { assignEvents, useWeekRegularEventLayout } from '@/features/calendar/utils';
 import type {
   AssignedCalendarEvent,
   CalendarEvent as CalendarEventType,

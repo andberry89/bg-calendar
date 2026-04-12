@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { fetchStaff as fetchStaffData } from '@/services/calendar/calendar-data';
+import { fetchStaff as fetchStaffData } from '@/features/calendar/services/calendar-data';
 import { addStaff as addStaffMutation, deleteStaff as deleteStaffMutation } from '@/services';
 import { getPersonColorKeyByIndex, type PersonColorKey } from '@/features/calendar/utils';
 import type { MutationResult, NewStaffInput, Staff } from '@/types/calendar';
