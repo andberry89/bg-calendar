@@ -1,9 +1,11 @@
 <template>
   <BaseModal @update="cancelModal" @close="cancelModal">
-    <div class="event-form-modal">
-      <div class="event-form-modal__header">
-        <h3 class="event-form-modal__title">Edit Event</h3>
-        <button class="event-form-modal__close" type="button" @click="cancelModal">×</button>
+    <div class="event-form-modal modal-panel">
+      <div class="modal-panel__header">
+        <h3 class="modal-panel__title">Edit Event</h3>
+        <button class="modal-panel__close" type="button" @click="cancelModal">
+          ×
+        </button>
       </div>
 
       <EventForm
@@ -73,74 +75,14 @@ function cancelModal(): void {
 
 <style lang="scss" scoped>
 .event-form-modal {
-  position: relative;
   width: min(560px, calc(100vw - 24px));
   max-width: 560px;
-  box-sizing: border-box;
   padding: 18px;
-  color: var(--calendar-text);
-  background: transparent;
-}
-
-.event-form-modal__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin: -2px -2px 14px;
-  padding: 0 0 12px;
-}
-
-.event-form-modal__title {
-  margin: 0;
-  color: #0f172a;
-  font-size: 1.15rem;
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: 0.01em;
-}
-
-.event-form-modal__close {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 34px;
-  min-height: 34px;
-  padding: 0;
-  border: 1px solid rgba(51, 65, 85, 0.22);
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(241, 245, 249, 0.92) 100%);
-  color: #0f172a;
-  font-size: 1rem;
-  line-height: 1;
-  box-shadow:
-    0 6px 14px rgba(15, 23, 42, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.72);
-  cursor: pointer;
-  transition:
-    transform 0.16s ease,
-    box-shadow 0.16s ease,
-    border-color 0.16s ease,
-    background 0.16s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    border-color: rgba(37, 99, 235, 0.3);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(239, 246, 255, 0.96) 100%);
-    box-shadow:
-      0 10px 20px rgba(15, 23, 42, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.82);
-  }
 }
 
 @media (max-width: 640px) {
   .event-form-modal {
     padding: 14px;
-  }
-
-  .event-form-modal__header {
-    margin-bottom: 12px;
-    padding-bottom: 10px;
   }
 }
 </style>

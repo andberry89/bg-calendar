@@ -1,7 +1,7 @@
 <template>
   <div class="date-picker-control">
     <div class="date-picker">
-      <label class="sr-only" for="calendar-month-select">Select month</label>
+      <label class="visually-hidden" for="calendar-month-select">Select month</label>
       <select
         id="calendar-month-select"
         class="picker-select"
@@ -13,7 +13,7 @@
         </option>
       </select>
 
-      <label class="sr-only" for="calendar-year-select">Select year</label>
+      <label class="visually-hidden" for="calendar-year-select">Select year</label>
       <select
         id="calendar-year-select"
         class="picker-select"
@@ -118,18 +118,6 @@ function updateYear(event: Event): void {
 .picker-select option {
   color: var(--black);
   text-shadow: none;
-}
-
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  white-space: nowrap;
-  border: 0;
-  clip: rect(0, 0, 0, 0);
 }
 
 @media (max-width: 900px) {

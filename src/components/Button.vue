@@ -3,7 +3,6 @@
     <slot></slot>
   </button>
 </template>
-<script></script>
 <style lang="scss" scoped>
 button {
   display: inline-flex;
