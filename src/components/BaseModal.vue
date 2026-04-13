@@ -32,6 +32,7 @@ let originalBodyOverflow = '';
 let originalActiveElement: Element | null = null;
 
 function requestClose(): void {
+  // Emit both modal signals so existing close paths stay aligned across calendar modals.
   emit('close');
   emit('update');
 }
@@ -49,6 +50,7 @@ onMounted(async (): Promise<void> => {
   originalBodyOverflow = document.body.style.overflow;
   originalActiveElement = document.activeElement;
 
+  // Lock page scroll while the modal is open so the overlay and dialog stay in sync.
   document.body.style.overflow = 'hidden';
   document.addEventListener('keydown', handleKeydown);
 
@@ -60,6 +62,7 @@ onBeforeUnmount((): void => {
   document.body.style.overflow = originalBodyOverflow;
   document.removeEventListener('keydown', handleKeydown);
 
+  // Return focus to the last active control so keyboard users stay in the same workflow.
   if (originalActiveElement instanceof HTMLElement) {
     originalActiveElement.focus();
   }

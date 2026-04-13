@@ -157,6 +157,7 @@ const { getDay, isWeekend } = useCalendarDayDate({
 });
 
 const visibleRegularEventLimit = computed((): number => {
+  // Half-day closures use one lane on mobile so the holiday state stays readable.
   if (isMobile.value && hasHalfClosureHoliday.value) {
     return 1;
   }

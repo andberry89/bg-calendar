@@ -123,6 +123,7 @@ function emitStaff(payload: 'add' | Staff): void {
     emit('update', ['remove', payload]);
   }
 
+  // Reset both modes after a staff action so the modal returns to its default state.
   newStaff.value.firstName = '';
   newStaff.value.lastName = '';
   showForm.value.add = false;
@@ -131,15 +132,18 @@ function emitStaff(payload: 'add' | Staff): void {
 
 function toggleEditStaffForm(form: 'add' | 'remove'): void {
   if (form === 'add') {
+    // Only one panel stays open at a time so staff actions remain clear.
     showForm.value.remove = false;
     showForm.value.add = !showForm.value.add;
 
     if (showForm.value.add) {
+      // Focus the first field when add mode opens so entry can start immediately.
       nextTick(() => {
         firstNameInput.value?.focus();
       });
     }
   } else {
+    // Only one panel stays open at a time so staff actions remain clear.
     showForm.value.add = false;
     showForm.value.remove = !showForm.value.remove;
   }

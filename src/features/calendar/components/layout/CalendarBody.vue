@@ -154,6 +154,7 @@ const events = computed((): AssignedCalendarEvent[][] => {
     return cachedEvents;
   }
 
+  // Reuse the assigned month layout until the visible month inputs actually change.
   if (
     cachedSourceEvents === currentMonthEvents &&
     cachedMonth === currentDate.month &&
@@ -285,6 +286,7 @@ function openWeekSpanEventModal(segment: CalendarWeekSpanningSegment, weekIdx: n
     return;
   }
 
+  // Late-week spans anchor from the visible end so the modal stays inside the calendar surface.
   const anchorDayIndex = segment.startDayIndex >= 4 ? segment.endDayIndex : segment.startDayIndex;
 
   selectedWeekSpanEvent.value = {
@@ -330,7 +332,7 @@ function updateDate(date: number): void {
 }
 
 function updateEvents(): void {
-  // keep emit path unchanged for child interactions
+  // CalendarDay still emits update from child interactions even when this layer does not need to react.
 }
 </script>
 

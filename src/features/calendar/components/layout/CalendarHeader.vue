@@ -89,6 +89,7 @@ const isTransitioning = ref(false);
 let transitionTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const headerStyle = computed(() => ({
+  // CSS vars keep the month background transition in sync without swapping header markup.
   '--calendar-header-gradient-current': `var(${activeGradientVar.value})`,
   '--calendar-header-gradient-incoming': `var(${incomingGradientVar.value})`
 }));
@@ -111,6 +112,7 @@ watch(
     incomingGradientVar.value = nextGradientVar;
     isTransitioning.value = false;
 
+    // Reset any in-flight transition so fast month changes do not leave the wrong gradient visible.
     if (transitionTimeout) {
       clearTimeout(transitionTimeout);
       transitionTimeout = null;

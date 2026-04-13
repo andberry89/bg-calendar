@@ -189,6 +189,7 @@ const selectedEventEmoji = computed((): string => {
 });
 
 function closeDayModal(): void {
+  // Closing the day modal also clears nested edit state so it always reopens from the list view.
   showEditModal.value = false;
   selectedEvent.value = null;
   emit('update');
@@ -237,7 +238,7 @@ function getEventLabel(event: CalendarEvent): string {
     staffDisplayName: event.staff[0]?.shortName
   });
 
-  // DayModal prefers inline composition
+  // DayModal keeps label parts inline so list rows stay compact.
   if (display.emoji) {
     return `${display.primary} ${display.emoji}`;
   }
@@ -266,6 +267,7 @@ function getStaffIdentityList(event: CalendarEvent): StaffIdentity[] {
 }
 
 function getVisibleStaff(event: CalendarEvent): StaffIdentity[] {
+  // Cap visible avatars so crowded events do not overtake the list and details layout.
   return getStaffIdentityList(event).slice(0, 3);
 }
 

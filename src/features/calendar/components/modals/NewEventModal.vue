@@ -59,11 +59,13 @@ function resetNewEvent(): void {
 }
 
 function openForm(): void {
+  // Always start from a fresh draft when opening the create modal.
   resetNewEvent();
   showForm.value = true;
 }
 
 function closeForm(): void {
+  // Clear the draft on close so canceled event data does not reappear later.
   resetNewEvent();
   showForm.value = false;
 }

@@ -140,6 +140,7 @@ const showErrors = ref(false);
 const eventReminder = computed(() => getSpecialDayReminder(localEvent.value.type));
 
 const requiredFields = computed(() =>
+  // Form fields stay aligned with the shared event-type rules used elsewhere in the app.
   localEvent.value.type ? new Set(getRequiredEventFields(localEvent.value.type)) : new Set()
 );
 
@@ -171,6 +172,7 @@ function submitForm(): void {
   showErrors.value = false;
   errors.value = validateEvent(localEvent.value);
 
+  // Keep the draft visible when validation fails so users can correct the same form state.
   if (errors.value.length > 0 || !localEvent.value.type) {
     showErrors.value = true;
     return;
