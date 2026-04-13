@@ -91,6 +91,8 @@ import type {
   SelectedWeekSpanEvent
 } from '@/types/calendar-layout';
 
+const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'] as const;
+
 const {
   currentDate,
   prevMonthDays,
@@ -109,8 +111,6 @@ const emit = defineEmits<{
   (e: 'date', value: CurrentDate): void;
   (e: 'delete', value: CalendarEventType): void;
 }>();
-
-const weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'] as const;
 
 const selectedWeekSpanEvent = ref<SelectedWeekSpanEvent | null>(null);
 const viewportWidth = ref<number>(window.innerWidth);
@@ -252,6 +252,10 @@ function getEventRowSpan(): number {
   return 1;
 }
 
+const dataReady = computed((): boolean => {
+  return currentMonthDays > 0;
+});
+
 const {
   weekRegularEventPlacements,
   weekRegularEventLanePlan,
@@ -277,6 +281,19 @@ const {
   currentDate,
   viewportWidth,
   getEventKey
+});
+
+function updateViewportWidth(): void {
+  viewportWidth.value = window.innerWidth;
+}
+
+onMounted(() => {
+  updateViewportWidth();
+  window.addEventListener('resize', updateViewportWidth);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateViewportWidth);
 });
 
 function openWeekSpanEventModal(segment: CalendarWeekSpanningSegment, weekIdx: number): void {
@@ -305,23 +322,6 @@ function deleteWeekSpanEvent(event: CalendarEventType): void {
   closeWeekSpanEventModal();
   deleteEvent(event);
 }
-
-const dataReady = computed((): boolean => {
-  return currentMonthDays > 0;
-});
-
-function updateViewportWidth(): void {
-  viewportWidth.value = window.innerWidth;
-}
-
-onMounted(() => {
-  updateViewportWidth();
-  window.addEventListener('resize', updateViewportWidth);
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateViewportWidth);
-});
 
 function deleteEvent(event: CalendarEventType): void {
   emit('delete', event);

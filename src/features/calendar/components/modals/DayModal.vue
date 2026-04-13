@@ -137,16 +137,23 @@ import { format } from 'date-fns';
 import BaseModal from '@/components/BaseModal.vue';
 import EditEventModal from '@/features/calendar/components/modals/EditEventModal.vue';
 import {
+  formatEventDateRange,
+  getEventDisplayContent,
   getPersonColorStyle,
   getRemainingStaffCount as getRemainingStaffCountValue,
   getStaffAvatarUrl,
-  formatEventDateRange,
   getStaffSummary,
-  getEventDisplayContent,
   getVisibleStaff as getVisibleStaffList
 } from '@/features/calendar/utils';
 import type { CalendarEvent, CurrentDate } from '@/types/calendar';
 import { useStaffStore } from '@/stores/staff';
+
+interface StaffIdentity {
+  id: string;
+  shortName: string;
+  avatarSrc: string;
+  colorStyle: Record<string, string>;
+}
 
 const props = defineProps<{
   currentDate: CurrentDate;
@@ -163,8 +170,21 @@ const emit = defineEmits<{
 const staffStore = useStaffStore();
 
 const selectedEvent = ref<CalendarEvent | null>(null);
-
 const showEditModal = ref(false);
+
+function imgUrl(name: string): string {
+  return getStaffAvatarUrl(name);
+}
+
+function getStaffColorStyle(staffId: string): Record<string, string> {
+  const key = staffStore.staffColorKeyById[staffId];
+
+  if (!key) {
+    return getPersonColorStyle('person-1');
+  }
+
+  return getPersonColorStyle(key);
+}
 
 const title = computed((): string => {
   return format(
@@ -191,11 +211,50 @@ const selectedEventEmoji = computed((): string => {
   return selectedEvent.value.class === 'birthday' ? '🎂' : '';
 });
 
-function closeDayModal(): void {
-  // Closing the day modal also clears nested edit state so it always reopens from the list view.
-  showEditModal.value = false;
-  selectedEvent.value = null;
-  emit('update');
+function formatEventDates(event: CalendarEvent): string {
+  return formatEventDateRange({
+    start: event.start,
+    end: event.end
+  });
+}
+
+function getEventLabel(event: CalendarEvent): string {
+  const display = getEventDisplayContent(event, {
+    staffDisplayName: event.staff[0]?.shortName
+  });
+
+  // DayModal keeps label parts inline so list rows stay compact.
+  if (display.emoji) {
+    return `${display.primary} ${display.emoji}`;
+  }
+
+  if (display.secondary) {
+    return `${display.primary} — ${display.secondary}`;
+  }
+
+  return display.primary;
+}
+
+function getStaffIdentityList(event: CalendarEvent): StaffIdentity[] {
+  return event.staff.map((person) => ({
+    id: person.id,
+    shortName: person.shortName,
+    avatarSrc: imgUrl(person.lastName),
+    colorStyle: getStaffColorStyle(person.id)
+  }));
+}
+
+function getVisibleStaff(event: CalendarEvent): StaffIdentity[] {
+  // Cap visible avatars so crowded events do not overtake the list and details layout.
+  return getVisibleStaffList(getStaffIdentityList(event));
+}
+
+function getRemainingStaffCount(event: CalendarEvent): number {
+  return getRemainingStaffCountValue(event.staff.length, getVisibleStaff(event).length);
+}
+
+function getEventStaffSummary(event: CalendarEvent): string {
+  return getStaffSummary(event.staff);
 }
 
 function selectEvent(event: CalendarEvent): void {
@@ -224,75 +283,16 @@ function saveEditModal(): void {
   emit('update');
 }
 
+function closeDayModal(): void {
+  // Closing the day modal also clears nested edit state so it always reopens from the list view.
+  showEditModal.value = false;
+  selectedEvent.value = null;
+  emit('update');
+}
+
 function deleteEvent(event: CalendarEvent): void {
   emit('delete', event);
   closeDayModal();
-}
-
-function formatEventDates(event: CalendarEvent): string {
-  return formatEventDateRange({
-    start: event.start,
-    end: event.end
-  });
-}
-
-function getEventLabel(event: CalendarEvent): string {
-  const display = getEventDisplayContent(event, {
-    staffDisplayName: event.staff[0]?.shortName
-  });
-
-  // DayModal keeps label parts inline so list rows stay compact.
-  if (display.emoji) {
-    return `${display.primary} ${display.emoji}`;
-  }
-
-  if (display.secondary) {
-    return `${display.primary} — ${display.secondary}`;
-  }
-
-  return display.primary;
-}
-
-interface StaffIdentity {
-  id: string;
-  shortName: string;
-  avatarSrc: string;
-  colorStyle: Record<string, string>;
-}
-
-function getStaffIdentityList(event: CalendarEvent): StaffIdentity[] {
-  return event.staff.map((person) => ({
-    id: person.id,
-    shortName: person.shortName,
-    avatarSrc: imgUrl(person.lastName),
-    colorStyle: getStaffColorStyle(person.id)
-  }));
-}
-
-function getVisibleStaff(event: CalendarEvent): StaffIdentity[] {
-  // Cap visible avatars so crowded events do not overtake the list and details layout.
-  return getVisibleStaffList(getStaffIdentityList(event));
-}
-
-function getRemainingStaffCount(event: CalendarEvent): number {
-  return getRemainingStaffCountValue(event.staff.length, getVisibleStaff(event).length);
-}
-
-function imgUrl(name: string): string {
-  return getStaffAvatarUrl(name);
-}
-
-function getStaffColorStyle(staffId: string): Record<string, string> {
-  const key = staffStore.staffColorKeyById[staffId];
-
-  if (!key) {
-    return getPersonColorStyle('person-1');
-  }
-
-  return getPersonColorStyle(key);
-}
-function getEventStaffSummary(event: CalendarEvent): string {
-  return getStaffSummary(event.staff);
 }
 </script>
 

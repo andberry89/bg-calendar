@@ -92,19 +92,26 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { formatEventDateRange } from '@/features/calendar/utils';
 import BaseModal from '@/components/BaseModal.vue';
 import EditEventModal from '@/features/calendar/components/modals/EditEventModal.vue';
 import {
+  formatEventDateRange,
+  getEventDisplayContent,
   getPersonColorStyle,
   getRemainingStaffCount,
   getStaffAvatarUrl,
   getStaffSummary,
-  getEventDisplayContent,
   getVisibleStaff
 } from '@/features/calendar/utils';
 import type { CalendarEvent } from '@/types/calendar';
 import { useStaffStore } from '@/stores/staff';
+
+interface VisibleStaffIdentity {
+  id: string;
+  shortName: string;
+  avatarSrc: string;
+  colorStyle: Record<string, string>;
+}
 
 const { event } = defineProps<{
   day: number;
@@ -121,11 +128,18 @@ const staffStore = useStaffStore();
 const isConfirmingDelete = ref(false);
 const showEditModal = ref(false);
 
-interface VisibleStaffIdentity {
-  id: string;
-  shortName: string;
-  avatarSrc: string;
-  colorStyle: Record<string, string>;
+function imgUrl(name: string): string {
+  return getStaffAvatarUrl(name);
+}
+
+function getStaffColorStyle(staffId: string): Record<string, string> {
+  const key = staffStore.staffColorKeyById[staffId];
+
+  if (!key) {
+    return getPersonColorStyle('person-1');
+  }
+
+  return getPersonColorStyle(key);
 }
 
 const visibleStaff = computed((): VisibleStaffIdentity[] => {
@@ -166,20 +180,6 @@ const eventTitle = computed((): string => {
 const eventEmoji = computed((): string => {
   return eventDisplay.value.emoji;
 });
-
-function imgUrl(name: string): string {
-  return getStaffAvatarUrl(name);
-}
-
-function getStaffColorStyle(staffId: string): Record<string, string> {
-  const key = staffStore.staffColorKeyById[staffId];
-
-  if (!key) {
-    return getPersonColorStyle('person-1');
-  }
-
-  return getPersonColorStyle(key);
-}
 
 function closeModal(): void {
   // Reset delete confirmation so the modal always reopens in its default state.
