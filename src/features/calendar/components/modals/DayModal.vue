@@ -1,9 +1,11 @@
 <template>
   <BaseModal @update="closeDayModal" @close="closeDayModal">
     <div class="day-modal">
-      <div class="day-modal__header">
-        <h3 class="day-modal__title">{{ title }}</h3>
-        <button class="day-modal__close" type="button" @click="closeDayModal">×</button>
+      <div class="modal-panel__header">
+        <h3 class="modal-panel__title">{{ title }}</h3>
+        <button class="modal-panel__close" type="button" @click="closeDayModal">
+          ×
+        </button>
       </div>
 
       <div v-if="events.length > 0" class="day-modal__content">
@@ -132,15 +134,16 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { format } from 'date-fns';
-import {} from '@/features/calendar/utils';
 import BaseModal from '@/components/BaseModal.vue';
 import EditEventModal from '@/features/calendar/components/modals/EditEventModal.vue';
 import {
   getPersonColorStyle,
+  getRemainingStaffCount as getRemainingStaffCountValue,
   getStaffAvatarUrl,
   formatEventDateRange,
   getStaffSummary,
-  getEventDisplayContent
+  getEventDisplayContent,
+  getVisibleStaff as getVisibleStaffList
 } from '@/features/calendar/utils';
 import type { CalendarEvent, CurrentDate } from '@/types/calendar';
 import { useStaffStore } from '@/stores/staff';
@@ -268,11 +271,11 @@ function getStaffIdentityList(event: CalendarEvent): StaffIdentity[] {
 
 function getVisibleStaff(event: CalendarEvent): StaffIdentity[] {
   // Cap visible avatars so crowded events do not overtake the list and details layout.
-  return getStaffIdentityList(event).slice(0, 3);
+  return getVisibleStaffList(getStaffIdentityList(event));
 }
 
 function getRemainingStaffCount(event: CalendarEvent): number {
-  return Math.max(event.staff.length - getVisibleStaff(event).length, 0);
+  return getRemainingStaffCountValue(event.staff.length, getVisibleStaff(event).length);
 }
 
 function imgUrl(name: string): string {
@@ -295,67 +298,16 @@ function getEventStaffSummary(event: CalendarEvent): string {
 
 <style lang="scss" scoped>
 .day-modal {
-  position: relative;
   width: min(680px, calc(100vw - 24px));
   max-width: 680px;
   padding: 18px;
-  box-sizing: border-box;
-  background: transparent;
-  color: var(--calendar-text);
   font:
     400 0.95rem/1.3 'Arial',
     sans-serif;
 }
 
-.day-modal__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin: -2px -2px 14px;
-  padding: 0 0 12px;
-}
-
-.day-modal__title {
-  margin: 0;
-  color: #0f172a;
-  font-size: 1.15rem;
-  font-weight: 700;
-  line-height: 1.2;
-  letter-spacing: 0.01em;
-}
-
 .day-modal__close {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 34px;
-  min-height: 34px;
-  padding: 0;
-  border: 1px solid rgba(51, 65, 85, 0.22);
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(241, 245, 249, 0.92) 100%);
-  color: #0f172a;
   font-size: 1rem;
-  line-height: 1;
-  box-shadow:
-    0 6px 14px rgba(15, 23, 42, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.72);
-  cursor: pointer;
-  transition:
-    transform 0.16s ease,
-    box-shadow 0.16s ease,
-    border-color 0.16s ease,
-    background 0.16s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    border-color: rgba(37, 99, 235, 0.3);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(239, 246, 255, 0.96) 100%);
-    box-shadow:
-      0 10px 20px rgba(15, 23, 42, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.82);
-  }
 }
 
 .day-modal__content {

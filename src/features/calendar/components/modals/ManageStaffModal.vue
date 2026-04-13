@@ -3,10 +3,12 @@
     <button type="button" class="manage-staff-button" @click="openModal">Manage Staff</button>
 
     <BaseModal v-if="showModal" @update="closeModal" @close="closeModal">
-      <section class="manage-staff-modal">
-        <header class="manage-staff-modal__header">
-          <h2>Manage Staff</h2>
-          <button type="button" class="manage-staff-modal__close" @click="closeModal">Close</button>
+      <section class="manage-staff-modal modal-panel">
+        <header class="modal-panel__header">
+          <h2 class="modal-panel__title manage-staff-modal__title">Manage Staff</h2>
+          <button type="button" class="modal-panel__close manage-staff-modal__close" @click="closeModal">
+            Close
+          </button>
         </header>
 
         <EditStaff :staff="staff" @update="emitStaffUpdate" />
@@ -90,62 +92,20 @@ function emitStaffUpdate(payload: StaffUpdatePayload): void {
   width: min(560px, calc(100vw - 24px));
   max-width: 100%;
   padding: 18px;
-  box-sizing: border-box;
-  background: transparent;
-  color: var(--calendar-text);
   text-shadow: none;
 }
 
-.manage-staff-modal__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin: -2px -2px 14px;
-  padding: 0 0 12px;
-
-  h2 {
-    margin: 0;
-    color: #0f172a;
-    font:
-      700 1.1rem/1.2 Arial,
-      sans-serif;
-    letter-spacing: 0.01em;
-  }
+.manage-staff-modal__title {
+  font:
+    700 1.1rem/1.2 Arial,
+    sans-serif;
 }
 
 .manage-staff-modal__close {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 34px;
-  min-height: 34px;
   padding: 0 12px;
-  border: 1px solid rgba(51, 65, 85, 0.22);
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(241, 245, 249, 0.92) 100%);
-  color: #0f172a;
   font:
     600 0.8rem/1 Arial,
     sans-serif;
-  box-shadow:
-    0 6px 14px rgba(15, 23, 42, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.72);
-  cursor: pointer;
-  transition:
-    transform 0.16s ease,
-    box-shadow 0.16s ease,
-    border-color 0.16s ease,
-    background 0.16s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    border-color: rgba(37, 99, 235, 0.3);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(239, 246, 255, 0.96) 100%);
-    box-shadow:
-      0 10px 20px rgba(15, 23, 42, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.82);
-  }
 }
 
 @media (max-width: 640px) {
@@ -162,8 +122,6 @@ function emitStaffUpdate(payload: StaffUpdatePayload): void {
   .manage-staff-modal__header {
     align-items: flex-start;
     flex-direction: column;
-    margin-bottom: 12px;
-    padding-bottom: 10px;
   }
 }
 </style>

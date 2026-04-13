@@ -1,7 +1,12 @@
 <template>
   <BaseModal @update="closeModal" @close="closeModal">
     <div class="event-modal">
-      <button class="close-btn" type="button" aria-label="Close event details" @click="closeModal">
+      <button
+        class="close-btn modal-panel__close"
+        type="button"
+        aria-label="Close event details"
+        @click="closeModal"
+      >
         ×
       </button>
 
@@ -92,9 +97,11 @@ import BaseModal from '@/components/BaseModal.vue';
 import EditEventModal from '@/features/calendar/components/modals/EditEventModal.vue';
 import {
   getPersonColorStyle,
+  getRemainingStaffCount,
   getStaffAvatarUrl,
   getStaffSummary,
-  getEventDisplayContent
+  getEventDisplayContent,
+  getVisibleStaff
 } from '@/features/calendar/utils';
 import type { CalendarEvent } from '@/types/calendar';
 import { useStaffStore } from '@/stores/staff';
@@ -123,7 +130,7 @@ interface VisibleStaffIdentity {
 
 const visibleStaff = computed((): VisibleStaffIdentity[] => {
   // Cap visible avatars so large staff groups do not crowd the modal header.
-  return event.staff.slice(0, 3).map((person) => ({
+  return getVisibleStaff(event.staff).map((person) => ({
     id: person.id,
     shortName: person.shortName,
     avatarSrc: imgUrl(person.lastName),
@@ -132,7 +139,7 @@ const visibleStaff = computed((): VisibleStaffIdentity[] => {
 });
 
 const remainingStaffCount = computed((): number => {
-  return Math.max(event.staff.length - visibleStaff.value.length, 0);
+  return getRemainingStaffCount(event.staff.length, visibleStaff.value.length);
 });
 
 const leadStaffSummary = computed((): string => {
@@ -209,17 +216,13 @@ function confirmDelete(): void {
 
 <style lang="scss" scoped>
 .event-modal {
-  position: relative;
   width: min(380px, calc(100vw - 24px));
   max-width: calc(100vw - 24px);
   min-height: 200px;
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 18px;
   padding: 26px 18px 18px;
-  background: transparent;
-  color: var(--calendar-text);
   text-align: left;
   font:
     400 0.95rem/1.35 'Arial',
@@ -230,36 +233,7 @@ function confirmDelete(): void {
   position: absolute;
   top: 10px;
   right: 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 34px;
-  min-height: 34px;
-  padding: 0;
-  border: 1px solid rgba(51, 65, 85, 0.22);
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(241, 245, 249, 0.92) 100%);
-  color: #0f172a;
   font-size: 1rem;
-  line-height: 1;
-  box-shadow:
-    0 6px 14px rgba(15, 23, 42, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.72);
-  cursor: pointer;
-  transition:
-    transform 0.16s ease,
-    box-shadow 0.16s ease,
-    border-color 0.16s ease,
-    background 0.16s ease;
-
-  &:hover {
-    transform: translateY(-1px);
-    border-color: rgba(37, 99, 235, 0.3);
-    background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(239, 246, 255, 0.96) 100%);
-    box-shadow:
-      0 10px 20px rgba(15, 23, 42, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.82);
-  }
 }
 
 .event-header {
