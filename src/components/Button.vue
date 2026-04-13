@@ -1,6 +1,4 @@
 <template>
-  <!-- Shared button keeps styling minimal so variants stay consistent via tokens. -->
-<button type="button">
   <button type="button">
     <slot></slot>
   </button>
