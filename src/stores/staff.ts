@@ -15,6 +15,7 @@ export const useStaffStore = defineStore('staff', {
 
   getters: {
     staffColorKeyById(state): Record<string, PersonColorKey> {
+      // Sort by ID first so staff keep the same color assignment across reloads.
       const sortedStaff = [...state.staff].sort((left, right) => left.id.localeCompare(right.id));
 
       return Object.fromEntries(
@@ -24,6 +25,7 @@ export const useStaffStore = defineStore('staff', {
   },
 
   actions: {
+    // Re-fetch staff to keep the store in sync after a successful change.
     async fetchStaff(): Promise<void> {
       this.staff = await fetchStaffData();
     },

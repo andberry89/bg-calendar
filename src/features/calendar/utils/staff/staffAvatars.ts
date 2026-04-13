@@ -3,6 +3,7 @@ const staffImages = import.meta.glob('@/assets/staff/*.{jpg,png}', {
   import: 'default'
 }) as Record<string, string>;
 
+// Returns the avatar for a staff member, falling back to a default image if none is found.
 export function getStaffAvatarUrl(lastName: string): string {
   return (
     staffImages[`/src/assets/staff/${lastName}.jpg`] ||

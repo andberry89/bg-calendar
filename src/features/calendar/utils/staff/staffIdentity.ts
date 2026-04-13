@@ -1,5 +1,6 @@
 import type { Staff } from '@/types/calendar';
 
+// Builds a staff label for display, falling back to a generic label when name data is missing.
 export function getStaffDisplayName(staff?: Staff): string {
   if (!staff) return 'Staff';
 
@@ -11,6 +12,7 @@ export function getStaffDisplayName(staff?: Staff): string {
   return lastInitial ? `${firstName} ${lastInitial}.` : firstName;
 }
 
+// Uses the first visible staff name and adds a count when more staff are included.
 export function getStaffSummary(staffList: Staff[]): string {
   const first = staffList[0];
 

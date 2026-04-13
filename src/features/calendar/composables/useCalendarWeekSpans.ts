@@ -93,6 +93,7 @@ export function useCalendarWeekSpans({
   viewportWidth,
   getEventKey
 }: UseCalendarWeekSpansParams) {
+  // Marks spans that begin on a current-month day with a full-closure holiday.
   function isFullCloseStart(weekIdx: number, dayIdx: number): boolean {
     return (
       weeks.value[weekIdx][dayIdx]?.month === 'current' &&
@@ -106,10 +107,12 @@ export function useCalendarWeekSpans({
     return getDateKey(new Date(currentDate.year, currentDate.month, cell.date));
   }
 
+  // Limits how many spanning-event rows are shown before overflow is hidden behind the more button.
   const maxVisibleWeekSpanRows = computed((): number => {
     return viewportWidth.value <= 640 ? 2 : 3;
   });
 
+  // Builds the visible multi-day segments for each week using only current-month cells.
   const weekSpanningSegments = computed((): CalendarWeekSpanningSegment[][] => {
     return weeks.value.map((week, weekIdx) => {
       const lanePlan = weekRegularEventLanePlan.value[weekIdx];
@@ -187,6 +190,7 @@ export function useCalendarWeekSpans({
     });
   });
 
+  // Counts multi-day events that exist in the week but fall below the visible row limit.
   const hiddenWeekSpanningEventCounts = computed((): number[][] => {
     return weeks.value.map((week, weekIdx) => {
       const hiddenCounts = Array.from({ length: week.length }, () => 0);

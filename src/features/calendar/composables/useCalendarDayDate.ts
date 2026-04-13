@@ -10,6 +10,7 @@ type UseCalendarDayDateParams = {
 };
 
 export function useCalendarDayDate({ currentDate, date, month }: UseCalendarDayDateParams) {
+  // Uses the correct month and year for days that appear from the previous or next month.
   const displayDate = computed((): CurrentDate => {
     const { year, month: currentMonth } = currentDate.value;
 

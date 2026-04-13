@@ -25,6 +25,7 @@ export const useEventsStore = defineStore('events', {
       const result = await addEventMutation(event);
 
       if (result.success) {
+        // Re-fetch events to keep the store in sync with the database after a change.
         await this.fetchEvents();
       }
 

@@ -27,6 +27,7 @@ export const fetchStaff = async (): Promise<Staff[]> => {
 
   const staff = snapshot.docs.map((doc) => mapStaff(doc.id, doc.data()));
 
+  // Keep staff ordered by last name so calendar views and selectors stay consistent.
   return staff.sort((a, b) => a.lastName.localeCompare(b.lastName));
 };
 

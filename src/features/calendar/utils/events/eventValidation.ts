@@ -17,6 +17,7 @@ export function getRequiredEventFields(type: DraftEventType): EventField[] {
   return config ? config.requiredFields : [];
 }
 
+// Validates event input and returns a list of missing or invalid fields for the form.
 export function validateEvent(input: EventValidationInput): string[] {
   const errors: string[] = [];
 
@@ -36,6 +37,7 @@ export function validateEvent(input: EventValidationInput): string[] {
     errors.push('Event Details');
   }
 
+  // These event types require exactly one staff member.
   if (input.type === 'Comp Day' || input.type === 'Birthday') {
     if (input.staff.length !== 1) {
       errors.push('Exactly 1 Staff Member');

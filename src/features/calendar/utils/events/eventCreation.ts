@@ -15,6 +15,7 @@ export interface DraftCalendarEventInput {
   staff: Staff[];
 }
 
+// Maps each event type to its corresponding class used for styling.
 const eventClassByType: Record<EventType, EventClass> = {
   'Auto Show': 'auto-show',
   'Press Trip': 'press-trip',
@@ -26,6 +27,7 @@ const eventClassByType: Record<EventType, EventClass> = {
   Birthday: 'birthday'
 };
 
+// Ensures a draft event has a valid type before creating a saved event.
 function hasEventType(type: DraftCalendarEventInput['type']): type is EventType {
   return type !== '';
 }
@@ -34,6 +36,8 @@ export function getEventClass(type: EventType): EventClass {
   return eventClassByType[type];
 }
 
+// Creates a new calendar event with the correct shape for storage.
+// Holiday events do not carry staff and always define a closure value.
 export function createNewCalendarEvent(event: DraftCalendarEventInput): NewCalendarEvent {
   if (!hasEventType(event.type)) {
     throw new Error('Cannot create calendar event without a valid event type.');

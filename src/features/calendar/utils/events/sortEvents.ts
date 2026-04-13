@@ -10,10 +10,12 @@ export const sortEvents = (events: CalendarEvent[]): EventsByYear => {
     })
     .flat();
 
+  // Collect all years touched by events, including events that span across years.
   const uniqueYears = [...new Set(yearsWithEvents)];
   const sortedEvents: EventsByYear = {};
 
   uniqueYears.forEach((year) => {
+    // Include events that start or end in this year.
     const yearEvents = events.filter((event) => {
       const start = event.start.split('-')[0];
       const end = event.end.split('-')[0];

@@ -1,3 +1,5 @@
+// Month and weekday labels used for calendar display.
+
 export const month = [
   'January',
   'February',

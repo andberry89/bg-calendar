@@ -2,6 +2,7 @@ import { addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { getEventsCollection } from '@/services';
 import type { CalendarEventDocument, MutationResult, NewCalendarEvent } from '@/types/calendar';
 
+// Converts a calendar event into the shape stored in Firestore.
 const mapNewEventToDocument = (event: NewCalendarEvent): CalendarEventDocument => {
   return {
     class: event.class,
