@@ -18,12 +18,15 @@ export const getCurrentMonthEvents = (
   const monthStart = new Date(currentDate.year, currentDate.month, 1);
   const monthEnd = new Date(currentDate.year, currentDate.month + 1, 0);
 
-  return currentYearEvents
-    .filter((event) => {
-      const eventStart = toDate(event.start);
-      const eventEnd = toDate(event.end);
+  return (
+    currentYearEvents
+      // Keep events that start, end, or continue through any part of the current month.
+      .filter((event) => {
+        const eventStart = toDate(event.start);
+        const eventEnd = toDate(event.end);
 
-      return eventStart <= monthEnd && eventEnd >= monthStart;
-    })
-    .sort((a, b) => toDate(a.start).getTime() - toDate(b.start).getTime());
+        return eventStart <= monthEnd && eventEnd >= monthStart;
+      })
+      .sort((a, b) => toDate(a.start).getTime() - toDate(b.start).getTime())
+  );
 };

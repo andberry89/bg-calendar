@@ -55,6 +55,7 @@ export function useCalendarDayEvents({
 
   const holidays = computed((): CalendarEventType[] => eventGroups.value.holidays);
 
+  // Full-closure holidays do not render as badge pills in the day cell.
   const visibleHolidayBadges = computed((): CalendarEventType[] => {
     return holidays.value.filter((event) => event.closed !== 'full');
   });
@@ -101,6 +102,7 @@ export function useCalendarDayEvents({
     return holidays.value.some((event) => event.closed === 'full');
   });
 
+  // Clear multi-day events out of the regular lane slots so they are not rendered twice.
   const normalizedRegularEventLaneSlots = computed((): CalendarEventLaneSlot[] => {
     return regularEventLaneSlots.value.map((slot) => {
       if (!isAssignedCalendarEvent(slot.event) || slot.event.display.isMultiDay !== true) {
@@ -152,6 +154,7 @@ export function useCalendarDayEvents({
     return visibleRenderableRegularLaneSlots.value.filter(({ slot }) => slot.event !== null).length;
   });
 
+  // Count hidden regular events and add any hidden spanning events shown behind the more button.
   const hiddenEventCount = computed((): number => {
     const totalRenderableRegularEventCount = renderableRegularLaneSlots.value.filter(
       (slot) => slot.event !== null

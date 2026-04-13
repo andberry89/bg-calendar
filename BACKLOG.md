@@ -8,14 +8,6 @@
 
 ## Planned (Not Started)
 
-- [ ] CAL-018 Code comments and documentation pass
-  - type: refactor
-  - priority: P2
-  - scope: medium
-  - notes:
-    - Add high-value comments (intent, edge cases)
-    - Avoid redundant comments
-
 ---
 
 ## Icebox (Future Ideas)
@@ -77,6 +69,9 @@
 
 - [x] **CAL-017E — Local state/type cleanup**
   - PR: refactor(events): remove non-null assertion in CalendarDay modal
+
+- [x] CAL-018 Code comments and documentation pass
+  - PR:refactor(calendar): add high-signal comments across calendar components
 
 - [x] CAL-019 File and folder organization review
   - PR:refactor(calendar): reorganize calendar feature structure and utils

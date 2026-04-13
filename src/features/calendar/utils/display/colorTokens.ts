@@ -1,3 +1,4 @@
+// Defines the available color slots used to style staff consistently.
 export const PERSON_COLOR_KEYS = [
   'person-1',
   'person-2',
@@ -19,10 +20,12 @@ export function getPersonColorVars(key: PersonColorKey) {
   };
 }
 
+// Wraps a CSS variable name for use in inline styles.
 export function getEventTypeColorVar(colorVar: string) {
   return `var(${colorVar})`;
 }
 
+// Cycles through available color keys so each index maps to a valid color.
 export function getPersonColorKeyByIndex(index: number): PersonColorKey {
   return PERSON_COLOR_KEYS[index % PERSON_COLOR_KEYS.length];
 }

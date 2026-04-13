@@ -15,6 +15,8 @@ export interface SyncEventDatesResult {
   end: string;
 }
 
+// Keeps draft event dates in a valid order as the user edits them.// Keeps start and end dates in order as the user edits them.
+// If one date is moved past the other, the other field is updated to match.
 export function syncEventDates(input: SyncEventDatesInput): SyncEventDatesResult {
   const nextDates: SyncEventDatesResult = {
     start: input.start,
@@ -31,6 +33,7 @@ export function syncEventDates(input: SyncEventDatesInput): SyncEventDatesResult
     return nextDates;
   }
 
+  // Birthdays always stay on a single day.
   if (input.type === 'Birthday') {
     nextDates.end = nextDates.start;
     return nextDates;
@@ -40,6 +43,7 @@ export function syncEventDates(input: SyncEventDatesInput): SyncEventDatesResult
   const endDate = parse(nextDates.end, 'yyyy-MM-dd', new Date());
   const result = compareDesc(startDate, endDate);
 
+  // If the range flips, pull back the field the user just changed.
   if (result < 0) {
     if (input.target === 'end') {
       nextDates.end = nextDates.start;

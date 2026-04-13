@@ -81,6 +81,7 @@ interface StaffFilterIdentity {
 }
 
 const staffIdentityList = computed((): StaffFilterIdentity[] => {
+  // Filters only show staff that are meant to appear in the current calendar identity set.
   return getVisibleStaff(props.staff, props.staff.length).map((member) => {
     const key = staffStore.staffColorKeyById[member.id];
 
@@ -96,6 +97,7 @@ const staffIdentityList = computed((): StaffFilterIdentity[] => {
 });
 
 const filterableEventTypes: readonly FilterableEventType[] = eventTypes.filter(
+  // Holidays and birthdays remain visible outside the manual event type filters.
   (type): type is FilterableEventType => type !== 'Holiday' && type !== 'Birthday'
 );
 
@@ -120,10 +122,12 @@ function getTypePillStyle(type: FilterableEventType): Record<string, string> {
 }
 
 function isStaffSelected(id: string): boolean {
+  // This UI uses one active staff filter at a time even though the shared filter model is array-based.
   return props.filters.staffIds[0] === id;
 }
 
 function isTypeSelected(type: FilterableEventType): boolean {
+  // Type pills also stay single-select so the header state remains easy to scan.
   return props.filters.types[0] === type;
 }
 

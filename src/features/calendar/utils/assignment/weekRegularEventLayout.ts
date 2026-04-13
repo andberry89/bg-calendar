@@ -22,6 +22,11 @@ export function useWeekRegularEventLayout({
   getEventKey,
   getEventRowSpan
 }: UseWeekRegularEventLayoutParams) {
+  // -------------------------
+  // Event placements
+  // -------------------------
+  // Collect each regular event once per week and track which days it appears on.
+  // Holiday events stay out of this step so they can keep their separate display order.
   const weekRegularEventPlacements = computed((): CalendarWeekRegularEventPlacement[][] => {
     return weekEvents.value.map((week) => {
       const eventBoundsByKey = new Map<
@@ -57,6 +62,8 @@ export function useWeekRegularEventLayout({
         });
       });
 
+      // Keep earlier events ahead of later ones so row placement stays stable.
+      // When two events cover the same days, fall back to the event key.
       const orderedEvents = Array.from(eventBoundsByKey.values()).sort((left, right) => {
         if (left.startDayIndex !== right.startDayIndex) {
           return left.startDayIndex - right.startDayIndex;
@@ -93,6 +100,10 @@ export function useWeekRegularEventLayout({
     });
   });
 
+  // -------------------------
+  // Lane plan
+  // -------------------------
+  // Keep each regular event in the same row for the full week.
   const weekRegularEventLanePlan = computed((): WeekRegularEventLanePlan[] => {
     return weekRegularEventPlacements.value.map((placements) => {
       const laneIndexByKey = new Map<string, { startRow: number; spanRows: number }>();
@@ -116,6 +127,11 @@ export function useWeekRegularEventLayout({
     });
   });
 
+  // -------------------------
+  // Ordered day events
+  // -------------------------
+  // Keep holidays first, then order regular events by their assigned row.
+  // This keeps the visible event order consistent from day to day.
   const orderedWeekEvents = computed((): AssignedCalendarEvent[][][] => {
     return weekEvents.value.map((week, weekIdx) => {
       const regularEventOrderIndex = new Map<string, number>();
@@ -140,6 +156,11 @@ export function useWeekRegularEventLayout({
     });
   });
 
+  // -------------------------
+  // Lane slots
+  // -------------------------
+  // Build the visible row slots for each day from the shared weekly row plan.
+  // Reserved slots keep taller events aligned even when a row has no card that day.
   const weekRegularEventLaneSlots = computed((): CalendarEventLaneSlot[][][] => {
     return weekEvents.value.map((week, weekIdx) => {
       const lanePlan = weekRegularEventLanePlan.value[weekIdx];

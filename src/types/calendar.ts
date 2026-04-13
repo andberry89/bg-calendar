@@ -1,13 +1,21 @@
-// Calendar navigation / date state
+// -------------------------
+// Calendar date state
+// -------------------------
+// Represents the month and year currently shown in the calendar, along with
+// the active day number within that view.
 export interface CurrentDate {
   date: number;
   month: number;
   year: number;
 }
 
+// Calendar event dates are stored as strings so the same value can move
+// cleanly between stores, services, and display helpers.
 export type CalendarDateString = string;
 
+// -------------------------
 // Staff
+// -------------------------
 export interface Staff {
   id: string;
   firstName: string;
@@ -23,9 +31,13 @@ export interface NewStaffInput {
   lastName: string;
 }
 
+// Describes the two supported staff mutations without splitting them into
+// separate payload shapes.
 export type StaffUpdatePayload = ['add', NewStaffInput] | ['remove', Staff];
 
+// -------------------------
 // Event taxonomy
+// -------------------------
 export type EventType =
   | 'Vacation'
   | 'Sick Time'
@@ -49,7 +61,9 @@ export type EventClass =
 
 export type HolidayClosure = '' | 'none' | 'half' | 'full';
 
+// -------------------------
 // Calendar events
+// -------------------------
 export interface CalendarEvent {
   id: string;
   class: EventClass;
@@ -61,6 +75,8 @@ export interface CalendarEvent {
   type: EventType;
 }
 
+// Adds display-only state used during calendar rendering without changing the
+// saved event shape.
 export interface AssignedCalendarEvent extends CalendarEvent {
   display: {
     startsToday: boolean;
@@ -71,6 +87,8 @@ export interface AssignedCalendarEvent extends CalendarEvent {
   };
 }
 
+// Represents one visible row in a day's event stack. Reserved slots keep
+// spanning events aligned even when no card is rendered in that row.
 export interface CalendarEventLaneSlot {
   event: AssignedCalendarEvent | null;
   spanRows: number;
@@ -82,7 +100,9 @@ export type CalendarEventDocument = Omit<CalendarEvent, 'id'>;
 export type NewCalendarEvent = CalendarEventDocument;
 export type EventsByYear = Record<string, CalendarEvent[]>;
 
-// Shared service/store results
+// -------------------------
+// Shared service and store results
+// -------------------------
 export interface MutationResult {
   success: boolean;
   message: string;

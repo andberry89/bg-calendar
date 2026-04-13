@@ -40,6 +40,7 @@ function closeModal(): void {
 }
 
 function emitStaffUpdate(payload: StaffUpdatePayload): void {
+  // Close after a successful staff action so the header stays the single entry point.
   emit('update', payload);
   closeModal();
 }

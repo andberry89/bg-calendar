@@ -11,6 +11,7 @@ export interface EventTypeConfig {
   pillBorder: string;
 }
 
+// Central source of truth for event-type requirements, reminders, and display styling.
 const eventTypeConfig: Readonly<Record<EventType, EventTypeConfig>> = {
   Vacation: {
     requiredFields: ['staff'],

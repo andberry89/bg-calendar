@@ -17,6 +17,7 @@ export function shouldShowSpecialDayReminder(type: DraftEventType): boolean {
   return showsSpecialDayReminder(type);
 }
 
+// Reminder shown for event types that require updating the Special Day Tracker.
 export function getSpecialDayReminder(type: DraftEventType): EventReminder | null {
   return shouldShowSpecialDayReminder(type) ? specialDayReminder : null;
 }

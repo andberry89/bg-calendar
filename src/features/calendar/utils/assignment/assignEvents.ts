@@ -23,6 +23,7 @@ const assignEvents = (
     const eventStart = toDate(event.start);
     const eventEnd = toDate(event.end);
 
+    // Only assign the portion of the event that appears within the current month.
     const visibleStart = eventStart > visibleMonthStart ? eventStart : visibleMonthStart;
     const visibleEnd = eventEnd < visibleMonthEnd ? eventEnd : visibleMonthEnd;
 

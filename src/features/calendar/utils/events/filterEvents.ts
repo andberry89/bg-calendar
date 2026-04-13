@@ -13,7 +13,9 @@ export const filterEvents = (events: CalendarEvent[], filters: EventFilters): Ca
     return events;
   }
 
+  // Filters events by type and staff while always keeping holidays visible.
   return events.filter((event) => {
+    // Holidays are always shown regardless of active filters.
     if (event.type === 'Holiday') {
       return true;
     }

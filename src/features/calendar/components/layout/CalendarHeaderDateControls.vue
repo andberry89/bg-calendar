@@ -29,6 +29,7 @@ const emit = defineEmits<{
 }>();
 
 function getMonthLabel(monthIndex: number): string {
+  // Short labels keep month navigation readable in the compact header controls.
   return month[monthIndex].substring(0, 3);
 }
 
@@ -59,6 +60,7 @@ function emitMonthChange(monthOffset: -1 | 1): void {
   const isDecemberToJanuary = currentDate.month === 11 && isNextMonth;
   const isJanuaryToDecember = currentDate.month === 0 && monthOffset === -1;
 
+  // Month jumps reset to the first day so date changes stay valid across shorter months.
   emit('date', {
     date: 1,
     month: isDecemberToJanuary ? 0 : isJanuaryToDecember ? 11 : currentDate.month + monthOffset,

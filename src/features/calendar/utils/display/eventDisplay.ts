@@ -22,6 +22,7 @@ function getHolidayClosureLabel(event: CalendarEvent): string {
   return '';
 }
 
+// Returns the text and emoji shown for an event in the calendar UI.
 export function getEventDisplayContent(
   event: CalendarEvent,
   options: EventDisplayOptions = {}

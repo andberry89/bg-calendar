@@ -122,6 +122,7 @@ interface VisibleStaffIdentity {
 }
 
 const visibleStaff = computed((): VisibleStaffIdentity[] => {
+  // Cap visible avatars so large staff groups do not crowd the modal header.
   return event.staff.slice(0, 3).map((person) => ({
     id: person.id,
     shortName: person.shortName,
@@ -174,6 +175,7 @@ function getStaffColorStyle(staffId: string): Record<string, string> {
 }
 
 function closeModal(): void {
+  // Reset delete confirmation so the modal always reopens in its default state.
   isConfirmingDelete.value = false;
   emit('update');
 }
@@ -187,6 +189,7 @@ function cancelEditModal(): void {
 }
 
 function saveEditModal(): void {
+  // Keep the details modal open after save so users stay on the same event.
   showEditModal.value = false;
   emit('update');
 }

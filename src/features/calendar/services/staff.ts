@@ -10,6 +10,7 @@ export const addStaff = async (person: NewStaffInput): Promise<MutationResult> =
     const lastInitial = lastName.charAt(0).toUpperCase();
     const initials = firstInitial + lastInitial;
     const shortName = firstInitial + '. ' + lastName;
+    // Use a normalized name-based ID so the same person cannot be added twice.
     const id = (firstName + '-' + lastName).toLowerCase();
 
     const docRef = doc(getStaffCollection(), id);

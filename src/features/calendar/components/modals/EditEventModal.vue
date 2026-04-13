@@ -39,6 +39,7 @@ const eventsStore = useEventsStore();
 const staffStore = useStaffStore();
 
 const editableEvent = ref<DraftCalendarEventInput>({
+  // Start from a draft copy so edits stay local until save succeeds.
   closed: event.closed,
   details: event.details,
   end: event.end,

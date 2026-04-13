@@ -95,6 +95,7 @@ const pillShape = computed((): EventPillShape => {
     return 'default';
   }
 
+  // Multi-day pills change shape so the span reads as one event across the week.
   const startsToday = display.startsToday === true;
   const endsToday = display.endsToday === true;
 
@@ -200,7 +201,7 @@ const eventDisplay = computed(() => {
 const primaryText = computed((): string => eventDisplay.value.primary);
 
 const secondaryText = computed((): string => {
-  // emoji stays separate for now to avoid UI changes
+  // Keep emoji on its own line so event pills keep the current text layout.
   if (eventDisplay.value.emoji) {
     return eventDisplay.value.emoji;
   }
