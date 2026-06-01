@@ -24,7 +24,8 @@ const eventClassByType: Record<EventType, EventClass> = {
   Vacation: 'vacation',
   'Sick Time': 'sick-time',
   Holiday: 'holiday',
-  Birthday: 'birthday'
+  Birthday: 'birthday',
+  'Summer Friday': 'summer-friday'
 };
 
 // Ensures a draft event has a valid type before creating a saved event.
