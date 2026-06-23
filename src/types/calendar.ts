@@ -47,7 +47,8 @@ export type EventType =
   | 'Birthday'
   | 'C/D Event'
   | 'Comp Day'
-  | 'Summer Friday';
+  | 'Summer Friday'
+  | 'Flex Day';
 
 export type EventClass =
   | ''
@@ -59,7 +60,8 @@ export type EventClass =
   | 'birthday'
   | 'cd-event'
   | 'comp-day'
-  | 'summer-friday';
+  | 'summer-friday'
+  | 'flex-day';
 
 export type HolidayClosure = '' | 'none' | 'half' | 'full';
 
