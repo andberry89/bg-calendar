@@ -89,8 +89,15 @@ export function getEventDisplayContent(
     case 'summer-friday':
       return {
         primary: staffDisplayName,
-        secondary: 'Summer Friday',
-        emoji: '☀️'
+        secondary: '☀️ Summer Friday',
+        emoji: ''
+      };
+
+    case 'flex-day':
+      return {
+        primary: staffDisplayName,
+        secondary: '🏠 Flex Day',
+        emoji: ''
       };
 
     default:

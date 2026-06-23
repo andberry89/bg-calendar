@@ -75,6 +75,13 @@ const eventTypeConfig: Readonly<Record<EventType, EventTypeConfig>> = {
     colorVar: '--event-type-summer-friday',
     pillBg: 'rgba(255, 193, 7, 0.16)',
     pillBorder: 'rgba(255, 193, 7, 0.3)'
+  },
+  'Flex Day': {
+    requiredFields: ['staff'],
+    showsSpecialDayReminder: false,
+    colorVar: '--event-type-flex-day',
+    pillBg: 'rgba(102, 126, 234, 0.16)',
+    pillBorder: 'rgba(102, 126, 234, 0.3)'
   }
 };
 
